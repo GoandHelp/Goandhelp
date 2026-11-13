@@ -60,7 +60,9 @@ class GuestMapLanguageRemovalTests(unittest.TestCase):
         self.assertIn("size-[43px]", utility_source)
         self.assertIn("text-white", utility_source)
 
-    def test_auth_wall_language_control_remains(self):
+    def test_auth_wall_language_control_is_removed(self):
+        from app.components.guest_map import guest_wall_auth_body
+
         auth_body_source = self._function_source("guest_wall_auth_body")
         imports = [
             node
@@ -68,10 +70,30 @@ class GuestMapLanguageRemovalTests(unittest.TestCase):
             if isinstance(node, ast.ImportFrom)
             and node.module == "app.components.language_control"
         ]
-        self.assertTrue(imports)
-        self.assertIn(
-            'language_control("guest-auth-language")', auth_body_source
-        )
+        self.assertFalse(imports)
+        self.assertNotIn("guest-auth-language", auth_body_source)
+        self.assertNotIn("language_control", auth_body_source)
+        self.assertIn("member_benefits_box()", auth_body_source)
+        self.assertIn('guest_wall_tab("Register", "register"', auth_body_source)
+        self.assertIn('guest_wall_tab("Sign in", "signin"', auth_body_source)
+        self.assertIn("register_form()", auth_body_source)
+        self.assertIn("sign_in_form()", auth_body_source)
+        self.assertIn("local_preview_button()", auth_body_source)
+        self.assertIn("legal_dialog()", auth_body_source)
+
+        function = self.functions["guest_wall_auth_body"]
+        returned = function.body[-1]
+        self.assertIsInstance(returned, ast.Return)
+        body_call = returned.value
+        self.assertIsInstance(body_call, ast.Call)
+        self.assertTrue(body_call.args)
+        first_child = body_call.args[0]
+        self.assertIsInstance(first_child, ast.Call)
+        self.assertEqual(first_child.func.id, "member_benefits_box")
+
+        rendered = str(guest_wall_auth_body())
+        self.assertTrue(rendered)
+        self.assertNotIn("guest-auth-language", rendered)
 
 
 if __name__ == "__main__":

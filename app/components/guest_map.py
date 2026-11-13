@@ -1,7 +1,6 @@
 import reflex as rx
 
 from app.interface_i18n import ui
-from app.components.language_control import language_control
 from app.components.auth_panel import (
     legal_dialog,
     local_preview_button,
@@ -84,7 +83,6 @@ def guest_wall_verification_body() -> rx.Component:
 def guest_wall_auth_body() -> rx.Component:
     """Normal acquisition state: benefits, tabs, forms and legal content."""
     return rx.el.div(
-        language_control("guest-auth-language"),
         member_benefits_box(),
         rx.el.div(
             guest_wall_tab("Register", "register", "user-round-plus"),
