@@ -263,10 +263,6 @@ def guest_utility_button(icon: str, label: str) -> rx.Component:
 
 def guest_control_stack() -> rx.Component:
     return rx.el.div(
-        rx.el.div(
-            language_control("guest-map-language"),
-            class_name="pointer-events-auto",
-        ),
         guest_utility_button("bell", "Notifications"),
         guest_utility_button("settings", "Settings"),
         aria_label=ui("Map"),
