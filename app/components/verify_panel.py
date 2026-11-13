@@ -131,8 +131,7 @@ def problem_actions() -> rx.Component:
         ),
         rx.el.a(
             rx.icon("arrow-left", class_name="h-4 w-4"),
-            ui("Back"),
-            ui("Map"),
+            ui("Back to map"),
             href="/",
             class_name="mt-4 w-fit flex items-center gap-2 rounded-full border border-[#d4d4d4] bg-white px-4 py-2.5 text-sm font-bold text-[#4b5563] transition-colors hover:border-[#e08b12] hover:text-[#b86e08]",
         ),

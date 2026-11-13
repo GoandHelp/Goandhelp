@@ -290,10 +290,36 @@ class AuthState(rx.State):
 
     @rx.var
     def localized_error(self) -> str:
+        first_name_error = (
+            f"First name must be {FIRST_NAME_MAX_LENGTH} characters or fewer."
+        )
+        family_name_error = (
+            f"Family name must be {FAMILY_NAME_MAX_LENGTH} characters or fewer."
+        )
+        if self.error == first_name_error:
+            return translate(
+                self.preferred_language,
+                "First name must be {limit} characters or fewer.",
+            ).format(limit=FIRST_NAME_MAX_LENGTH)
+        if self.error == family_name_error:
+            return translate(
+                self.preferred_language,
+                "Family name must be {limit} characters or fewer.",
+            ).format(limit=FAMILY_NAME_MAX_LENGTH)
         return translate(self.preferred_language, self.error)
 
     @rx.var
     def localized_success(self) -> str:
+        preview_name = self.display_name or self.email
+        preview_message = (
+            f"Local preview only — signed in as {preview_name} "
+            "without changing any account."
+        )
+        if self.success == preview_message:
+            return translate(
+                self.preferred_language,
+                "Local preview only — signed in as {name} without changing any account.",
+            ).format(name=preview_name)
         greeting = f"Good to see you again, {self.display_name}."
         if self.success in (greeting, f"{greeting} {UNVERIFIED_BYPASS_NOTE}"):
             text = translate(
@@ -496,7 +522,10 @@ class AuthState(rx.State):
             self.forgot_note = (
                 RESET_THROTTLED_NOTE if throttled else RESET_GENERIC_NOTE
             )
-        yield rx.toast(RESET_GENERIC_NOTE, duration=6000)
+            notification = translate(
+                self.preferred_language, RESET_GENERIC_NOTE
+            )
+        yield rx.toast(notification, duration=6000)
 
     @rx.var
     def is_signed_in(self) -> bool:
@@ -682,7 +711,10 @@ class AuthState(rx.State):
             async with self:
                 self.error = LOCAL_PREVIEW_ONLY_NOTE
                 self.success = ""
-            yield rx.toast(LOCAL_PREVIEW_ONLY_NOTE, duration=5000)
+                notification = translate(
+                    self.preferred_language, LOCAL_PREVIEW_ONLY_NOTE
+                )
+            yield rx.toast(notification, duration=5000)
             return
         async with self:
             self.is_busy = True
@@ -739,10 +771,12 @@ class AuthState(rx.State):
                 "Local preview only — signed in as "
                 f"{row[2] or row[1]} without changing any account."
             )
-        yield rx.toast(
-            "Local preview only: production email verification is unchanged.",
-            duration=4000,
-        )
+        async with self:
+            notification = translate(
+                self.preferred_language,
+                "Local preview only: production email verification is unchanged.",
+            )
+        yield rx.toast(notification, duration=4000)
         from app.states.membership_state import MembershipState
         from app.states.profile_state import ProfileState
 
@@ -1233,7 +1267,10 @@ VALUES (:sid, 1, '', :answers, '{}', 0)
             await asession.commit()
         async with self:
             self.help_mode = mode
-        yield rx.toast("Participation mode updated.", duration=2500)
+            notification = translate(
+                self.preferred_language, "Participation mode updated."
+            )
+        yield rx.toast(notification, duration=2500)
 
     @rx.event(background=True)
     async def update_language(self, language: str):

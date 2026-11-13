@@ -32,6 +32,10 @@ from app.interface_catalog_settings_notifications import (
 from app.interface_catalog_reviews import REVIEW_CATALOGS, REVIEW_KEYS
 from app.interface_catalog_map import MAP_COPY_CATALOGS, MAP_COPY_KEYS
 from app.interface_catalog_auth import AUTH_COPY_CATALOGS, AUTH_COPY_KEYS
+from app.interface_catalog_auth_feedback import (
+    AUTH_FEEDBACK_CATALOGS,
+    AUTH_FEEDBACK_KEYS,
+)
 from app.interface_catalog_tour import TOUR_COPY_CATALOGS, TOUR_COPY_KEYS
 from app.interface_catalog_onboarding import (
     EXTRA_TITLE_ROWS,
@@ -412,18 +416,25 @@ for _language, _entries in TOUR_COPY_CATALOGS.items():
     for _key, _value in _entries.items():
         CATALOGS[_language].setdefault(_key, _value)
 
-for _language, _entries in STORY_CATALOGS.items():
-    CATALOGS[_language].update(_entries)
-    CATALOGS[_language].update(ENTRY_CATALOGS[_language])
-    CATALOGS[_language].update(CONFIRMATION_CATALOGS[_language])
-    CATALOGS[_language].update(ENTRY_FEEDBACK_CATALOGS[_language])
-    CATALOGS[_language].update(ENTRY_TEMPLATE_CATALOGS[_language])
-    CATALOGS[_language][
+for language, entries in STORY_CATALOGS.items():
+    CATALOGS[language].update(entries)
+    CATALOGS[language].update(ENTRY_CATALOGS[language])
+    CATALOGS[language].update(CONFIRMATION_CATALOGS[language])
+    CATALOGS[language].update(ENTRY_FEEDBACK_CATALOGS[language])
+    CATALOGS[language].update(ENTRY_TEMPLATE_CATALOGS[language])
+    CATALOGS[language][
         "This reset link has already been used or has expired. Request a fresh one from the sign-in panel."
-    ] = f"{ENTRY_CATALOGS[_language]['This reset link has already been used or has expired.']} {ENTRY_CATALOGS[_language]['Back to sign in']}"
-    CATALOGS[_language]["Back to sign-in"] = ENTRY_CATALOGS[_language][
+    ] = f"{ENTRY_CATALOGS[language]['This reset link has already been used or has expired.']} {ENTRY_CATALOGS[language]['Back to sign in']}"
+    CATALOGS[language]["Back to sign-in"] = ENTRY_CATALOGS[language][
         "Back to sign in"
     ]
+
+for _language, _entries in AUTH_FEEDBACK_CATALOGS.items():
+    for _key, _value in _entries.items():
+        CATALOGS[_language].setdefault(_key, _value)
+
+for _key, _value in ENTRY_FEEDBACK_CATALOGS["ha"].items():
+    CATALOGS["ha"].setdefault(_key, _value)
 
 for _language, _row in EXTRA_TITLE_ROWS.items():
     CATALOGS[_language].update(
@@ -512,6 +523,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *ONBOARDING_TITLE_KEYS,
             *MAP_COPY_KEYS,
             *AUTH_COPY_KEYS,
+            *AUTH_FEEDBACK_KEYS,
             *TOUR_COPY_KEYS,
             *STORY_KEYS,
             *ENTRY_KEYS,
