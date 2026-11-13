@@ -83,10 +83,11 @@ class AuthAccountFeedbackTranslationTests(unittest.TestCase):
             "That reset link is incomplete. Please request a new one from the sign-in panel.",
             "This reset link has already been used or has expired. Request a fresh one from the sign-in panel.",
         )
+        offered = {code for code, _label in LANGUAGE_OPTIONS if code != "en"}
         for source in already_complete:
             with self.subTest(source=source):
                 self.assertNotIn(source, AUTH_FEEDBACK_KEYS)
-                for locale in EXPECTED_AUTH_FEEDBACK_LOCALES:
+                for locale in offered:
                     self.assertTrue(CATALOGS[locale][source].strip())
                     self.assertNotEqual(translate(locale, source), source)
 

@@ -43,9 +43,14 @@ class EntryTranslationCoverageTests(unittest.TestCase):
         self.assertEqual(len(offered), 36)
         for keys, catalogs in GROUPS:
             self.assertEqual(len(keys), len(set(keys)))
-            self.assertEqual(set(catalogs), offered)
+            expected_locales = (
+                offered | {"ha"}
+                if catalogs is ENTRY_FEEDBACK_CATALOGS
+                else offered
+            )
+            self.assertEqual(set(catalogs), expected_locales)
             self.assertTrue(set(keys) <= set(COMPLETE_KEYS))
-            for code in offered:
+            for code in expected_locales:
                 with self.subTest(locale=code, group=keys[0]):
                     self.assertEqual(set(catalogs[code]), set(keys))
                     for key in keys:

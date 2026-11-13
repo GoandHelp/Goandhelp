@@ -1,3 +1,8 @@
+from app.interface_catalog_legal_east_asian import LEGAL_EAST_ASIAN_ROWS
+from app.interface_catalog_legal_european_a import LEGAL_EUROPEAN_A_ROWS
+from app.interface_catalog_legal_european_b import LEGAL_EUROPEAN_B_ROWS
+from app.interface_catalog_legal_south_asian_a import LEGAL_SOUTH_ASIAN_A_ROWS
+from app.interface_catalog_legal_south_asian_b import LEGAL_SOUTH_ASIAN_B_ROWS
 from app.models import LANGUAGE_OPTIONS
 
 LEGAL_KEYS: tuple[str, ...] = (
@@ -10,7 +15,7 @@ LEGAL_KEYS: tuple[str, ...] = (
     "Go and Help uses a small number of essential cookies and local storage entries to keep you signed in, remember your language and protect the sign-in form from abuse. We use privacy-friendly, aggregated measurement to understand which features members use, and no advertising or cross-site tracking cookies. Clearing your browser storage signs you out and resets these preferences.",
 )
 
-LEGAL_ROWS: dict[str, tuple[str, ...]] = {
+_EXISTING_LEGAL_ROWS: dict[str, tuple[str, ...]] = {
     "es": (
         "Políticas legales de Go and Help",
         "Términos y condiciones",
@@ -84,6 +89,31 @@ LEGAL_ROWS: dict[str, tuple[str, ...]] = {
         "Go and Help tana amfani da ƴan kukis masu muhimmanci da ajiyar na’ura don kiyaye shigarka, tuna harshenka da kare fom ɗin shiga daga amfani ba daidai ba. Muna amfani da ma’auni na jimilla masu kula da sirri don fahimtar fasalolin da ake amfani da su; babu tallace-tallace ko kukis na bin sawu tsakanin shafuka. Share ajiyar burauza zai fitar da kai kuma ya sake saita zaɓuɓɓukan.",
     ),
 }
+
+_LEGAL_PARTS: tuple[dict[str, tuple[str, ...]], ...] = (
+    LEGAL_EUROPEAN_A_ROWS,
+    LEGAL_EUROPEAN_B_ROWS,
+    LEGAL_SOUTH_ASIAN_A_ROWS,
+    LEGAL_SOUTH_ASIAN_B_ROWS,
+    LEGAL_EAST_ASIAN_ROWS,
+)
+_LEGAL_PART_LOCALES = [locale for part in _LEGAL_PARTS for locale in part]
+if len(_LEGAL_PART_LOCALES) != len(set(_LEGAL_PART_LOCALES)):
+    raise ValueError("Legal translation locale groups must be disjoint")
+if set(_LEGAL_PART_LOCALES) & set(_EXISTING_LEGAL_ROWS):
+    raise ValueError("New legal locale groups must not replace legacy rows")
+
+_EXPECTED_LEGAL_LOCALES = {
+    code for code, _label in LANGUAGE_OPTIONS if code != "en"
+} | {"ha"}
+LEGAL_ROWS: dict[str, tuple[str, ...]] = {
+    **_EXISTING_LEGAL_ROWS,
+    **{locale: row for part in _LEGAL_PARTS for locale, row in part.items()},
+}
+if set(LEGAL_ROWS) != _EXPECTED_LEGAL_LOCALES:
+    raise ValueError("Legal translation locales do not match supported locales")
+if any(len(row) != len(LEGAL_KEYS) for row in LEGAL_ROWS.values()):
+    raise ValueError("Every legal translation must provide all seven sources")
 
 LEGAL_CATALOGS: dict[str, dict[str, str]] = {
     language: dict(zip(LEGAL_KEYS, row, strict=True))
