@@ -12,10 +12,10 @@ from app.components.header import BRAND_LOGO_SRC, BRAND_LOGO_ALT
 
 LOGO_SRC = BRAND_LOGO_SRC
 
-# Compact icon-only dock: no labels, just the icon slot centred in the column.
+# Compact labeled dock with the icon slot centred above each label.
 ITEM_BASE = (
     "gah-dock-control gah-nav-item flex w-full min-w-0 mx-auto flex-col "
-    "items-center justify-center gap-0 rounded-xl px-0.5 "
+    "items-center justify-center gap-[2px] rounded-xl px-0.5 "
     "h-[3.25rem] select-none transition-colors focus:outline-hidden "
     "border-0 shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#fba922]"
 )
@@ -44,6 +44,10 @@ def nav_button(
             ),
             activity_dot(unread),
             class_name="relative flex h-[33px] w-[33px] items-center justify-center",
+        ),
+        rx.el.span(
+            ui(label),
+            class_name="max-w-full shrink-0 whitespace-nowrap text-center text-[0.6875rem] leading-[12px] font-medium",
         ),
         type="button",
         title=ui(label),
@@ -81,6 +85,10 @@ def profile_button() -> rx.Component:
                 ),
             ),
             class_name="gah-profile-avatar-slot relative flex size-[36px] min-w-[36px] min-h-[36px] aspect-square shrink-0 rounded-full overflow-visible items-center justify-center",
+        ),
+        rx.el.span(
+            ui("Profile"),
+            class_name="max-w-full shrink-0 whitespace-nowrap text-center text-[0.6875rem] leading-[12px] font-medium",
         ),
         type="button",
         title=ui("Profile"),
