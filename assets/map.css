@@ -1,0 +1,100 @@
+/* Compact, glassy Windy-style treatment for the MapLibre chrome. */
+.maplibregl-ctrl-group {
+  background: rgba(255, 250, 240, 0.86) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(184, 167, 255, 0.85) !important;
+  border-radius: 999px !important;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+
+.maplibregl-ctrl-group button {
+  width: 34px !important;
+  height: 34px !important;
+  background: transparent !important;
+}
+
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid rgba(184, 167, 255, 0.6) !important;
+}
+
+.maplibregl-ctrl-group button:hover {
+  background: rgba(229, 221, 255, 0.9) !important;
+}
+
+/* No compass / north indicator anywhere. */
+.maplibregl-ctrl-compass,
+.maplibregl-compact-show .maplibregl-ctrl-compass {
+  display: none !important;
+}
+
+.maplibregl-ctrl-attrib {
+  background: rgba(255, 250, 240, 0.82) !important;
+  border-radius: 999px 0 0 0 !important;
+  font-size: 10px !important;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: #35406f !important;
+}
+
+.maplibregl-ctrl-bottom-left,
+.maplibregl-ctrl-top-left {
+  z-index: 10;
+}
+
+@media (max-width: 640px) {
+  .maplibregl-ctrl-top-left {
+    margin-top: 3.25rem;
+  }
+}
+
+/* Bottom dock items: tactile 300ms grow-then-shrink press pulse. */
+@keyframes gah-press-pulse {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.16);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.gah-nav-item {
+  transition: background-color 200ms ease, color 200ms ease;
+  transform-origin: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.gah-nav-item:active {
+  animation: gah-press-pulse 300ms ease-out;
+}
+
+.gah-nav-item:active,
+.gah-nav-item:active * {
+  color: #000000 !important;
+}
+
+.gah-nav-item:active svg {
+  stroke: #000000 !important;
+}
+
+/* Member sections (My profile, Help, Community, Inbox): a white page canvas
+   with cream paper containers, and slightly less curved bounding boxes.
+   Compact pills, avatars, buttons and circles keep their own radii. */
+.gah-member-section [class~="rounded-[2rem]"] {
+  border-radius: 20px !important;
+}
+
+.gah-member-section [class~="rounded-3xl"] {
+  border-radius: 16px !important;
+}
+
+.gah-member-section [class~="rounded-t-[2rem]"] {
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+}
+

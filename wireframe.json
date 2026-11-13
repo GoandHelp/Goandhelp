@@ -1,0 +1,374 @@
+{
+  "version": 4,
+  "app_title": "SkillKind Travel Help Marketplace Plan",
+  "nav": {
+    "placement": "none",
+    "items": []
+  },
+  "pages": [
+    {
+      "id": "page-2ce927a5",
+      "name": "Registration and Profile",
+      "route": "/profile",
+      "item_ref": {
+        "index": 2,
+        "text": "Rework the Profile screen header, nationality flag and combined five-star review rating; simplify editable fields and apply the requested purple Save treatment."
+      },
+      "blocks": [
+        {
+          "id": "nav-sidebar-profile",
+          "type": "sidebar",
+          "label": "Sidebar",
+          "hint": "Registration and Profile, Post Help Request, Local Job Map, Messages, Reviews, Backend Activity",
+          "x": 0,
+          "y": 0,
+          "w": 3,
+          "h": 6,
+          "item_ref": {
+            "index": 2,
+            "text": "Rework the Profile screen header, nationality flag and combined five-star review rating; simplify editable fields and apply the requested purple Save treatment."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "header-profile",
+          "type": "header",
+          "label": "SkillKind header",
+          "hint": "Warm travel-help branding, profile navigation, role status",
+          "x": 3,
+          "y": 0,
+          "w": 9,
+          "h": 1,
+          "item_ref": {
+            "index": 2,
+            "text": "Rework the Profile screen header, nationality flag and combined five-star review rating; simplify editable fields and apply the requested purple Save treatment."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "profile-tabs",
+          "type": "tabs",
+          "label": "Help / Receive profile tabs",
+          "hint": "Choose helper, receiver, or both and edit profile details",
+          "x": 3,
+          "y": 1,
+          "w": 5,
+          "h": 5,
+          "item_ref": {
+            "index": 2,
+            "text": "Rework the Profile screen header, nationality flag and combined five-star review rating; simplify editable fields and apply the requested purple Save treatment."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "profile-form",
+          "type": "form",
+          "label": "Profile details form",
+          "hint": "Name, location, local area, skills, availability, profile summary",
+          "x": 8,
+          "y": 1,
+          "w": 4,
+          "h": 5,
+          "item_ref": {
+            "index": 2,
+            "text": "Rework the Profile screen header, nationality flag and combined five-star review rating; simplify editable fields and apply the requested purple Save treatment."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "profile-activity",
+          "type": "list",
+          "label": "Activity summary",
+          "hint": "Posted help, accepted jobs, completed exchanges, review average",
+          "x": 0,
+          "y": 6,
+          "w": 9,
+          "h": 3,
+          "item_ref": {
+            "index": 2,
+            "text": "Rework the Profile screen header, nationality flag and combined five-star review rating; simplify editable fields and apply the requested purple Save treatment."
+          },
+          "type_source": "palette"
+        }
+      ],
+      "deleted_ids": []
+    },
+    {
+      "id": "page-c59bc33d",
+      "name": "Post Help Request",
+      "route": "/post-help",
+      "item_ref": {
+        "index": 3,
+        "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+      },
+      "blocks": [
+        {
+          "id": "nav-sidebar-post-help",
+          "type": "sidebar",
+          "label": "Sidebar",
+          "hint": "Registration and Profile, Post Help Request, Local Job Map, Messages, Reviews, Backend Activity",
+          "x": 0,
+          "y": 0,
+          "w": 3,
+          "h": 6,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "header-post",
+          "type": "header",
+          "label": "SkillKind header",
+          "hint": "Branding and navigation back to profile/map",
+          "x": 3,
+          "y": 0,
+          "w": 9,
+          "h": 1,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "task-form",
+          "type": "form",
+          "label": "Task category descriptions",
+          "hint": "Hands on, Heavy labour, Teaching, Health text inputs",
+          "x": 3,
+          "y": 1,
+          "w": 4,
+          "h": 6,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "reward-form",
+          "type": "form",
+          "label": "Reward details",
+          "hint": "Lunch, dinner, accommodation, guided tours, workshops, lessons, other descriptions",
+          "x": 7,
+          "y": 1,
+          "w": 4,
+          "h": 6,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "schedule-form",
+          "type": "form",
+          "label": "Location and schedule",
+          "hint": "Name, place, date, time, submit help request",
+          "x": 0,
+          "y": 7,
+          "w": 9,
+          "h": 3,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        }
+      ],
+      "deleted_ids": []
+    },
+    {
+      "id": "page-cc46e087",
+      "name": "Local Job Map",
+      "route": "/map",
+      "item_ref": {
+        "index": 3,
+        "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+      },
+      "blocks": [
+        {
+          "id": "nav-sidebar-map",
+          "type": "sidebar",
+          "label": "Sidebar",
+          "hint": "Registration and Profile, Post Help Request, Local Job Map, Messages, Reviews, Backend Activity",
+          "x": 0,
+          "y": 0,
+          "w": 3,
+          "h": 7,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "header-map",
+          "type": "header",
+          "label": "SkillKind header",
+          "hint": "Map search navigation and profile shortcut",
+          "x": 3,
+          "y": 0,
+          "w": 9,
+          "h": 1,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "map-filters",
+          "type": "form",
+          "label": "Discovery filters",
+          "hint": "Category, reward, date, distance, accepted/open status",
+          "x": 3,
+          "y": 1,
+          "w": 2,
+          "h": 7,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "job-map",
+          "type": "map",
+          "label": "Nearby help posts map",
+          "hint": "Small category icons for Hands on, Heavy labour, Teaching, Health",
+          "x": 5,
+          "y": 1,
+          "w": 4,
+          "h": 7,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "job-details",
+          "type": "text",
+          "label": "Selected job details",
+          "hint": "Task description, reward, time, poster info, accept button",
+          "x": 9,
+          "y": 1,
+          "w": 2,
+          "h": 7,
+          "item_ref": {
+            "index": 3,
+            "text": "Verify signed-in map controls, full-screen section navigation, profile calculations, and responsive rendering."
+          },
+          "type_source": "palette"
+        }
+      ],
+      "deleted_ids": []
+    },
+    {
+      "id": "page-625d2d89",
+      "name": "Messages, Reviews, Backend Activity",
+      "route": "/activity",
+      "item_ref": {
+        "index": 4,
+        "text": "Build the Get Help flow with the requested fields, 2,000-character validation, and up to five automatically resized and compressed photos capped at 1 MB each."
+      },
+      "blocks": [
+        {
+          "id": "nav-sidebar-activity",
+          "type": "sidebar",
+          "label": "Sidebar",
+          "hint": "Registration and Profile, Post Help Request, Local Job Map, Messages, Reviews, Backend Activity",
+          "x": 0,
+          "y": 0,
+          "w": 3,
+          "h": 6,
+          "item_ref": {
+            "index": 4,
+            "text": "Build the Get Help flow with the requested fields, 2,000-character validation, and up to five automatically resized and compressed photos capped at 1 MB each."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "header-activity",
+          "type": "header",
+          "label": "SkillKind header",
+          "hint": "Conversation, reviews, and backend activity navigation",
+          "x": 3,
+          "y": 0,
+          "w": 9,
+          "h": 1,
+          "item_ref": {
+            "index": 4,
+            "text": "Build the Get Help flow with the requested fields, 2,000-character validation, and up to five automatically resized and compressed photos capped at 1 MB each."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "conversation-list",
+          "type": "list",
+          "label": "Conversation list",
+          "hint": "Accepted jobs and active message threads",
+          "x": 3,
+          "y": 1,
+          "w": 2,
+          "h": 5,
+          "item_ref": {
+            "index": 4,
+            "text": "Build the Get Help flow with the requested fields, 2,000-character validation, and up to five automatically resized and compressed photos capped at 1 MB each."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "message-thread",
+          "type": "chat",
+          "label": "Message thread",
+          "hint": "Helper and poster conversation with completion action",
+          "x": 5,
+          "y": 1,
+          "w": 4,
+          "h": 5,
+          "item_ref": {
+            "index": 4,
+            "text": "Build the Get Help flow with the requested fields, 2,000-character validation, and up to five automatically resized and compressed photos capped at 1 MB each."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "review-form",
+          "type": "form",
+          "label": "Reciprocal review form",
+          "hint": "Description box and 1–5 stars for both worker and poster",
+          "x": 9,
+          "y": 1,
+          "w": 3,
+          "h": 5,
+          "item_ref": {
+            "index": 4,
+            "text": "Build the Get Help flow with the requested fields, 2,000-character validation, and up to five automatically resized and compressed photos capped at 1 MB each."
+          },
+          "type_source": "palette"
+        },
+        {
+          "id": "backend-table",
+          "type": "table",
+          "label": "Subscriber activity backend",
+          "hint": "Subscribers, posts, acceptances, messages, reviews, status",
+          "x": 0,
+          "y": 6,
+          "w": 9,
+          "h": 4,
+          "item_ref": {
+            "index": 4,
+            "text": "Build the Get Help flow with the requested fields, 2,000-character validation, and up to five automatically resized and compressed photos capped at 1 MB each."
+          },
+          "type_source": "palette"
+        }
+      ],
+      "deleted_ids": []
+    }
+  ],
+  "attached_to_plan": false
+}

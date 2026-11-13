@@ -1,0 +1,253 @@
+html.dark,
+html.dark body,
+html.dark #root {
+  color-scheme: dark;
+  background: #090b0f !important;
+  color: #e7ebf0;
+}
+
+html.dark #root > main:not(.gah-app-shell),
+html.dark .gah-app-shell,
+html.dark .gah-member-section {
+  background: #090b0f !important;
+  color: #e7ebf0 !important;
+}
+
+html.dark #root [class~="bg-white"],
+html.dark #root [class~="bg-[#ffffff]"],
+html.dark #root [class~="bg-[#fff]"],
+html.dark #root [class~="bg-gray-50"],
+html.dark #root [class~="bg-slate-50"],
+html.dark #root [class~="bg-zinc-50"],
+html.dark [data-radix-popper-content-wrapper] [class~="bg-white"],
+html.dark [data-radix-popper-content-wrapper] [class~="bg-[#ffffff]"],
+html.dark [role="dialog"] [class~="bg-white"],
+html.dark [role="dialog"] [class~="bg-[#ffffff]"],
+html.dark .rt-DialogContent,
+html.dark .rt-PopoverContent,
+html.dark .rt-SelectContent {
+  background-color: #15191f !important;
+}
+
+html.dark #root [class~="bg-[#fff7e8]"],
+html.dark #root [class~="bg-[#fff7e8]/20"],
+html.dark #root [class~="bg-[#fff7e8]/40"],
+html.dark #root [class~="bg-[#fff7e8]/50"],
+html.dark #root [class~="bg-[#fff7e8]/60"],
+html.dark #root [class~="bg-[#fff7e8]/70"],
+html.dark #root [class~="bg-[#fff7e8]/80"],
+html.dark #root [class~="bg-[#fff7e8]/90"],
+html.dark #root [class~="bg-[#fff0d6]"],
+html.dark #root [class~="bg-[#eaf2ff]"],
+html.dark #root [class~="bg-[#ffedcc]"],
+html.dark #root [class~="bg-[#f5f5f5]"],
+html.dark #root [class~="bg-[#e5e5e5]"],
+html.dark #root [class~="bg-[#fffaf0]"],
+html.dark #root [class~="bg-[#fff8ed]"],
+html.dark #root [class~="bg-[#fff5e6]"],
+html.dark #root [class~="bg-[#f9fafb]"],
+html.dark #root [class~="bg-[#f8fafc]"],
+html.dark #root [class~="bg-[#f3f4f6]"],
+html.dark [data-radix-popper-content-wrapper] [class~="bg-[#fff7e8]"],
+html.dark [role="dialog"] [class~="bg-[#fff7e8]"] {
+  background-color: #20262e !important;
+}
+
+html.dark #root [class~="bg-white/20"],
+html.dark #root [class~="bg-white/40"],
+html.dark #root [class~="bg-white/50"],
+html.dark #root [class~="bg-white/60"],
+html.dark #root [class~="bg-white/70"],
+html.dark #root [class~="bg-white/80"],
+html.dark #root [class~="bg-white/90"],
+html.dark #root [class~="bg-[#ffffff]/20"],
+html.dark #root [class~="bg-[#ffffff]/60"],
+html.dark #root [class~="bg-[#ffffff]/90"],
+html.dark .gah-search-drawer,
+html.dark #map-settings-sheet,
+html.dark #map-notifications-sheet,
+html.dark .gah-bottom-dock {
+  background-color: rgb(21 25 31 / 82%) !important;
+  background-image: none !important;
+  backdrop-filter: blur(14px);
+}
+
+html.dark #root [class~="text-black"],
+html.dark #root [class~="text-[#000000]"],
+html.dark #root [class~="text-[#111827]"],
+html.dark #root [class~="text-[#1f2937]"],
+html.dark #root [class~="text-[#374151]"],
+html.dark #root [class~="text-[#404040]"],
+html.dark #root [class~="text-gray-900"],
+html.dark #root [class~="text-gray-800"],
+html.dark #root [class~="text-slate-900"],
+html.dark #root [class~="text-slate-800"],
+html.dark [data-radix-popper-content-wrapper] [class~="text-black"],
+html.dark [data-radix-popper-content-wrapper] [class~="text-[#111827]"],
+html.dark [role="dialog"] [class~="text-black"],
+html.dark [role="dialog"] [class~="text-[#111827]"] {
+  color: #e7ebf0 !important;
+}
+
+html.dark #root [class~="text-[#4b5563]"],
+html.dark #root [class~="text-[#6b7280]"],
+html.dark #root [class~="text-[#737373]"],
+html.dark #root [class~="text-gray-600"],
+html.dark #root [class~="text-gray-500"],
+html.dark #root [class~="text-slate-600"],
+html.dark #root [class~="text-slate-500"],
+html.dark #root [class~="text-zinc-600"],
+html.dark #root [class~="text-zinc-500"],
+html.dark [data-radix-popper-content-wrapper] [class~="text-[#4b5563]"],
+html.dark [role="dialog"] [class~="text-[#4b5563]"] {
+  color: #a4adb8 !important;
+}
+
+html.dark #root [class~="text-[#b86e08]"],
+html.dark #root [class~="text-[#e08b12]"],
+html.dark #root [class~="text-[#fba922]"],
+html.dark #root [class~="text-[#f59e0b]"] {
+  color: #f6b84b !important;
+}
+
+html.dark #root :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select),
+html.dark [data-radix-popper-content-wrapper] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select),
+html.dark [role="dialog"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select) {
+  color: #e7ebf0 !important;
+  background-color: #15191f !important;
+  border-color: #424a55 !important;
+  caret-color: #fba922;
+  color-scheme: dark;
+}
+
+html.dark #root :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select)::placeholder,
+html.dark [data-radix-popper-content-wrapper] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select)::placeholder,
+html.dark [role="dialog"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select)::placeholder {
+  color: #9aa4b0 !important;
+  opacity: 1;
+}
+
+html.dark #root option,
+html.dark [role="dialog"] option {
+  color: #e7ebf0;
+  background: #15191f;
+}
+
+html.dark #root [class*="border-[#d4d4d4]"],
+html.dark #root [class*="border-[#d1d5db]"],
+html.dark #root [class*="border-[#e5e5e5]"],
+html.dark #root [class*="border-[#e5e7eb]"],
+html.dark #root [class*="border-[#c6d2e8]"],
+html.dark #root [class~="border-gray-200"],
+html.dark #root [class~="border-gray-300"],
+html.dark [data-radix-popper-content-wrapper] [class*="border-[#d4d4d4]"],
+html.dark [role="dialog"] [class*="border-[#d4d4d4]"] {
+  border-color: #343b45 !important;
+}
+
+html.dark #root [class*="border-[#f7d9a0]"],
+html.dark #root [class*="border-[#f6c66f]"],
+html.dark #root [class*="border-[#fff7e8]"] {
+  border-color: #5b4930 !important;
+}
+
+html.dark #root :is(button, a, summary):not([class~="bg-[#fba922]"]):not([class~="bg-[#e08b12]"]):not(.gah-brand-home):hover {
+  --tw-ring-color: #fba922;
+}
+
+html.dark #root [class~="bg-[#fba922]"] {
+  color: #111827 !important;
+}
+
+html.dark #root [class~="bg-[#e08b12]"],
+html.dark #root [class~="bg-[#b86e08]"] {
+  color: #ffffff !important;
+}
+
+html.dark #root [class~="bg-[#fba922]"] :is([class~="text-black"], [class~="text-[#111827]"], [class~="text-[#404040]"]),
+html.dark #root [class~="bg-[#e08b12]"][class~="text-black"],
+html.dark #root [class~="bg-[#e08b12]"][class~="text-[#111827]"],
+html.dark #root [class~="bg-[#b86e08]"][class~="text-black"],
+html.dark #root [class~="bg-[#b86e08]"][class~="text-[#111827]"] {
+  color: #111827 !important;
+}
+
+html.dark #root [class*="bg-linear-to-bl"] {
+  background-color: #090b0f !important;
+  background-image: none !important;
+}
+
+html.dark .gah-community-context-header {
+  background-color: #15191f !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+}
+
+html.dark .gah-community-sticky-header::before {
+  background: inherit !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  opacity: 1 !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+html.dark .gah-community-context-header::after {
+  background: #15191f !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  opacity: 1 !important;
+  mask-image: none !important;
+  -webkit-mask-image: none !important;
+}
+
+html.dark .gah-app-shell .gah-member-section,
+html.dark .gah-app-shell .gah-main-card,
+html.dark .gah-app-shell .gah-card,
+html.dark .gah-app-shell .gah-inset-row,
+html.dark .gah-app-shell .gah-chat-composer,
+html.dark .gah-app-shell .gah-compose-body,
+html.dark .gah-app-shell .gah-profile-screen,
+html.dark .gah-app-shell .gah-profile-row,
+html.dark .gah-app-shell .gah-profile-membership,
+html.dark .gah-app-shell .gah-edge-stack,
+html.dark .gah-app-shell .gah-search-drawer,
+html.dark .gah-app-shell #map-settings-sheet,
+html.dark .gah-app-shell #map-notifications-sheet,
+html.dark .gah-app-shell .gah-bottom-dock {
+  background-color: #15191f !important;
+  color: #e7ebf0 !important;
+  border-color: #343b45 !important;
+  box-shadow: none !important;
+}
+
+html.dark .gah-app-shell .gah-inset-row,
+html.dark .gah-app-shell .gah-edge-stack > :is(article, li, button, details, section, div) + :is(article, li, button, details, section, div) {
+  border-color: #343b45 !important;
+}
+
+html.dark .gah-app-shell .gah-primary-outline,
+html.dark .gah-app-shell .gah-setting-choice[aria-checked="true"] {
+  background-color: #20262e !important;
+  color: #f1f3f5 !important;
+}
+
+
+html.dark :is([data-radix-popper-content-wrapper], [role="dialog"], .rt-DialogContent, .rt-PopoverContent, .rt-SelectContent) {
+  color: #e7ebf0 !important;
+  border-color: #343b45 !important;
+}
+
+html.dark :is([data-radix-popper-content-wrapper], [role="dialog"]) [class~="bg-[#fff7e8]"] {
+  background-color: #20262e !important;
+}
+
+html.dark #root :is(img, picture, video, canvas, .maplibregl-map, .maplibregl-canvas, .maplibregl-marker, .maplibregl-ctrl) {
+  filter: none !important;
+}
+
+html.dark #root :is(button, a, input, textarea, select, summary):focus-visible,
+html.dark [role="dialog"] :is(button, a, input, textarea, select, summary):focus-visible {
+  outline-color: #fba922 !important;
+  --tw-ring-color: #fba922 !important;
+}

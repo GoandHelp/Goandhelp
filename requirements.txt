@@ -1,0 +1,13 @@
+
+reflex[db]==0.10.0
+reflex-enterprise>=0.9.7
+psycopg[binary]>=3.1.8
+resend
+pillow
+stripe
+global-land-mask
+numpy
+PyGithub
+playwright
+faker
+starlette

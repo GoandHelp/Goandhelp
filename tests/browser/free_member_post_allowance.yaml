@@ -1,0 +1,22 @@
+name: free_member_post_allowance
+description: Verify that a member without premium entitlement sees and receives the
+  basic free-member help-request allowance.
+steps:
+- Navigate to the home page and sign in with an account that has no active premium
+  membership.
+- Open the Membership panel from the visible account or navigation controls.
+- "Verify the membership status shows \"Free member\" and the allowance text shows\
+  \ \"Up to 2 open requests \xB7 visible 1 month\"."
+- Open the Ask for Help or new help-request form and verify the form is available
+  to the free member.
+- Create and submit help requests until the basic open-request allowance is reached,
+  completing all required visible fields for each request.
+- Attempt to submit one additional help request and verify an on-page message states
+  that free membership allows 2 open help requests at a time and offers an upgrade
+  to keep up to 10 running.
+expected_outcome: The member remains identified as a Free member, the membership panel
+  visibly shows the basic allowance of up to 2 open requests with one-month visibility,
+  and submitting a request beyond that allowance is prevented with the free-membership
+  allowance and upgrade message visible.
+routes:
+- ''

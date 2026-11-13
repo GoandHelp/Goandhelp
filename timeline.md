@@ -1,0 +1,8 @@
+Previous revision completed the supplied logo, onboarding visual system, map/privacy changes, detail-sheet and request workflows, verification, premium membership, and request-history changes.
+Offer-price validation was reproduced for comma decimals (`12,50`), repaired with locale-tolerant normalization, immediate quote controls, safe authoritative rollback, and regression tests; 17 focused tests and 37 surrounding request/state regressions passed.
+Onboarding/registration revision implemented: uploaded image sequence for screens 1–5, opaque surfaces, optional screen-8 details persistence, Off-to-Approximate location switching, accurate-location copy, screen-13 Skip for now/Next behavior, silent completion, and 16+ registration year/date validation.
+Updated stale onboarding, guided-tour, and premium tests to reflect approved behavior; 54 onboarding/registration tests passed across the final batches.
+Map/member revision implemented: mode-specific markers, completed-task exclusions, cog/dock/logo changes, helper marker redesign, currency-aware cost estimate label, direct-request warning/copy, compact shared top-right sheets, human avatar fallbacks, public member loading/privacy, Gave/Got metrics, and profile action layout.
+Initial map/member regression run exposed missing completed-task exclusions and stale test assumptions; completed-task exclusions were added to counts/shared queries, duplicate direct-query exclusion was removed, and affected tests were aligned.
+Final map/member validation passed `MAP_MEMBER_SHEET_OK_28` and `MAP_PROFILE_REGRESSION_OK_26`; plan marked onboarding and map/member groups complete.
+Current plan status: inbox/notifications rebuild remains unchecked; Requests/search/transient-surface polish remains unchecked.
