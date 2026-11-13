@@ -132,6 +132,12 @@ class DirectRequest(TypedDict):
     category_label: str
 
 
+class FilterSummaryItem(TypedDict):
+    source: str
+    value: str
+    localize_value: bool
+
+
 class DiscoveryPost(TypedDict):
     id: int
     title: str
@@ -1103,6 +1109,80 @@ class DiscoveryState(rx.State):
             summary.append(f"Nationality: {self.nationality_filter.strip()}")
         for language in self.language_filters:
             summary.append(f"Speaks {language.title()}")
+        return summary
+
+    @rx.var
+    def active_filter_summary_items(self) -> list[FilterSummaryItem]:
+        """Display-only localized templates with untouched member-entered values."""
+        summary: list[FilterSummaryItem] = []
+        for value in self.category_filters:
+            summary.append(
+                {
+                    "source": "Category: {value}",
+                    "value": category_label(value),
+                    "localize_value": True,
+                }
+            )
+        if self.reward_filter != "all":
+            summary.append(
+                {
+                    "source": "Reward: {value}",
+                    "value": REWARD_LABELS.get(
+                        self.reward_filter,
+                        "Money"
+                        if self.reward_filter == "money"
+                        else self.reward_filter,
+                    ),
+                    "localize_value": True,
+                }
+            )
+        if self.city_filter.strip():
+            summary.append(
+                {
+                    "source": "Place: {value}",
+                    "value": self.city_filter,
+                    "localize_value": False,
+                }
+            )
+        if self.last_online_filter != "any":
+            labels = {
+                "today": "Online today",
+                "week": "Online this week",
+                "month": "Online this month",
+            }
+            summary.append(
+                {
+                    "source": labels.get(
+                        self.last_online_filter, "Last online"
+                    ),
+                    "value": "",
+                    "localize_value": False,
+                }
+            )
+        if self.rating_min > 0 or self.rating_max < 100:
+            summary.append(
+                {
+                    "source": "Rating {value}%",
+                    "value": f"{self.rating_min}–{self.rating_max}",
+                    "localize_value": False,
+                }
+            )
+        if self.nationality_filter.strip():
+            summary.append(
+                {
+                    "source": "Nationality: {value}",
+                    "value": self.nationality_filter,
+                    "localize_value": False,
+                }
+            )
+        for language in self.language_filters:
+            summary.append(
+                {
+                    "source": "Speaks {value}",
+                    "value": language.title(),
+                    "localize_value": True,
+                }
+            )
         return summary
 
     def _advanced_clause(

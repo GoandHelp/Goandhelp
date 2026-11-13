@@ -1,5 +1,7 @@
 import reflex as rx
 
+from app.interface_i18n import ui
+
 from app.components.geolocation import geolocation_request
 from app.states.profile_state import ProfileState
 
@@ -19,7 +21,7 @@ LOCATION_TAP_OFF = (
 
 
 def location_tap(
-    value: str, label: str, icon: str, compact: bool = False
+    value: str, label: str | rx.Var[str], icon: str, compact: bool = False
 ) -> rx.Component:
     return rx.el.button(
         rx.icon(
@@ -44,7 +46,11 @@ def location_tap(
         aria_checked=rx.cond(
             ProfileState.location_mode == value, "true", "false"
         ),
-        aria_label=f"Show my location: {label}",
+        aria_label=rx.cond(
+            value == "hidden",
+            ui("Show my location: Off"),
+            ui("Show my location: Approx"),
+        ),
         on_click=lambda: ProfileState.set_location_mode(value),
         class_name=rx.cond(
             ProfileState.location_mode == value,
@@ -72,7 +78,7 @@ def location_selection(compact: bool = False) -> rx.Component:
         rx.el.div(
             rx.el.div(
                 rx.el.label(
-                    rx.cond(compact, "My location", "Show my location"),
+                    rx.cond(compact, ui("My location"), ui("Show my location")),
                     class_name=rx.cond(
                         compact,
                         "text-xs font-semibold text-[#404040]",
@@ -86,12 +92,12 @@ def location_selection(compact: bool = False) -> rx.Component:
                 ),
             ),
             rx.el.div(
-                location_tap("hidden", "Off", "eye-off", compact=compact),
+                location_tap("hidden", ui("Off"), "eye-off", compact=compact),
                 location_tap(
-                    "approximate", "Approx", "circle-dot", compact=compact
+                    "approximate", ui("Approx"), "circle-dot", compact=compact
                 ),
                 role="radiogroup",
-                aria_label="Show my location",
+                aria_label=ui("Show my location"),
                 class_name=rx.cond(
                     compact,
                     "gah-segment-group flex min-w-fit flex-1 flex-row flex-wrap items-stretch gap-1 rounded-xl bg-white/80 p-0.5",

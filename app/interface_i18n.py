@@ -1,5 +1,8 @@
 import reflex as rx
 
+import json
+from reflex.vars.base import VarData
+
 from app.interface_catalog_forum import FORUM_LABEL_CATALOGS, FORUM_LABEL_KEYS
 from app.interface_catalog_forum_text import (
     FORUM_TEXT_CATALOGS,
@@ -58,6 +61,10 @@ from app.interface_catalog_guest_intro_verification import (
     GUEST_INTRO_VERIFICATION_KEYS,
 )
 from app.interface_catalog_legal import LEGAL_CATALOGS, LEGAL_KEYS
+from app.interface_catalog_search_filters import (
+    SEARCH_FILTER_CATALOGS,
+    SEARCH_FILTER_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -505,6 +512,10 @@ for _language, _entries in LEGAL_CATALOGS.items():
     for _key, _value in _entries.items():
         CATALOGS[_language].setdefault(_key, _value)
 
+for _language, _entries in SEARCH_FILTER_CATALOGS.items():
+    for _key, _value in _entries.items():
+        CATALOGS[_language].setdefault(_key, _value)
+
 COMPLETE_KEYS: tuple[str, ...] = tuple(
     dict.fromkeys(
         [
@@ -517,6 +528,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *REPORT_KEYS,
             *GUEST_INTRO_VERIFICATION_KEYS,
             *LEGAL_KEYS,
+            *SEARCH_FILTER_KEYS,
             *REVIEW_KEYS,
             *LANGUAGE_CHOICE_KEYS,
             *SETUP_PRIVACY_KEYS,
@@ -554,7 +566,16 @@ def ui(source: str | rx.Var[str]) -> rx.Var[str]:
 
 
 def ui_template(
-    source: str, parameter: str, value: str | rx.Var[str]
+    source: str | rx.Var[str], parameter: str, value: str | rx.Var[str]
 ) -> rx.Var[str]:
-    """Substitute a single named slot without reinterpreting the value."""
-    return ui(source).split(f"{{{parameter}}}").join(value)
+    """Substitute a named slot without reinterpreting its value."""
+    template = ui(source)
+    replacement = rx.Var.create(value)
+    data = VarData.merge(
+        template._get_all_var_data(), replacement._get_all_var_data()
+    )
+    return rx.Var(
+        _js_expr=f"({template}).split({json.dumps(f'{{{parameter}}}')}).join({replacement})",
+        _var_type=str,
+        _var_data=data,
+    ).to(str)

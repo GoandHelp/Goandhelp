@@ -1,6 +1,6 @@
 import reflex as rx
 
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template
 
 from app.components.language_control import (
     browser_translatable_text,
@@ -51,7 +51,7 @@ def helper_photo(helper: HelperProfile, class_name: str) -> rx.Component:
 
 
 def option_item(item: dict[str, str]) -> rx.Component:
-    return rx.el.option(item["label"], value=item["value"])
+    return rx.el.option(ui(item["label"]), value=item["value"])
 
 
 def urgency_pill(urgency: rx.Var[str]) -> rx.Component:
@@ -73,16 +73,16 @@ def urgency_pill(urgency: rx.Var[str]) -> rx.Component:
 def sheet_mode_button(label: str, value: str, description: str) -> rx.Component:
     return rx.el.button(
         rx.el.span(
-            rx.el.span(label, aria_hidden=True, class_name="invisible"),
+            rx.el.span(ui(label), aria_hidden=True, class_name="invisible"),
             rx.el.span(
-                label,
+                ui(label),
                 class_name="absolute inset-0 flex items-center justify-center text-[length:calc(14px-1pt)]!",
             ),
             class_name="relative inline-block",
         ),
         type="button",
-        title=description,
-        aria_label=description,
+        title=ui(description),
+        aria_label=ui(description),
         aria_pressed=rx.cond(DiscoveryState.map_mode == value, "true", "false"),
         on_click=lambda: DiscoveryState.set_map_mode(value),
         class_name=rx.cond(
@@ -117,8 +117,8 @@ def category_choice_row(item: dict[str, str]) -> rx.Component:
             class_name="flex size-7 shrink-0 items-center justify-center rounded-full text-white",
         ),
         rx.el.span(
-            item["label"],
-            class_name="min-w-0 flex-1 text-left text-[11px] font-semibold text-[#000000]",
+            ui(item["label"]),
+            class_name="min-w-0 flex-1 text-left text-[11px] font-semibold text-[#000000] [overflow-wrap:anywhere]",
         ),
         type="button",
         role="checkbox",
@@ -127,7 +127,7 @@ def category_choice_row(item: dict[str, str]) -> rx.Component:
             "true",
             "false",
         ),
-        aria_label=item["label"],
+        aria_label=ui(item["label"]),
         on_click=lambda: DiscoveryState.toggle_category_choice(item["value"]),
         class_name="flex w-full items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-[#fff7e8] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]",
     )
@@ -138,7 +138,19 @@ def category_multiselect(compact: bool = False) -> rx.Component:
     return rx.el.div(
         rx.el.button(
             rx.el.span(
-                DiscoveryState.category_summary_label,
+                rx.cond(
+                    DiscoveryState.category_filters.length() == 0,
+                    ui("All categories"),
+                    rx.cond(
+                        DiscoveryState.category_filters.length() == 1,
+                        ui(DiscoveryState.category_summary_label),
+                        ui_template(
+                            "{count} categories selected",
+                            "count",
+                            DiscoveryState.category_filters.length().to_string(),
+                        ),
+                    ),
+                ),
                 class_name=rx.cond(
                     DiscoveryState.category_filters.length() > 0,
                     "min-w-0 flex-1 truncate text-left text-sm font-medium text-[#404040]",
@@ -157,7 +169,9 @@ def category_multiselect(compact: bool = False) -> rx.Component:
             aria_expanded=rx.cond(
                 DiscoveryState.category_list_open, "true", "false"
             ),
-            aria_label="Choose one or more search categories, including Events",
+            aria_label=ui(
+                "Choose one or more search categories, including Events"
+            ),
             on_click=DiscoveryState.toggle_category_list,
             class_name=rx.cond(
                 compact,
@@ -174,16 +188,16 @@ def category_multiselect(compact: bool = False) -> rx.Component:
                         category_choice_row,
                     ),
                     role="group",
-                    aria_label="Search categories and Events",
+                    aria_label=ui("Search categories and Events"),
                     class_name="flex max-h-56 flex-col gap-0.5 overflow-y-auto",
                 ),
                 rx.cond(
                     DiscoveryState.category_filters.length() > 0,
                     rx.el.button(
                         rx.icon("x", class_name="h-3 w-3"),
-                        "Clear categories",
+                        ui("Clear categories"),
                         type="button",
-                        aria_label="Clear every selected category",
+                        aria_label=ui("Clear every selected category"),
                         on_click=DiscoveryState.clear_category_choices,
                         class_name="mt-1.5 flex w-fit items-center gap-1.5 rounded-full border border-[#d4d4d4] bg-white px-2.5 py-1 text-[10px] font-bold text-[#404040] transition-colors hover:border-[#e08b12]",
                     ),
@@ -197,18 +211,38 @@ def category_multiselect(compact: bool = False) -> rx.Component:
     )
 
 
+def distance_filter_label() -> rx.Var[str]:
+    return rx.cond(
+        DiscoveryState.distance_km <= 0,
+        ui("Any"),
+        rx.cond(
+            DiscoveryState.distance_km >= DiscoveryState.distance_max_km,
+            ui_template(
+                "{distance}+ km",
+                "distance",
+                DiscoveryState.distance_max_km.to_string(),
+            ),
+            ui_template(
+                "{distance} km",
+                "distance",
+                DiscoveryState.distance_km.to_string(),
+            ),
+        ),
+    )
+
+
 def distance_filter_block(compact: bool = False) -> rx.Component:
     """Free travel-radius slider, shown in both Give and Get modes."""
     return rx.el.div(
         rx.el.div(
             rx.el.span(
-                "1 km",
+                ui("1 km"),
                 class_name="shrink-0 whitespace-nowrap text-left text-[11px] font-bold text-black",
             ),
             rx.el.label(
-                "Distance ",
+                ui("Distance"),
                 rx.el.span(
-                    DiscoveryState.distance_label,
+                    distance_filter_label(),
                     role="status",
                     aria_live="polite",
                     class_name="whitespace-nowrap text-[#e08b12]",
@@ -217,7 +251,7 @@ def distance_filter_block(compact: bool = False) -> rx.Component:
                 class_name="min-w-0 flex-1 whitespace-nowrap text-center text-[11px] font-bold text-black",
             ),
             rx.el.span(
-                "Any",
+                ui("Any"),
                 class_name="shrink-0 whitespace-nowrap text-right text-[11px] font-bold text-black",
             ),
             class_name="mb-1 flex w-full min-w-0 items-baseline justify-between gap-1 whitespace-nowrap",
@@ -230,8 +264,8 @@ def distance_filter_block(compact: bool = False) -> rx.Component:
             step=DiscoveryState.distance_step_km.to_string(),
             default_value=DiscoveryState.distance_km.to_string(),
             key=DiscoveryState.distance_reset_token.to_string(),
-            aria_label="Distance in kilometres, zero means any distance",
-            aria_valuetext=DiscoveryState.distance_label,
+            aria_label=ui("Distance in kilometres, zero means any distance"),
+            aria_valuetext=distance_filter_label(),
             on_change=[
                 DiscoveryState.set_distance_filter.throttle(100),
                 DiscoveryState.commit_distance_filter.debounce(150),
@@ -255,8 +289,8 @@ def sheet_view_button(value: str, icon: str, description: str) -> rx.Component:
     return rx.el.button(
         rx.icon(icon, class_name="h-3.5 w-3.5"),
         type="button",
-        title=description,
-        aria_label=description,
+        title=ui(description),
+        aria_label=ui(description),
         aria_pressed=rx.cond(
             DiscoveryState.view_mode == value, "true", "false"
         ),
@@ -280,7 +314,7 @@ def show_my_location_block(compact: bool = False) -> rx.Component:
         rx.cond(
             DiscoveryState.distance_warning,
             rx.el.p(
-                "Turn on your Approximate location first",
+                ui("Turn on your Approximate location first"),
                 id="gah-distance-warning",
                 key=DiscoveryState.distance_reset_token,
                 role="status",
@@ -305,7 +339,7 @@ def sheet_view_toggle() -> rx.Component:
         sheet_view_button("map", "map", "Show results on the map"),
         sheet_view_button("list", "list", "Show results as a list"),
         role="group",
-        aria_label="Switch between map view and list view",
+        aria_label=ui("Switch between map view and list view"),
         custom_attrs={"data-tour-target": "view-toggle"},
         class_name="gah-segment-group flex h-7 shrink-0 items-center gap-0 rounded-full border border-[#d4d4d4] bg-white p-0",
     )
@@ -317,7 +351,7 @@ def filter_dismiss_layer() -> rx.Component:
         rx.el.button(
             type="button",
             id="gah-filter-dismiss",
-            aria_label="Dismiss Search filters",
+            aria_label=ui("Dismiss Search filters"),
             on_click=DiscoveryState.close_filters,
             on_scroll=DiscoveryState.close_filters,
             on_mount=rx.call_script("""
@@ -354,7 +388,9 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                             "Get — filter people offering help",
                         ),
                         role="group",
-                        aria_label="Filter people requesting help, or people offering help",
+                        aria_label=ui(
+                            "Filter people requesting help, or people offering help"
+                        ),
                         class_name="gah-segment-group flex h-[31px] shrink-0 items-center gap-0 rounded-full border border-[#d4d4d4] bg-white p-0",
                     ),
                     class_name=rx.cond(
@@ -438,7 +474,7 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                             ),
                             value=DiscoveryState.reward_filter,
                             on_change=DiscoveryState.set_reward_filter,
-                            aria_label="Filter by reward",
+                            aria_label=ui("Filter by reward"),
                             class_name=rx.cond(
                                 compact,
                                 "gah-filter-field h-9 w-full appearance-none cursor-pointer rounded-xl border border-gray-300 bg-white px-3 pr-9 text-sm font-medium text-[#404040] outline-hidden transition-colors focus:border-[#fba922] focus:ring-2 focus:ring-[#fba922]/30",
