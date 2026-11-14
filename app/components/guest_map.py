@@ -408,7 +408,11 @@ def guest_map_canvas() -> rx.Component:
         ),
         guest_map_brand_lockup(),
         guest_control_stack(),
-        guest_filters_button(),
+        rx.cond(
+            ~GuestMapState.search_expanded,
+            guest_filters_button(),
+            rx.fragment(),
+        ),
         rx.cond(
             GuestMapState.is_loading,
             map_loading_logo(),

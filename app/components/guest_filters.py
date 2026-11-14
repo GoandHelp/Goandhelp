@@ -321,7 +321,7 @@ def guest_filter_drawer() -> rx.Component:
             })();
         """),
         on_unmount=rx.call_script(
-            "window.gahGuestFilterCleanup?.(); delete window.gahGuestFilterCleanup; document.getElementById('gah-guest-filter-open')?.focus({preventScroll:true});"
+            "window.gahGuestFilterCleanup?.(); delete window.gahGuestFilterCleanup; requestAnimationFrame(() => document.getElementById('gah-guest-filter-open')?.focus({preventScroll:true}));"
         ),
         class_name="gah-search-drawer pointer-events-auto fixed right-2 bottom-[calc(3.875rem+env(safe-area-inset-bottom))] z-30 flex w-[calc(100vw-1rem)] max-w-[23.75rem] max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom))] min-h-0 flex-col gap-1.5 overflow-y-auto overscroll-contain rounded-tl-2xl border-0 bg-[#f4f8ff] p-3 font-['Inter'] text-[#404040]",
     )

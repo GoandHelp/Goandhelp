@@ -60,6 +60,10 @@ class GuestMapFilterTests(unittest.IsolatedAsyncioTestCase):
         self,
     ):
         state = GuestMapState()
+        state.browse_mode = "give"
+        state.reward_filter = "all"
+        state.category_filters = []
+        state.wall_open = False
         from app.states.auth_state import AuthState
 
         auth = await state.get_state(AuthState)
