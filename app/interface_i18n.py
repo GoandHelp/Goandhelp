@@ -556,6 +556,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *ENTRY_FEEDBACK_KEYS,
             *ENTRY_TEMPLATE_KEYS,
             *FORUM_KEYS,
+            *EVENT_KEYS,
             *SEARCH_FILTER_KEYS,
             *ADMIN_UI_KEYS,
             *MAP_STATUS_KEYS,

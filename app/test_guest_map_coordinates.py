@@ -40,7 +40,7 @@ class GuestMapCoordinateTests(unittest.TestCase):
             for code in codes
         ]
         # Invoke the getter directly: constructor kwargs can leave jobs empty.
-        state = SimpleNamespace(jobs=jobs)
+        state = SimpleNamespace(jobs=jobs, helpers=[], browse_mode="give")
         markers = GuestMapState.map_markers.fget(state)
         self.assertEqual(len(markers), len(jobs))
         self.assertEqual(markers, GuestMapState.map_markers.fget(state))
@@ -72,7 +72,10 @@ class GuestMapCoordinateTests(unittest.TestCase):
 
     def test_empty_jobs_still_produce_no_markers(self):
         self.assertEqual(
-            GuestMapState.map_markers.fget(SimpleNamespace(jobs=[])), []
+            GuestMapState.map_markers.fget(
+                SimpleNamespace(jobs=[], helpers=[], browse_mode="give")
+            ),
+            [],
         )
 
 

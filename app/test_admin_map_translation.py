@@ -1,3 +1,4 @@
+import ast
 import inspect
 import unittest
 from pathlib import Path
@@ -12,6 +13,7 @@ from app.interface_catalog_map_status import (
     MAP_STATUS_KEYS,
 )
 from app.interface_i18n import CATALOGS, COMPLETE_KEYS, translate, ui
+from app.interface_catalog_events import EVENT_KEYS
 from app.models import LANGUAGE_OPTIONS
 from app.states.auth_state import AuthState
 
@@ -36,6 +38,9 @@ class AdminMapTranslationTests(unittest.TestCase):
                         translate(locale, source), CATALOGS[locale][source]
                     )
 
+    def test_event_manifest_retains_every_event_source(self):
+        self.assertTrue(set(EVENT_KEYS).issubset(set(COMPLETE_KEYS)))
+
     def test_language_lookup_remains_hydrated_and_reactive(self):
         self.assertIn(
             "AuthState.interface_text.get(source, source)",
@@ -53,8 +58,17 @@ class AdminMapTranslationTests(unittest.TestCase):
             self.assertIsInstance(component, rx.Component)
         admin_source = Path("app/components/admin_panel.py").read_text()
         map_source = Path("app/components/map_loading.py").read_text()
-        for phrase in ADMIN_UI_KEYS:
-            self.assertIn(f'ui("{phrase}")', admin_source)
+        ui_keys = {
+            node.args[0].value
+            for node in ast.walk(ast.parse(admin_source))
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "ui"
+            and node.args
+            and isinstance(node.args[0], ast.Constant)
+            and isinstance(node.args[0].value, str)
+        }
+        self.assertTrue(set(ADMIN_UI_KEYS).issubset(ui_keys))
         self.assertIn('ui("Updating map…")', map_source)
         self.assertIn('aria_label=ui("Updating map")', map_source)
 

@@ -36,15 +36,19 @@ class GuestTitleGatingTests(unittest.IsolatedAsyncioTestCase):
         )
         source = Path("app/states/guest_map_state.py").read_text()
         self.assertIn("SELECT p.id, p.title", source)
+        projection = source.split("SELECT p.id, p.title", 1)[1].split(
+            "FROM skillkind_help_post", 1
+        )[0]
         for field in (
             "p.reward",
             "p.category",
             "p.city",
             "p.country",
-            "selected_job",
+            "p.author_id",
         ):
-            self.assertNotIn(field, source)
-        self.assertIn("while True:", source)
+            self.assertNotIn(field, projection)
+        self.assertNotIn("selected_job", source)
+        self.assertIn("LIMIT :page_size", source)
         self.assertIn("PAGE_SIZE = 100", source)
         self.assertIn("LEFT(COALESCE(p.description, ''), 100)", source)
         self.assertIn("post_guest_approximate", source)

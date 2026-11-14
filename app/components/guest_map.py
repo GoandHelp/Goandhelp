@@ -16,6 +16,10 @@ from app.components.header import (
 )
 from app.components.openfreemap import open_free_map
 from app.components.map_loading import map_loading_logo
+from app.components.guest_filters import (
+    guest_filter_drawer,
+    guest_filter_status,
+)
 from app.components.map_utility_icon import map_utility_icon
 from app.components.verification_notice import verification_notice
 from app.states.auth_state import AuthState
@@ -365,11 +369,7 @@ def guest_list_view() -> rx.Component:
 
 
 def guest_filters_button() -> rx.Component:
-    """The only floating control a signed-out visitor sees on the map.
-
-    It matches the signed-in Search filters control, and opens the existing
-    sign-up wall instead of pretending to filter anything.
-    """
+    """Open the read-only guest Search filters without an account wall."""
     return rx.el.button(
         rx.icon(
             "sliders-horizontal",
@@ -378,7 +378,10 @@ def guest_filters_button() -> rx.Component:
         type="button",
         title=ui("Open Search filters"),
         aria_label=ui("Search filters"),
-        on_click=GuestMapState.open_join_prompt,
+        id="gah-guest-filter-open",
+        aria_controls="gah-guest-filter-drawer",
+        aria_expanded=rx.cond(GuestMapState.search_expanded, "true", "false"),
+        on_click=GuestMapState.expand_search,
         class_name="pointer-events-auto absolute bottom-[91px] right-[22px] z-30 flex size-[54px] items-center justify-center rounded-full border-0 bg-white text-[#fba922] transition-colors hover:bg-white hover:text-[#e08b12] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#fba922]",
     )
 
@@ -396,15 +399,18 @@ def guest_map_canvas() -> rx.Component:
             class_name="absolute inset-0 h-full w-full",
         ),
         rx.cond(
-            GuestMapState.is_list_view,
-            guest_list_view(),
-            rx.fragment(),
+            GuestMapState.search_expanded,
+            guest_filter_drawer(),
+            rx.el.div(
+                guest_filter_status(),
+                class_name="pointer-events-none absolute top-24 left-3 z-20 max-w-[calc(100%-1.5rem)] rounded-xl bg-white/95 px-3 py-1.5 [&_button]:pointer-events-auto",
+            ),
         ),
         guest_map_brand_lockup(),
         guest_control_stack(),
         guest_filters_button(),
         rx.cond(
-            GuestMapState.is_loading & ~GuestMapState.is_list_view,
+            GuestMapState.is_loading,
             map_loading_logo(),
             rx.fragment(),
         ),
