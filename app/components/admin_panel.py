@@ -1,5 +1,6 @@
 import reflex as rx
 from app.avatars import member_avatar
+from app.interface_i18n import ui
 
 from app.models import CATEGORY_LABELS
 from app.states.admin_state import AdminState
@@ -723,11 +724,13 @@ def safety_table() -> rx.Component:
             rx.fragment(),
         ),
         rx.el.h3(
-            "Profile, message and community reports",
+            ui("Profile, message and community reports"),
             class_name="mt-5 text-lg font-bold text-black",
         ),
         rx.el.p(
-            "Up to 60 reports, open and reviewing first. Use the admin note above for your next decision.",
+            ui(
+                "Up to 60 reports, open and reviewing first. Use the admin note above for your next decision."
+            ),
             class_name="mt-1 text-xs text-[#404040]",
         ),
         rx.cond(
@@ -742,7 +745,7 @@ def safety_table() -> rx.Component:
             ),
         ),
         rx.el.h3(
-            "Completed-job safety reports",
+            ui("Completed-job safety reports"),
             class_name="mt-5 text-lg font-bold text-black",
         ),
         rx.cond(
@@ -787,7 +790,7 @@ def safety_table() -> rx.Component:
 
 def empty_note() -> rx.Component:
     return rx.el.p(
-        "Rows appear here as neighbours sign up, post, chat and review.",
+        ui("Rows appear here as neighbours sign up, post, chat and review."),
         class_name="text-xs font-medium text-[#4b5563] mt-3",
     )
 
