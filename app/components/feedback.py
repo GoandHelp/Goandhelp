@@ -57,6 +57,7 @@ def _avatar_interface_label(value: str | rx.Var[str]) -> str | rx.Var[str]:
         "Email verified",
         "Traveller avatar",
         "Contact profile photo",
+        "Member profile photo",
         "Open member profile",
     }:
         return ui(value)

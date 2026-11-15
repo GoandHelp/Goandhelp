@@ -1,6 +1,6 @@
 import reflex as rx
 from app.avatars import animal_avatar
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template
 from app.states.message_attachment_state import MessageAttachmentState
 from app.states.unified_inbox_state import UnifiedInboxState
 from app.components.message_attachments import message_attachments
@@ -49,11 +49,15 @@ def contacts_header() -> rx.Component:
     return rx.el.div(
         rx.el.div(
             rx.el.h2(
-                ContactsState.contact_count_heading,
+                ui_template(
+                    "{count} Contacts",
+                    "count",
+                    ContactsState.contacts.length().to_string(),
+                ),
                 class_name="text-2xl font-bold tracking-tight text-[#111827]",
             ),
             rx.el.p(
-                "Connections to a world of kind people",
+                ui("Connections to a world of kind people"),
                 class_name="mt-1 text-sm font-medium text-[#4b5563] leading-relaxed",
             ),
             class_name="min-w-0 flex-1",
@@ -120,7 +124,7 @@ def incoming_card(contact: ContactItem) -> rx.Component:
             ),
             rx.el.span(
                 rx.icon("mail", class_name="h-3 w-3"),
-                "Wants to connect",
+                ui("Wants to connect"),
                 class_name="w-fit shrink-0 flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-2.5 py-1 text-[11px] font-semibold text-[#e08b12]",
             ),
             class_name="flex items-start gap-3 w-full",
@@ -131,7 +135,9 @@ def incoming_card(contact: ContactItem) -> rx.Component:
                 contact["requested_at"],
                 rx.el.span(
                     rx.icon("calendar", class_name="h-3 w-3"),
-                    f"Asked {contact['requested_at']}",
+                    ui_template(
+                        "Asked {date}", "date", contact["requested_at"]
+                    ),
                     class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-2.5 py-1 text-[11px] font-semibold text-[#4b5563]",
                 ),
                 rx.fragment(),
@@ -142,7 +148,7 @@ def incoming_card(contact: ContactItem) -> rx.Component:
         rx.el.div(
             rx.el.button(
                 rx.icon("check", class_name="h-3.5 w-3.5"),
-                "Confirm contact",
+                ui("Confirm contact"),
                 type="button",
                 disabled=ContactsState.is_responding,
                 on_click=lambda: ContactsState.accept_request(
@@ -196,7 +202,7 @@ def requests_section() -> rx.Component:
                     class_name="mt-4 grid grid-cols-1 xl:grid-cols-2 gap-3 w-full items-start",
                 ),
                 rx.el.p(
-                    "No requests waiting.",
+                    ui("No requests waiting."),
                     class_name="mt-3 rounded-2xl border border-dashed border-[#f7d9a0] bg-white/60 px-4 py-4 text-sm font-medium text-[#4b5563]",
                 ),
             ),
@@ -231,7 +237,7 @@ def contact_row(contact: dict[str, str]) -> rx.Component:
                     class_name="mt-0.5 text-sm font-semibold text-[#e08b12] truncate",
                 ),
                 rx.el.p(
-                    "no username yet",
+                    ui("no username yet"),
                     class_name="mt-0.5 text-sm font-medium text-[#4b5563] italic truncate",
                 ),
             ),
@@ -241,8 +247,10 @@ def contact_row(contact: dict[str, str]) -> rx.Component:
             rx.icon("message-square", class_name="h-5 w-5"),
             activity_dot(contact["unread_count"]),
             type="button",
-            aria_label=f"Message {contact['other_name']} in the Inbox",
-            title="Open this conversation in your Inbox",
+            aria_label=ui_template(
+                "Message {name} in the Inbox", "name", contact["other_name"]
+            ),
+            title=ui("Open this conversation in your Inbox"),
             on_click=lambda: ContactsState.open_contact_in_inbox(
                 contact["link_id"]
             ),
@@ -260,11 +268,11 @@ def contacts_list() -> rx.Component:
             ContactsState.contacts.length() > 0,
             rx.el.ul(
                 rx.foreach(ContactsState.contacts, contact_row),
-                aria_label="Your contacts",
+                aria_label=ui("Your contacts"),
                 class_name="flex flex-col gap-2 w-full",
             ),
             rx.el.p(
-                "No contacts yet — find people and send a request.",
+                ui("No contacts yet — find people and send a request."),
                 class_name="rounded-2xl border border-dashed border-[#f7d9a0] bg-white/60 px-4 py-6 text-center text-sm font-medium text-[#4b5563]",
             ),
         ),
@@ -321,7 +329,7 @@ def conversation_header() -> rx.Component:
                     class_name="text-base font-bold text-[#111827] leading-tight",
                 ),
                 rx.el.p(
-                    ContactsState.selected_contact["status_label"],
+                    ui(ContactsState.selected_contact["status_label"]),
                     class_name="text-xs font-medium text-[#4b5563] mt-0.5",
                 ),
                 class_name="min-w-0 flex-1",
@@ -364,7 +372,9 @@ def message_history() -> rx.Component:
                         class_name="h-6 w-6 text-[#fba922] mb-2",
                     ),
                     rx.el.p(
-                        ui("No messages yet"),
+                        ui(
+                            "Say hello, share where you're heading, and swap a little help."
+                        ),
                         class_name="text-sm font-semibold text-[#111827]",
                     ),
                     rx.el.p(
@@ -384,7 +394,7 @@ def composer() -> rx.Component:
         rx.el.textarea(
             name="body",
             rows="1",
-            aria_label="Write a note to your confirmed contact",
+            aria_label=ui("Write a note to your confirmed contact"),
             placeholder=ui("Write a message"),
             class_name=MESSAGE_INPUT_CLASS,
         ),
@@ -430,7 +440,7 @@ def conversation_panel(
                 rx.cond(
                     embedded,
                     rx.el.p(
-                        ContactsState.selected_contact["status_label"],
+                        ui(ContactsState.selected_contact["status_label"]),
                         class_name="text-xs text-[#e08b12]",
                     ),
                     conversation_header(),
@@ -440,7 +450,9 @@ def conversation_panel(
                     ContactsState.can_message_selected,
                     rx.cond(dedicated, rx.fragment(), composer()),
                     rx.el.p(
-                        "You can write once this contact request is confirmed by both sides.",
+                        ui(
+                            "You can write once this contact request is confirmed by both sides."
+                        ),
                         class_name="text-sm font-medium text-[#4b5563]",
                     ),
                 ),
@@ -465,11 +477,13 @@ def conversation_panel(
                         class_name="flex items-center justify-center size-12 rounded-2xl bg-[#fff7e8] mb-3",
                     ),
                     rx.el.p(
-                        "Select a conversation to read it",
+                        ui("Select a conversation to read it"),
                         class_name="text-sm font-bold text-[#111827]",
                     ),
                     rx.el.p(
-                        "Pick any conversation from the list — contacts, direct messages and job threads all open here.",
+                        ui(
+                            "Pick any conversation from the list — contacts, direct messages and job threads all open here."
+                        ),
                         class_name="mt-1 max-w-md text-xs font-medium leading-relaxed text-[#4b5563]",
                     ),
                     role="status",

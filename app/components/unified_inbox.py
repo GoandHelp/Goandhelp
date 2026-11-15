@@ -3,7 +3,7 @@
 import reflex as rx
 from app.avatars import animal_avatar
 
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template
 from app.components.feedback import avatar_with_tick
 from app.states.contacts_state import ContactsState, ContactItem
 from app.components.contacts_panel import avatar_src
@@ -58,8 +58,8 @@ def type_badge(item: UnifiedItem) -> rx.Component:
             ("helpee", rx.icon("hand-helping", class_name="size-6")),
             rx.icon("users-round", class_name="size-6"),
         ),
-        title=item["type_label"],
-        aria_label=item["type_label"],
+        title=ui(item["type_label"]),
+        aria_label=ui(item["type_label"]),
         class_name="shrink-0 text-[#e08b12]",
     )
 
@@ -72,7 +72,9 @@ def remove_from_inbox(key: str | rx.Var[str]) -> rx.Component:
         ),
         type="button",
         aria_label=ui("Remove from Inbox"),
-        title="Remove only from your Inbox. Messages stay safe and new messages bring it back.",
+        title=ui(
+            "Remove only from your Inbox. Messages stay safe and new messages bring it back."
+        ),
         on_click=UnifiedInboxState.dismiss_thread(key),
         class_name="gah-conversation-toggle flex min-h-11 w-fit shrink-0 flex-col items-center justify-center gap-1 rounded-xl border-0 bg-transparent px-2 py-2 text-xs font-medium text-[#e08b12] shadow-none hover:bg-[#fff7e8] focus-visible:ring-2 focus-visible:ring-[#fba922] sm:flex-row sm:gap-1.5",
     )
@@ -85,13 +87,13 @@ def conversation_card(
         rx.el.button(
             corner_activity_dot(
                 item["unread_count"] > 0,
-                "Unread messages in this conversation",
+                ui("Unread messages in this conversation"),
             ),
             avatar_with_tick(
                 _avatar(item["other_avatar"], item["other_avatar_seed"]),
                 item["other_verified"],
                 "size-16 shrink-0 rounded-full bg-[#fff7e8] object-cover",
-                "Member profile photo",
+                ui("Member profile photo"),
             ),
             rx.el.div(
                 rx.el.p(
@@ -126,7 +128,7 @@ def conversation_card(
                 item["last_photo"],
                 rx.el.img(
                     src=rx.get_upload_url(item["last_photo"]),
-                    alt="Latest message photo",
+                    alt=ui("Latest message photo"),
                     loading="lazy",
                     class_name="size-12 shrink-0 rounded-xl bg-[#fff7e8] object-cover",
                 ),
@@ -134,7 +136,38 @@ def conversation_card(
             ),
             type_badge(item),
             type="button",
-            aria_label=f"Open the {item['type_label']} conversation with {item['other_name']}",
+            aria_label=rx.match(
+                item["conv_type"],
+                (
+                    "contact",
+                    ui_template(
+                        "Open the Contact conversation with {name}",
+                        "name",
+                        item["other_name"],
+                    ),
+                ),
+                (
+                    "helper",
+                    ui_template(
+                        "Open the Helper conversation with {name}",
+                        "name",
+                        item["other_name"],
+                    ),
+                ),
+                (
+                    "helpee",
+                    ui_template(
+                        "Open the Helpee conversation with {name}",
+                        "name",
+                        item["other_name"],
+                    ),
+                ),
+                ui_template(
+                    "Open the Contact conversation with {name}",
+                    "name",
+                    item["other_name"],
+                ),
+            ),
             aria_current=rx.cond(
                 UnifiedInboxState.selected_key == item["key"], "true", "false"
             ),
@@ -153,7 +186,12 @@ def filter_chip(option: dict[str, str]) -> rx.Component:
             UnifiedInboxState.unread_by_type.get(option["value"], 0) > 0,
             rx.el.span(
                 class_name="absolute right-2 top-2 size-2 rounded-full bg-[#e08b12]",
-                aria_label=f"Unread {option['label']} messages",
+                aria_label=rx.match(
+                    option["value"],
+                    ("helper", ui("Unread Helpers messages")),
+                    ("helpee", ui("Unread Helpees messages")),
+                    ui("Unread Contacts messages"),
+                ),
                 role="img",
             ),
             rx.fragment(),
@@ -168,9 +206,11 @@ def filter_chip(option: dict[str, str]) -> rx.Component:
             ),
             rx.icon(option["icon"], class_name="size-6 text-[#e08b12]"),
         ),
-        rx.el.span(option["label"], class_name="text-xs sm:text-sm text-black"),
-        title=option["label"],
-        aria_label=option["label"],
+        rx.el.span(
+            ui(option["label"]), class_name="text-xs sm:text-sm text-black"
+        ),
+        title=ui(option["label"]),
+        aria_label=ui(option["label"]),
         type="button",
         aria_pressed=rx.cond(
             UnifiedInboxState.type_filter == option["value"], "true", "false"
@@ -256,7 +296,7 @@ def inbox_toolbar() -> rx.Component:
             ),
             id="gah-inbox-filters",
             role="group",
-            aria_label="Filter conversations by type",
+            aria_label=ui("Filter conversations by type"),
             aria_hidden=~UnifiedInboxState.filters_open,
             class_name=rx.cond(
                 UnifiedInboxState.filters_open,
@@ -338,7 +378,9 @@ def address_book_row(contact: ContactItem) -> rx.Component:
         rx.el.button(
             contact_identity(contact),
             type="button",
-            aria_label=f"Open {contact['other_name']}'s passport",
+            aria_label=ui_template(
+                "Open {name}'s passport", "name", contact["other_name"]
+            ),
             on_click=UnifiedInboxState.open_contact_passport(
                 contact["link_id"]
             ),
@@ -348,7 +390,9 @@ def address_book_row(contact: ContactItem) -> rx.Component:
             envelope_star(),
             rx.el.span(ui("New"), class_name="text-xs text-black"),
             type="button",
-            aria_label=f"New message to {contact['other_name']}",
+            aria_label=ui_template(
+                "New message to {name}", "name", contact["other_name"]
+            ),
             on_click=UnifiedInboxState.open_compose(contact["link_id"]),
             class_name="gah-conversation-toggle flex shrink-0 flex-col items-center gap-1 rounded-xl bg-white px-3 py-2 hover:bg-[#fff7e8]",
         ),
@@ -381,7 +425,9 @@ def inbox_contacts_view() -> rx.Component:
                     class_name="gah-edge-stack flex w-full flex-col gap-0 overflow-hidden rounded-2xl bg-white",
                 ),
                 rx.el.p(
-                    "No confirmed contacts yet. Connect with someone in Community to start writing.",
+                    ui(
+                        "No confirmed contacts yet. Connect with someone in Community to start writing."
+                    ),
                     role="status",
                     class_name="py-8 text-center text-gray-600",
                 ),
@@ -420,8 +466,10 @@ def empty_state() -> rx.Component:
         rx.el.p(
             rx.cond(
                 UnifiedInboxState.has_search,
-                "Try a different name, message or request title.",
-                "Contacts, direct messages and job conversations all land here.",
+                ui("Try a different name, message or request title."),
+                ui(
+                    "Contacts, direct messages and job conversations all land here."
+                ),
             ),
             class_name="mt-1 max-w-md text-xs font-medium leading-relaxed text-[#4b5563]",
         ),
@@ -477,6 +525,6 @@ def unified_conversation_list(
                 ),
             ),
         ),
-        aria_label="All conversations",
+        aria_label=ui("All conversations"),
         class_name="w-full min-w-0 bg-transparent",
     )

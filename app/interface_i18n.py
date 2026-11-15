@@ -75,6 +75,18 @@ from app.interface_catalog_shared_interface import (
     SHARED_INTERFACE_CATALOGS,
     SHARED_INTERFACE_KEYS,
 )
+from app.interface_catalog_inbox_contacts import (
+    INBOX_CONTACT_CATALOGS,
+    INBOX_CONTACT_KEYS,
+)
+from app.interface_catalog_inbox_direct import (
+    INBOX_DIRECT_CATALOGS,
+    INBOX_DIRECT_KEYS,
+)
+from app.interface_catalog_inbox_feed import (
+    INBOX_FEED_CATALOGS,
+    INBOX_FEED_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -538,6 +550,15 @@ for _language, _entries in SHARED_INTERFACE_CATALOGS.items():
     for _key, _value in _entries.items():
         CATALOGS[_language].setdefault(_key, _value)
 
+for _catalogs in (
+    INBOX_CONTACT_CATALOGS,
+    INBOX_DIRECT_CATALOGS,
+    INBOX_FEED_CATALOGS,
+):
+    for _language, _entries in _catalogs.items():
+        for _key, _value in _entries.items():
+            CATALOGS[_language].setdefault(_key, _value)
+
 COMPLETE_KEYS: tuple[str, ...] = tuple(
     dict.fromkeys(
         [
@@ -570,6 +591,9 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *ADMIN_UI_KEYS,
             *MAP_STATUS_KEYS,
             *SHARED_INTERFACE_KEYS,
+            *INBOX_CONTACT_KEYS,
+            *INBOX_DIRECT_KEYS,
+            *INBOX_FEED_KEYS,
             "clear",
             "optional",
         ]

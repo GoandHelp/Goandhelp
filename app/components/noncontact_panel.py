@@ -2,7 +2,7 @@
 
 import reflex as rx
 from app.avatars import animal_avatar
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template
 from app.states.message_attachment_state import MessageAttachmentState
 from app.states.unified_inbox_state import UnifiedInboxState
 from app.components.message_attachments import message_attachments
@@ -53,7 +53,9 @@ def compose_form(
                 rows="3",
                 required=True,
                 max_length=2000,
-                placeholder="Hello! I'm passing through your city next week — could you point me to a good bike repair spot?",
+                placeholder=ui(
+                    "Hello! I'm passing through your city next week — could you point me to a good bike repair spot?"
+                ),
                 class_name=INPUT_CLASS + " resize-y leading-relaxed",
             ),
             class_name="w-full",
@@ -69,7 +71,7 @@ def compose_form(
                     ),
                     rx.el.span(
                         rx.icon("send", class_name="h-4 w-4"),
-                        "Send message",
+                        ui("Send message"),
                         class_name="flex items-center justify-center gap-2",
                     ),
                 ),
@@ -101,11 +103,11 @@ def message_control(
             rx.icon("mail", class_name="h-3.5 w-3.5"),
             rx.cond(
                 NonContactMessagingState.compose_target_id == person_id,
-                "Close message",
-                "Message",
+                ui("Close message"),
+                ui("Message"),
             ),
             type="button",
-            aria_label=f"Message {person_name}",
+            aria_label=ui_template("Message {name}", "name", person_name),
             on_click=lambda: NonContactMessagingState.open_compose(
                 person_id, person_name
             ),
@@ -159,7 +161,7 @@ def thread_header() -> rx.Component:
                     class_name="flex min-w-0 flex-wrap items-center gap-2",
                 ),
                 rx.el.p(
-                    "Replies are welcome either way",
+                    ui("Replies are welcome either way"),
                     class_name="mt-0.5 text-xs font-medium text-[#4b5563]",
                 ),
                 class_name="min-w-0 flex-1",
@@ -199,7 +201,7 @@ def thread_history() -> rx.Component:
                     class_name="flex flex-col gap-1 w-full min-w-0",
                 ),
                 rx.el.p(
-                    "No messages in this conversation yet.",
+                    ui("No messages in this conversation yet."),
                     class_name="text-sm font-medium text-[#4b5563] text-center py-8",
                 ),
             ),
@@ -215,7 +217,7 @@ def reply_composer() -> rx.Component:
             rows="1",
             required=MessageAttachmentState.pending.length() == 0,
             max_length=2000,
-            aria_label="Reply — you don't need to be contacts",
+            aria_label=ui("Reply — you don't need to be contacts"),
             placeholder=ui("Write your reply…"),
             class_name=MESSAGE_INPUT_CLASS,
         ),
@@ -260,7 +262,7 @@ def noncontact_conversation_view(
         rx.cond(
             embedded,
             rx.el.p(
-                "Not a contact · Replies are welcome either way",
+                ui("Not a contact · Replies are welcome either way"),
                 class_name="text-xs text-[#e08b12]",
             ),
             thread_header(),
