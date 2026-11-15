@@ -1,5 +1,6 @@
 import reflex as rx
 from app.avatars import animal_avatar
+from app.interface_i18n import ui
 from app.states.message_attachment_state import MessageAttachmentState
 from app.states.unified_inbox_state import UnifiedInboxState
 from app.components.message_attachments import message_attachments
@@ -59,7 +60,7 @@ def contacts_header() -> rx.Component:
         ),
         rx.el.button(
             rx.icon("search", class_name="h-3.5 w-3.5"),
-            "Find people",
+            ui("Find people"),
             type="button",
             on_click=lambda: CommunityState.set_section("search"),
             class_name="w-fit shrink-0 flex items-center gap-2 rounded-full bg-[#fff7e8] px-4 py-2 text-xs font-semibold text-[#e08b12] transition-colors hover:bg-[#f7d9a0] focus:outline-hidden focus:ring-2 focus:ring-[#e08b12]",
@@ -151,7 +152,7 @@ def incoming_card(contact: ContactItem) -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("x", class_name="h-3.5 w-3.5"),
-                "Decline",
+                ui("Decline"),
                 type="button",
                 disabled=ContactsState.is_responding,
                 on_click=lambda: ContactsState.decline_request(
@@ -182,7 +183,7 @@ def requests_section() -> rx.Component:
     """Incoming requests only — nothing outgoing is listed separately."""
     return rx.el.section(
         rx.el.h3(
-            "Requests",
+            ui("Requests"),
             class_name="text-xl sm:text-2xl font-bold tracking-tight text-[#111827]",
         ),
         rx.cond(
@@ -330,7 +331,7 @@ def conversation_header() -> rx.Component:
         rx.el.button(
             rx.icon("x", class_name="h-3.5 w-3.5"),
             type="button",
-            aria_label="Close conversation",
+            aria_label=ui("Close conversation"),
             on_click=ContactsState.clear_selection,
             class_name="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#fff7e8] text-black hover:bg-[#fff7e8] focus-visible:ring-2 focus-visible:ring-[#e08b12]",
         ),
@@ -363,7 +364,7 @@ def message_history() -> rx.Component:
                         class_name="h-6 w-6 text-[#fba922] mb-2",
                     ),
                     rx.el.p(
-                        "No messages yet",
+                        ui("No messages yet"),
                         class_name="text-sm font-semibold text-[#111827]",
                     ),
                     rx.el.p(
@@ -384,7 +385,7 @@ def composer() -> rx.Component:
             name="body",
             rows="1",
             aria_label="Write a note to your confirmed contact",
-            placeholder="Write a message",
+            placeholder=ui("Write a message"),
             class_name=MESSAGE_INPUT_CLASS,
         ),
         rx.el.button(
@@ -392,12 +393,12 @@ def composer() -> rx.Component:
                 ContactsState.is_sending,
                 rx.el.span(
                     rx.spinner(class_name="h-4 w-4"),
-                    "Sending…",
+                    ui("Sending…"),
                     class_name="flex items-center justify-center gap-2",
                 ),
                 rx.el.span(
                     rx.icon("send", class_name="h-4 w-4"),
-                    "Send",
+                    ui("Send"),
                     class_name="flex items-center justify-center gap-2",
                 ),
             ),
@@ -472,7 +473,7 @@ def conversation_panel(
                         class_name="mt-1 max-w-md text-xs font-medium leading-relaxed text-[#4b5563]",
                     ),
                     role="status",
-                    aria_label="No conversation selected",
+                    aria_label=ui("No conversation selected"),
                     class_name="mt-4 flex flex-col items-center justify-center text-center rounded-2xl border border-dashed border-[#f7d9a0] bg-white/60 px-6 py-14",
                 ),
             ),

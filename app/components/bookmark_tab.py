@@ -8,6 +8,7 @@ produced.
 import reflex as rx
 
 from app.states.bookmark_state import BookmarkState
+from app.interface_i18n import ui_template
 
 TAB_BASE = (
     "flex size-7 items-center justify-center rounded-lg rounded-tr-2xl "
@@ -42,13 +43,17 @@ def bookmark_tab(
         type="button",
         title=rx.cond(
             saved,
-            f"Remove {title} from your saved help requests",
-            f"Save {title} to your help requests",
+            ui_template(
+                "Remove {title} from your saved help requests", "title", title
+            ),
+            ui_template("Save {title} to your help requests", "title", title),
         ),
         aria_label=rx.cond(
             saved,
-            f"Remove {title} from your saved help requests",
-            f"Save {title} to your help requests",
+            ui_template(
+                "Remove {title} from your saved help requests", "title", title
+            ),
+            ui_template("Save {title} to your help requests", "title", title),
         ),
         aria_pressed=rx.cond(saved, "true", "false"),
         on_click=lambda: BookmarkState.toggle_bookmark(post_id),

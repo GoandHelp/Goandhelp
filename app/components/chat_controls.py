@@ -1,6 +1,7 @@
 import reflex as rx
 
 from app.components.report_dialog import report_button
+from app.interface_i18n import ui, ui_template
 
 COMPOSER_CLASS = "gah-chat-composer relative shrink-0 w-full min-w-0 rounded-xl bg-white shadow-[0_0_10px_rgba(17,24,39,0.12)]"
 MESSAGE_INPUT_CLASS = "block w-full min-w-0 min-h-24 max-h-40 [field-sizing:content] resize-none rounded-xl border-0 bg-white px-3 pt-3 pb-16 text-sm leading-relaxed text-black placeholder:text-[#4b5563] outline-hidden"
@@ -49,14 +50,22 @@ def _correspondence_bubble(
                     lambda photo, index: rx.el.a(
                         rx.el.img(
                             src=rx.get_upload_url(photo),
-                            alt=f"Message photo {index + 1}",
+                            alt=ui_template(
+                                "Message photo {number}",
+                                "number",
+                                (index + 1).to_string(),
+                            ),
                             loading="lazy",
                             class_name="h-auto max-h-48 w-full rounded-xl bg-white object-contain sm:max-h-64",
                         ),
                         href=rx.get_upload_url(photo),
                         target="_blank",
                         rel="noopener noreferrer",
-                        aria_label=f"Open message photo {index + 1} at full size in a new tab",
+                        aria_label=ui_template(
+                            "Open message photo {number} at full size in a new tab",
+                            "number",
+                            (index + 1).to_string(),
+                        ),
                         class_name="block w-full min-w-0 rounded-xl text-[#111827] focus-visible:ring-2 focus-visible:ring-[#fba922]",
                     ),
                 ),
@@ -66,7 +75,7 @@ def _correspondence_bubble(
                 rx.el.button(
                     rx.icon("trash-2", class_name="size-3"),
                     type="button",
-                    aria_label="Delete message",
+                    aria_label=ui("Delete message"),
                     on_click=delete_event,
                     class_name="flex size-11 shrink-0 items-center justify-center rounded-full bg-white text-[#b86e08] hover:bg-[#fff7e8] focus-visible:ring-2 focus-visible:ring-[#e08b12]",
                 ),

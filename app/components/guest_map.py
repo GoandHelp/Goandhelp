@@ -389,7 +389,7 @@ def guest_filters_button() -> rx.Component:
 def guest_map_canvas() -> rx.Component:
     return rx.el.div(
         open_free_map(
-            markers=GuestMapState.map_markers,
+            markers=GuestMapState.localized_map_markers,
             center=GuestMapState.map_center,
             zoom=GuestMapState.map_zoom,
             on_marker_select=GuestMapState.open_wall_for_marker,

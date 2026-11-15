@@ -1,19 +1,28 @@
 import reflex as rx
 
 from app.states.message_attachment_state import MessageAttachmentState
+from app.interface_i18n import ui, ui_template
 
 
 def pending_photo(path: rx.Var[str], index: rx.Var[int]) -> rx.Component:
     return rx.el.div(
         rx.el.img(
             src=rx.get_upload_url(path),
-            alt=f"Pending message photo {index + 1}",
+            alt=ui_template(
+                "Pending message photo {number}",
+                "number",
+                (index + 1).to_string(),
+            ),
             class_name="size-16 rounded-xl bg-[#fff7e8] object-cover",
         ),
         rx.el.button(
             rx.icon("x", class_name="size-4"),
             type="button",
-            aria_label=f"Remove pending photo {index + 1}",
+            aria_label=ui_template(
+                "Remove pending photo {number}",
+                "number",
+                (index + 1).to_string(),
+            ),
             on_click=MessageAttachmentState.remove_photo(path),
             disabled=MessageAttachmentState.busy,
             class_name="absolute -right-1 -top-1 flex size-8 items-center justify-center rounded-full bg-white text-[#e08b12] focus-visible:ring-2 focus-visible:ring-[#fba922]",
@@ -29,7 +38,7 @@ def message_attachments() -> rx.Component:
             MessageAttachmentState.pending.length() > 0,
             rx.el.div(
                 rx.foreach(MessageAttachmentState.pending, pending_photo),
-                aria_label="Pending photo attachments",
+                aria_label=ui("Pending photo attachments"),
                 class_name="flex max-h-24 w-full min-w-0 gap-3 overflow-x-auto px-1 pt-2 pb-1",
             ),
             rx.fragment(),
@@ -40,8 +49,8 @@ def message_attachments() -> rx.Component:
                     rx.icon("paperclip", class_name="size-4"),
                     rx.cond(
                         MessageAttachmentState.busy,
-                        "Attaching…",
-                        "Attach photos",
+                        ui("Attaching…"),
+                        ui("Attach photos"),
                     ),
                     class_name="flex items-center gap-1.5 text-sm font-semibold text-[#e08b12]",
                 ),
@@ -59,7 +68,9 @@ def message_attachments() -> rx.Component:
                 on_drop=MessageAttachmentState.upload_photos(
                     rx.upload_files(upload_id="inbox_message_photos")
                 ),
-                aria_label="Attach photos: JPEG, PNG or WebP, up to five, 3 MB each",
+                aria_label=ui(
+                    "Attach photos: JPEG, PNG or WebP, up to five, 3 MB each"
+                ),
                 class_name="w-fit cursor-pointer rounded-xl bg-white px-2 py-2 text-[#e08b12] focus-within:ring-2 focus-within:ring-[#fba922]",
             ),
             rx.el.span(

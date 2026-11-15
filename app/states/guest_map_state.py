@@ -314,6 +314,23 @@ class GuestMapState(rx.State):
             for job in self.jobs
         ]
 
+    @rx.var
+    async def localized_map_markers(self) -> list[MapMarker]:
+        from app.interface_i18n import translate
+        from app.states.auth_state import AuthState
+
+        auth = await self.get_state(AuthState)
+        language = auth.preferred_language
+        return [
+            {
+                **marker,
+                "label": translate(language, "Give help")
+                if marker["kind"] == "helper"
+                else marker["label"],
+            }
+            for marker in self.map_markers
+        ]
+
     @rx.event
     def set_view_mode(self, mode: str):
         self.view_mode = "map"

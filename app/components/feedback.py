@@ -52,6 +52,17 @@ def success_banner(
     )
 
 
+def _avatar_interface_label(value: str | rx.Var[str]) -> str | rx.Var[str]:
+    if isinstance(value, str) and value in {
+        "Email verified",
+        "Traveller avatar",
+        "Contact profile photo",
+        "Open member profile",
+    }:
+        return ui(value)
+    return value
+
+
 def verified_badge(
     verified: rx.Var[bool] | bool,
     label: str | rx.Var[str] = "Email verified",
@@ -64,8 +75,8 @@ def verified_badge(
         verified,
         rx.el.span(
             rx.icon("check", class_name="h-2.5 w-2.5 text-white"),
-            title=label,
-            aria_label=label,
+            title=_avatar_interface_label(label),
+            aria_label=_avatar_interface_label(label),
             role="img",
             class_name="absolute -bottom-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full border-2 border-white bg-[#22c55e]",
         ),
@@ -86,8 +97,8 @@ def verified_tick(
         verified,
         rx.el.span(
             rx.icon("check", class_name="h-2.5 w-2.5 text-white"),
-            title="Email verified",
-            aria_label="Email verified",
+            title=_avatar_interface_label(label),
+            aria_label=_avatar_interface_label(label),
             role="img",
             class_name=(
                 "shrink-0 flex items-center justify-center rounded-full "
@@ -104,8 +115,13 @@ def verified_chip(verified: rx.Var[bool] | bool) -> rx.Component:
         verified,
         rx.el.span(
             rx.icon("badge-check", class_name="h-3 w-3 text-white"),
-            "Email verified",
-            title="Email verified — confirms control of the email address, not real-world identity.",
+            ui("Email verified"),
+            title=ui(
+                "Email verified — confirms control of the email address, not real-world identity."
+            ),
+            aria_label=ui(
+                "Email verified — confirms control of the email address, not real-world identity."
+            ),
             class_name="w-fit flex items-center gap-1 rounded-full bg-[#22c55e] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white",
         ),
         rx.fragment(),
@@ -126,15 +142,21 @@ def avatar_with_tick(
         rx.cond(
             member_id > 0,
             rx.el.a(
-                rx.image(src=src, alt=alt, class_name=class_name),
+                rx.image(
+                    src=src,
+                    alt=_avatar_interface_label(alt),
+                    class_name=class_name,
+                ),
                 href="#",
-                aria_label=accessible_label,
+                aria_label=_avatar_interface_label(accessible_label),
                 on_click=DiscoveryState.open_member_profile(
                     member_id
                 ).stop_propagation.prevent_default,
                 class_name="block rounded-full focus-visible:outline-2 focus-visible:outline-[#fba922]",
             ),
-            rx.image(src=src, alt=alt, class_name=class_name),
+            rx.image(
+                src=src, alt=_avatar_interface_label(alt), class_name=class_name
+            ),
         ),
         verified_badge(verified, verification_label),
         class_name="relative w-fit shrink-0",

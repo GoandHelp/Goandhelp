@@ -2,6 +2,7 @@
 
 import reflex as rx
 from app.avatars import animal_avatar
+from app.interface_i18n import ui
 from app.states.message_attachment_state import MessageAttachmentState
 from app.states.unified_inbox_state import UnifiedInboxState
 from app.components.message_attachments import message_attachments
@@ -63,7 +64,7 @@ def compose_form(
                     NonContactMessagingState.is_sending,
                     rx.el.span(
                         rx.spinner(class_name="h-4 w-4"),
-                        "Sending…",
+                        ui("Sending…"),
                         class_name="flex items-center justify-center gap-2",
                     ),
                     rx.el.span(
@@ -77,7 +78,7 @@ def compose_form(
                 class_name="w-full sm:w-fit rounded-full bg-[#e08b12] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#b86e08] disabled:opacity-60",
             ),
             rx.el.button(
-                "Cancel",
+                ui("Cancel"),
                 type="button",
                 on_click=NonContactMessagingState.close_compose,
                 class_name="w-full sm:w-fit rounded-full border border-[#d4d4d4] bg-white px-4 py-2.5 text-sm font-semibold text-[#4b5563] transition-colors hover:border-[#e08b12] hover:text-[#b86e08]",
@@ -150,9 +151,9 @@ def thread_header() -> rx.Component:
                         class_name="text-base font-bold text-[#111827] leading-tight truncate",
                     ),
                     rx.el.span(
-                        "Not a contact",
-                        title="Not a contact",
-                        aria_label="Not a contact",
+                        ui("Not a contact"),
+                        title=ui("Not a contact"),
+                        aria_label=ui("Not a contact"),
                         class_name="w-fit shrink-0 rounded-full border border-[#fff7e8] bg-[#fff7e8] px-2 py-0.5 text-[10px] font-bold text-[#e08b12]",
                     ),
                     class_name="flex min-w-0 flex-wrap items-center gap-2",
@@ -168,7 +169,7 @@ def thread_header() -> rx.Component:
         rx.el.button(
             rx.icon("x", class_name="h-3.5 w-3.5"),
             type="button",
-            aria_label="Close conversation",
+            aria_label=ui("Close conversation"),
             on_click=NonContactMessagingState.clear_selection,
             class_name="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#fff7e8] text-black hover:bg-[#fff7e8] focus-visible:ring-2 focus-visible:ring-[#e08b12]",
         ),
@@ -215,7 +216,7 @@ def reply_composer() -> rx.Component:
             required=MessageAttachmentState.pending.length() == 0,
             max_length=2000,
             aria_label="Reply — you don't need to be contacts",
-            placeholder="Write your reply…",
+            placeholder=ui("Write your reply…"),
             class_name=MESSAGE_INPUT_CLASS,
         ),
         rx.el.button(
@@ -223,12 +224,12 @@ def reply_composer() -> rx.Component:
                 NonContactMessagingState.is_sending,
                 rx.el.span(
                     rx.spinner(class_name="h-4 w-4"),
-                    "Sending…",
+                    ui("Sending…"),
                     class_name="flex items-center justify-center gap-2",
                 ),
                 rx.el.span(
                     rx.icon("send", class_name="h-4 w-4"),
-                    "Send",
+                    ui("Send"),
                     class_name="flex items-center justify-center gap-2",
                 ),
             ),

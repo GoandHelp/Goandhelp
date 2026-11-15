@@ -1,5 +1,6 @@
 import reflex as rx
 
+from app.interface_i18n import ui
 from app.components.block_dialog import block_member_button
 from app.components.report_dialog import report_button
 from app.models import REPORT_TARGET_PROFILE
@@ -13,11 +14,11 @@ def chat_safety(member_id: rx.Var[int], name: rx.Var[str]) -> rx.Component:
             rx.el.button(
                 rx.cond(
                     ContactsState.accepted_member_ids.contains(member_id),
-                    "Already a contact",
+                    ui("Already a contact"),
                     rx.cond(
                         ContactsState.pending_member_ids.contains(member_id),
-                        "Contact request pending",
-                        "Add contact",
+                        ui("Contact request pending"),
+                        ui("Add contact"),
                     ),
                 ),
                 type="button",

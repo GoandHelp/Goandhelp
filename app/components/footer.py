@@ -1,5 +1,6 @@
 import reflex as rx
 
+from app.interface_i18n import ui
 from app.components.header import brand_mark
 from app.components.language_control import language_control
 
@@ -17,7 +18,7 @@ def footer() -> rx.Component:
                         class_name="text-sm font-bold tracking-tight text-[#000000]",
                     ),
                     rx.el.p(
-                        "Community in your hands",
+                        ui("Community in your hands"),
                         class_name="text-xs font-medium text-[#404040]",
                     ),
                     class_name="min-w-0",
@@ -27,7 +28,7 @@ def footer() -> rx.Component:
             rx.el.div(
                 rx.el.span(
                     rx.icon("globe", class_name="h-3.5 w-3.5 text-[#e08b12]"),
-                    "Language",
+                    ui("Language"),
                     class_name="flex items-center gap-1.5 text-xs font-semibold text-[#404040]",
                 ),
                 language_control(),
