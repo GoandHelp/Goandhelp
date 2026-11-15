@@ -307,9 +307,78 @@ class InboxInterfaceCatalogTests(unittest.TestCase):
             'contact["intro_note"]',
             inspect.getsource(contacts_panel.incoming_card),
         )
+        bubble_source = inspect.getsource(chat_controls._correspondence_bubble)
+        self.assertIn('msg["body"].to(str)', bubble_source)
+        self.assertNotIn('ui(msg["body"]', bubble_source)
         self.assertIn(
-            'msg["body"].to(str)',
+            "_correspondence_bubble(_normalize_message(msg), target, delete_event)",
             inspect.getsource(chat_controls.correspondence_bubble),
+        )
+
+    def test_message_history_empty_state_uses_distinct_localized_heading_and_caption(
+        self,
+    ):
+        source = inspect.getsource(contacts_panel.message_history)
+        tree = ast.parse(source)
+        localized_paragraphs = []
+        raw_paragraph_text = []
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call) or not isinstance(
+                node.func, ast.Attribute
+            ):
+                continue
+            if node.func.attr != "p" or not node.args:
+                continue
+            text = node.args[0]
+            if isinstance(text, ast.Constant) and isinstance(text.value, str):
+                raw_paragraph_text.append(text.value)
+                continue
+            if not isinstance(text, ast.Call) or not isinstance(
+                text.func, ast.Name
+            ):
+                continue
+            if text.func.id != "ui" or not text.args:
+                continue
+            value = text.args[0]
+            if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                class_name = next(
+                    (
+                        keyword.value.value
+                        for keyword in node.keywords
+                        if keyword.arg == "class_name"
+                        and isinstance(keyword.value, ast.Constant)
+                        and isinstance(keyword.value.value, str)
+                    ),
+                    "",
+                )
+                localized_paragraphs.append((value.value, class_name))
+
+        self.assertIn(
+            ("No messages yet", "text-sm font-semibold text-[#111827]"),
+            localized_paragraphs,
+        )
+        self.assertIn(
+            (
+                "Say hello, share where you're heading, and swap a little help.",
+                "text-sm font-medium text-[#4b5563] mt-1",
+            ),
+            localized_paragraphs,
+        )
+        self.assertNotIn(
+            "Say hello, share where you're heading, and swap a little help.",
+            raw_paragraph_text,
+        )
+        rendered_component = contacts_panel.message_history()
+        self.assertTrue(rendered_component.render())
+        rendered = str(rendered_component)
+        self.assertIn(str(ui("No messages yet")), rendered)
+        self.assertIn(
+            str(
+                ui(
+                    "Say hello, share where you're heading, and swap a little help."
+                )
+            ),
+            rendered,
         )
 
     def test_node_substitution_preserves_special_member_text_and_role_templates(
@@ -452,10 +521,20 @@ class InboxInterfaceCatalogTests(unittest.TestCase):
         self.assertIn(
             "type_filters", inspect.getsource(unified_inbox.inbox_toolbar)
         )
-        self.assertIn(
-            "contact_count_heading",
-            inspect.getsource(contacts_panel.contacts_header),
+        contacts_header_source = inspect.getsource(
+            contacts_panel.contacts_header
         )
+        self.assertIn(
+            "ContactsState.contacts.length().to_string()",
+            contacts_header_source,
+        )
+        count_heading = ui_template(
+            "{count} Contacts",
+            "count",
+            ContactsState.contacts.length().to_string(),
+        )
+        self.assertIsNotNone(count_heading._get_all_var_data())
+        self.assertIn('.split("{count}").join(', str(count_heading))
 
 
 if __name__ == "__main__":

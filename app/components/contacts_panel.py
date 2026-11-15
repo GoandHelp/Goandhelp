@@ -372,13 +372,13 @@ def message_history() -> rx.Component:
                         class_name="h-6 w-6 text-[#fba922] mb-2",
                     ),
                     rx.el.p(
-                        ui(
-                            "Say hello, share where you're heading, and swap a little help."
-                        ),
+                        ui("No messages yet"),
                         class_name="text-sm font-semibold text-[#111827]",
                     ),
                     rx.el.p(
-                        "Say hello, share where you're heading, and swap a little help.",
+                        ui(
+                            "Say hello, share where you're heading, and swap a little help."
+                        ),
                         class_name="text-sm font-medium text-[#4b5563] mt-1",
                     ),
                     class_name="flex flex-col items-center justify-center text-center w-full px-6 py-10",

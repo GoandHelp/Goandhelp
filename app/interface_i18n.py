@@ -87,6 +87,10 @@ from app.interface_catalog_inbox_feed import (
     INBOX_FEED_CATALOGS,
     INBOX_FEED_KEYS,
 )
+from app.interface_catalog_skills_prompt import (
+    SKILLS_PROMPT_CATALOGS,
+    SKILLS_PROMPT_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -554,6 +558,7 @@ for _catalogs in (
     INBOX_CONTACT_CATALOGS,
     INBOX_DIRECT_CATALOGS,
     INBOX_FEED_CATALOGS,
+    SKILLS_PROMPT_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -594,6 +599,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *INBOX_CONTACT_KEYS,
             *INBOX_DIRECT_KEYS,
             *INBOX_FEED_KEYS,
+            *SKILLS_PROMPT_KEYS,
             "clear",
             "optional",
         ]
