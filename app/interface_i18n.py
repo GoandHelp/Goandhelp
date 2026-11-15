@@ -91,6 +91,10 @@ from app.interface_catalog_skills_prompt import (
     SKILLS_PROMPT_CATALOGS,
     SKILLS_PROMPT_KEYS,
 )
+from app.interface_catalog_job_conversation import (
+    JOB_CONVERSATION_CATALOGS,
+    JOB_CONVERSATION_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -559,6 +563,7 @@ for _catalogs in (
     INBOX_DIRECT_CATALOGS,
     INBOX_FEED_CATALOGS,
     SKILLS_PROMPT_CATALOGS,
+    JOB_CONVERSATION_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -600,6 +605,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *INBOX_DIRECT_KEYS,
             *INBOX_FEED_KEYS,
             *SKILLS_PROMPT_KEYS,
+            *JOB_CONVERSATION_KEYS,
             "clear",
             "optional",
         ]
@@ -632,6 +638,37 @@ def ui_template(
     )
     return rx.Var(
         _js_expr=f"({template}).split({json.dumps(f'{{{parameter}}}')}).join({replacement})",
+        _var_type=str,
+        _var_data=data,
+    ).to(str)
+
+
+def ui_template_multi(
+    source: str | rx.Var[str], values: dict[str, str | rx.Var[str]]
+) -> rx.Var[str]:
+    """Translate a named-slot template, then insert each value literally once."""
+    template = ui(source)
+    replacements = {
+        name: rx.Var.create(value) for name, value in values.items()
+    }
+    data = VarData.merge(
+        template._get_all_var_data(),
+        *(value._get_all_var_data() for value in replacements.values()),
+    )
+    names = "|".join(replacements)
+    slots = (
+        "{"
+        + ",".join(
+            f"{json.dumps(name)}:{value}"
+            for name, value in replacements.items()
+        )
+        + "}"
+    )
+    return rx.Var(
+        _js_expr=(
+            f"({template}).replace(new RegExp('\\\\{{({names})\\\\}}', 'g'), "
+            f"(match, slot) => ({slots})[slot])"
+        ),
         _var_type=str,
         _var_data=data,
     ).to(str)

@@ -138,9 +138,9 @@ class SkillsPromptTranslationTests(unittest.TestCase):
         self.assertIn("missing_skills_open: bool = False", state_source)
         self.assertIn(
             "self.missing_skills_open = False",
-            inspect.getsource(ProfileState.close_missing_skills),
+            inspect.getsource(ProfileState.close_missing_skills.fn),
         )
-        open_source = inspect.getsource(ProfileState.open_required_skills)
+        open_source = inspect.getsource(ProfileState.open_required_skills.fn)
         self.assertIn("self.missing_skills_open = False", open_source)
         self.assertIn('self.active_tab = "profile"', open_source)
         self.assertIn("self.skills_open = True", open_source)

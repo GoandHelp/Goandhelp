@@ -1,6 +1,6 @@
 import reflex as rx
 
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template, ui_template_multi
 from app.avatars import animal_avatar, member_avatar
 
 from app.states.message_deletion_state import MessageDeletionState
@@ -75,7 +75,13 @@ def contact_option(contact: ContactItem) -> rx.Component:
         on_click=ContactsState.set_compose_target(
             contact["link_id"].to_string()
         ),
-        aria_label=f"Write to {contact['other_name']} {contact['other_handle']}",
+        aria_label=ui_template_multi(
+            "Write to {name} {handle}",
+            {
+                "name": contact["other_name"],
+                "handle": contact["other_handle"],
+            },
+        ),
         class_name="gah-conversation-toggle flex w-full items-center gap-3 bg-white px-3 py-3 text-black hover:bg-[#fff7e8]",
     )
 
@@ -86,7 +92,7 @@ def compose_area() -> rx.Component:
         inbox_subview_header("Write a message", envelope_star()),
         rx.el.div(
             rx.el.label(
-                "To:",
+                ui("To:"),
                 html_for="inbox-to",
                 class_name="text-sm font-semibold text-black",
             ),
@@ -95,7 +101,7 @@ def compose_area() -> rx.Component:
                 default_value=ContactsState.compose_search,
                 on_change=ContactsState.set_compose_search.debounce(300),
                 disabled=ContactsState.is_sending,
-                placeholder="Find a contact by name or @username",
+                placeholder=ui("Find a contact by name or @username"),
                 auto_complete="off",
                 class_name=INPUT_CLASS,
             ),
@@ -109,7 +115,9 @@ def compose_area() -> rx.Component:
                 rx.cond(
                     ContactsState.compose_ready,
                     rx.el.p(
-                        "Recipient selected · edit To to choose someone else",
+                        ui(
+                            "Recipient selected · edit To to choose someone else"
+                        ),
                         role="status",
                         class_name="text-xs text-[#e08b12]",
                     ),
@@ -119,11 +127,13 @@ def compose_area() -> rx.Component:
                             rx.foreach(
                                 ContactsState.compose_options, contact_option
                             ),
-                            aria_label="Matching accepted contacts",
+                            aria_label=ui("Matching accepted contacts"),
                             class_name="gah-edge-stack flex max-h-64 w-full flex-col gap-0 overflow-y-auto rounded-2xl bg-white",
                         ),
                         rx.el.p(
-                            "No matching contacts. Try another name or username.",
+                            ui(
+                                "No matching contacts. Try another name or username."
+                            ),
                             role="status",
                             class_name="py-3 text-sm text-gray-600",
                         ),
@@ -137,7 +147,7 @@ def compose_area() -> rx.Component:
                 ContactsState.has_message_contacts,
                 rx.el.form(
                     rx.el.label(
-                        "Subject",
+                        ui("Subject"),
                         html_for="inbox-subject",
                         class_name="text-sm font-semibold text-black",
                     ),
@@ -146,12 +156,12 @@ def compose_area() -> rx.Component:
                         name="subject",
                         required=True,
                         max_length=120,
-                        placeholder="What is your message about?",
+                        placeholder=ui("What is your message about?"),
                         class_name=INPUT_CLASS,
                     ),
                     rx.el.div(
                         rx.el.label(
-                            "Message",
+                            ui("Message"),
                             html_for="inbox-compose-message",
                             class_name="text-sm font-semibold text-black",
                         ),
@@ -161,7 +171,7 @@ def compose_area() -> rx.Component:
                             rows="7",
                             required=True,
                             max_length=2000,
-                            placeholder="Write a message",
+                            placeholder=ui("Write a message"),
                             class_name=INPUT_CLASS
                             + " resize-y leading-relaxed",
                         ),
@@ -196,11 +206,11 @@ def compose_area() -> rx.Component:
                         "users-round", class_name="h-5 w-5 text-[#fba922] mb-2"
                     ),
                     rx.el.p(
-                        "No confirmed contacts yet",
+                        ui("No confirmed contacts yet"),
                         class_name="text-sm font-bold text-[#111827]",
                     ),
                     rx.el.p(
-                        "Confirm a contact in Community, then message them",
+                        ui("Confirm a contact in Community, then message them"),
                         class_name="mt-1 text-sm font-medium leading-relaxed text-[#4b5563]",
                     ),
                     class_name="gah-compose-body w-full flex flex-col items-center justify-center text-center rounded-2xl bg-white px-5 py-8 shadow-[0_0_10px_rgba(17,24,39,0.12)]",
@@ -268,8 +278,16 @@ def review_target_identity() -> rx.Component:
                     aria_label=rx.cond(
                         MessagingState.selected_thread["other_rating_count"]
                         > 0,
-                        f"{MessagingState.selected_thread['other_rating']:.1f} out of 5 · {MessagingState.selected_thread['other_rating_count']} reviews",
-                        "Unrated · 0 reviews",
+                        ui_template_multi(
+                            "{score} out of 5 · {count} reviews",
+                            {
+                                "score": f"{MessagingState.selected_thread['other_rating']:.1f}",
+                                "count": MessagingState.selected_thread[
+                                    "other_rating_count"
+                                ].to_string(),
+                            },
+                        ),
+                        ui("Unrated · 0 reviews"),
                     ),
                     class_name="flex shrink-0 items-center gap-0.5",
                 ),
@@ -288,7 +306,7 @@ def review_target_identity() -> rx.Component:
         rx.el.button(
             disclosure_arrow(True, "x"),
             type="button",
-            aria_label="Close review form",
+            aria_label=ui("Close review form"),
             aria_expanded=True,
             aria_controls=f"pending-review-{MessagingState.selected_thread['task_id']}",
             disabled=MessagingState.is_reviewing,
@@ -327,11 +345,11 @@ def message_history() -> rx.Component:
                 rx.el.div(
                     rx.icon("send", class_name="h-6 w-6 text-[#fba922] mb-2"),
                     rx.el.p(
-                        "No messages in this thread yet.",
+                        ui("No messages in this thread yet."),
                         class_name="text-sm font-semibold text-[#404040]",
                     ),
                     rx.el.p(
-                        "Say hello and agree where to meet.",
+                        ui("Say hello and agree where to meet."),
                         class_name="text-sm font-medium text-[#4b5563] mt-1",
                     ),
                     class_name="flex flex-col items-center justify-center text-center w-full px-6 py-10",
@@ -349,8 +367,8 @@ def composer() -> rx.Component:
             key=MessagingState.composer_generation,
             default_value="",
             rows="1",
-            aria_label="Reply to this conversation",
-            placeholder="Write a message",
+            aria_label=ui("Reply to this conversation"),
+            placeholder=ui("Write a message"),
             class_name=MESSAGE_INPUT_CLASS,
         ),
         rx.el.div(
@@ -392,7 +410,9 @@ def composer() -> rx.Component:
 def completion_form() -> rx.Component:
     return rx.el.button(
         rx.cond(
-            MessagingState.is_completing, "Confirming…", "Confirm job is done"
+            MessagingState.is_completing,
+            ui("Confirming…"),
+            ui("Confirm job is done"),
         ),
         rx.cond(
             MessagingState.is_completing,
@@ -412,7 +432,7 @@ def completion_card() -> rx.Component:
         rx.cond(
             MessagingState.can_review,
             rx.el.button(
-                "Review",
+                ui("Review"),
                 rx.icon("star", class_name="size-4"),
                 type="button",
                 on_click=MessagingState.open_review_target,
@@ -444,7 +464,10 @@ def category_star(
             ),
         ),
         type="button",
-        aria_label=f"{label}: {value} out of 5 stars",
+        aria_label=ui_template_multi(
+            "{category}: {score} out of 5 stars",
+            {"category": ui(label), "score": value.to_string()},
+        ),
         aria_pressed=value == score,
         on_click=lambda: MessagingState.set_review_score(field, value),
         class_name=rx.cond(
@@ -459,14 +482,18 @@ def review_category_row(item: dict[str, str]) -> rx.Component:
     return rx.el.div(
         rx.el.div(
             rx.el.p(
-                item["label"],
+                ui(item["label"]),
                 class_name="text-sm font-bold text-[#111827]",
             ),
             rx.el.span(
                 rx.cond(
                     item["score"].to(int) > 0,
-                    f"{item['score'].to(float):.1f} out of 5",
-                    "Not scored yet",
+                    ui_template(
+                        "{score} out of 5",
+                        "score",
+                        f"{item['score'].to(float):.1f}",
+                    ),
+                    ui("Not scored yet"),
                 ),
                 class_name=rx.cond(
                     item["score"].to(int) > 0,
@@ -486,7 +513,10 @@ def review_category_row(item: dict[str, str]) -> rx.Component:
             rx.el.button(
                 ui("Clear"),
                 type="button",
-                aria_label=f"Clear {item['label']} to zero, not scored",
+                aria_label=ui_template_multi(
+                    "Clear {category} to zero, not scored",
+                    {"category": ui(item["label"])},
+                ),
                 on_click=lambda: MessagingState.set_review_score(
                     item["field"], 0
                 ),
@@ -501,11 +531,15 @@ def review_category_row(item: dict[str, str]) -> rx.Component:
 def category_score_chip(item: dict[str, str]) -> rx.Component:
     return rx.el.span(
         rx.el.span(
-            item["label"],
+            ui(item["label"]),
             class_name="text-[10px] font-bold uppercase tracking-wide text-[#4b5563]",
         ),
         rx.el.span(
-            f"{item['score'].to(float):.1f} out of 5",
+            ui_template(
+                "{score} out of 5",
+                "score",
+                f"{item['score'].to(float):.1f}",
+            ),
             class_name="text-[11px] font-bold text-[#e08b12]",
         ),
         class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-2.5 py-1",
@@ -533,7 +567,15 @@ def review_form() -> rx.Component:
     return rx.el.form(
         rx.el.div(
             rx.el.h4(
-                "Score all four categories",
+                rx.cond(
+                    MessagingState.review_ready,
+                    ui_template(
+                        "Overall {score} out of 5",
+                        "score",
+                        f"{(MessagingState.review_scores['category_one'] + MessagingState.review_scores['category_two'] + MessagingState.review_scores['category_three'] + MessagingState.review_scores['category_four']) / 4:.1f}",
+                    ),
+                    ui("Score all four categories"),
+                ),
                 class_name="rounded-xl bg-[#fff7e8] border border-[#fba922] px-3 py-2 text-sm font-bold text-[#b86e08]",
             ),
             rx.el.span(
@@ -552,7 +594,9 @@ def review_form() -> rx.Component:
             rx.el.textarea(
                 name="comment",
                 rows="3",
-                placeholder="I.e. Turned up early, carried more than their share and told great stories.",
+                placeholder=ui(
+                    "I.e. Turned up early, carried more than their share and told great stories."
+                ),
                 class_name=INPUT_CLASS + " resize-y leading-relaxed",
             ),
             class_name="w-full",
@@ -562,12 +606,12 @@ def review_form() -> rx.Component:
                 MessagingState.is_reviewing,
                 rx.el.span(
                     rx.spinner(class_name="h-4 w-4"),
-                    "Saving review…",
+                    ui("Saving review…"),
                     class_name="flex items-center justify-center gap-2",
                 ),
                 rx.el.span(
                     rx.icon("star", class_name="h-4 w-4"),
-                    "Save review",
+                    ui("Save review"),
                     class_name="flex items-center justify-center gap-2",
                 ),
             ),
@@ -588,7 +632,7 @@ def review_response(review: ReviewItem) -> rx.Component:
             review["response"],
             rx.el.div(
                 rx.el.p(
-                    "Recipient’s response",
+                    ui("Recipient’s response"),
                     class_name="text-xs font-bold text-[#e08b12]",
                 ),
                 browser_translatable_text(
@@ -601,7 +645,7 @@ def review_response(review: ReviewItem) -> rx.Component:
                 review["can_respond"],
                 rx.el.form(
                     rx.el.label(
-                        "Your one-time response · up to 500 words",
+                        ui("Your one-time response · up to 500 words"),
                         html_for=f"review-response-{review['id']}",
                         class_name="text-xs font-semibold text-[#4b5563]",
                     ),
@@ -610,14 +654,16 @@ def review_response(review: ReviewItem) -> rx.Component:
                         id=f"review-response-{review['id']}",
                         rows="2",
                         required=True,
-                        placeholder="Add a thoughtful response. It cannot be edited after posting.",
+                        placeholder=ui(
+                            "Add a thoughtful response. It cannot be edited after posting."
+                        ),
                         class_name="w-full rounded-xl border border-[#fff7e8] bg-white p-3 text-sm text-[#111827] focus:outline-hidden focus:ring-2 focus:ring-[#e08b12]",
                     ),
                     rx.el.button(
                         rx.cond(
                             MessagingState.responding_id == review["id"],
-                            "Posting…",
-                            "Post response",
+                            ui("Posting…"),
+                            ui("Post response"),
                         ),
                         type="submit",
                         disabled=MessagingState.responding_id != 0,
@@ -659,11 +705,23 @@ def review_card(review: ReviewItem) -> rx.Component:
             ),
             rx.el.div(
                 rx.el.p(
-                    f"{review['reviewer_name']} → {review['reviewee_name']}",
+                    ui_template_multi(
+                        "{reviewer} → {reviewee}",
+                        {
+                            "reviewer": review["reviewer_name"],
+                            "reviewee": review["reviewee_name"],
+                        },
+                    ),
                     class_name="text-sm font-semibold text-[#111827]",
                 ),
                 rx.el.p(
-                    f"{review['direction_label']} · {review['created']}",
+                    ui_template_multi(
+                        "{direction} · {date}",
+                        {
+                            "direction": ui(review["direction_label"]),
+                            "date": review["created"],
+                        },
+                    ),
                     class_name="text-[11px] font-medium text-[#4b5563] mt-0.5",
                 ),
                 class_name="min-w-0 flex-1",
@@ -671,7 +729,11 @@ def review_card(review: ReviewItem) -> rx.Component:
             rx.el.div(
                 star_row(review["rating"].to(int)),
                 rx.el.span(
-                    f"{review['rating']:.1f} out of 5",
+                    ui_template(
+                        "{score} out of 5",
+                        "score",
+                        f"{review['rating']:.1f}",
+                    ),
                     class_name="text-[11px] font-bold text-[#e08b12]",
                 ),
                 class_name="flex flex-col items-end gap-1 shrink-0",
@@ -694,7 +756,7 @@ def review_card(review: ReviewItem) -> rx.Component:
             review["kindness_flag"],
             rx.el.span(
                 rx.icon("sparkles", class_name="h-3 w-3"),
-                "Kindness badge",
+                ui("Kindness badge"),
                 class_name="mt-2 w-fit flex items-center gap-1.5 rounded-full bg-[#fba922] px-2.5 py-0.5 text-[11px] font-semibold text-[#111827]",
             ),
             rx.fragment(),
@@ -714,8 +776,20 @@ def pending_review_card(target: ThreadItem) -> rx.Component:
                 rx.el.p(
                     rx.cond(
                         target["my_role"] == "poster",
-                        f"{target['other_name']} helped you with {target['post_title']}.",
-                        f"{target['other_name']} received your help with {target['post_title']}.",
+                        ui_template_multi(
+                            "{name} helped you with {title}.",
+                            {
+                                "name": target["other_name"],
+                                "title": target["post_title"],
+                            },
+                        ),
+                        ui_template_multi(
+                            "{name} received your help with {title}.",
+                            {
+                                "name": target["other_name"],
+                                "title": target["post_title"],
+                            },
+                        ),
                     ),
                     class_name="text-xs text-[#4b5563]",
                 ),
@@ -743,8 +817,16 @@ def pending_review_card(target: ThreadItem) -> rx.Component:
                     rx.el.span(
                         rx.cond(
                             target["other_rating_count"] > 0,
-                            f"{target['other_rating']:.1f} out of 5 · {target['other_rating_count']} reviews",
-                            "Unrated · 0 reviews",
+                            ui_template_multi(
+                                "{score} out of 5 · {count} reviews",
+                                {
+                                    "score": f"{target['other_rating']:.1f}",
+                                    "count": target[
+                                        "other_rating_count"
+                                    ].to_string(),
+                                },
+                            ),
+                            ui("Unrated · 0 reviews"),
                         ),
                         class_name="block mt-1 text-xs font-semibold text-[#e08b12]",
                     ),
@@ -755,8 +837,8 @@ def pending_review_card(target: ThreadItem) -> rx.Component:
                     rx.el.span(
                         rx.cond(
                             target["my_role"] == "poster",
-                            "Helped you",
-                            "Received your help",
+                            ui("Helped you"),
+                            ui("Received your help"),
                         ),
                         class_name="block mt-1 text-xs text-[#4b5563]",
                     ),
@@ -778,9 +860,9 @@ def pending_review_card(target: ThreadItem) -> rx.Component:
             & (MessagingState.selected_thread["task_id"] == target["task_id"]),
             rx.el.button(
                 rx.icon("trash-2", class_name="size-3.5"),
-                "Delete review",
+                ui("Delete review"),
                 type="button",
-                title="Dismiss this unfilled review for this session only",
+                title=ui("Dismiss this unfilled review for this session only"),
                 disabled=MessagingState.is_reviewing,
                 on_click=lambda: MessagingState.dismiss_review_target(
                     target["task_id"]
@@ -809,7 +891,7 @@ def story_photo(photo: dict[str, str]) -> rx.Component:
     return rx.el.figure(
         rx.image(
             src=rx.get_upload_url(photo["url_name"]),
-            alt="A photo of the finished work",
+            alt=ui("A photo of the finished work"),
             class_name="h-28 w-40 rounded-xl object-cover bg-[#fff7e8]",
         ),
         rx.el.figcaption(
@@ -828,8 +910,8 @@ def story_photo(photo: dict[str, str]) -> rx.Component:
             rx.el.button(
                 rx.icon("trash-2", class_name="h-3 w-3"),
                 type="button",
-                title="Remove your photo",
-                aria_label="Remove your photo",
+                title=ui("Remove your photo"),
+                aria_label=ui("Remove your photo"),
                 on_click=lambda: MessagingState.remove_completion_photo(
                     photo["id"]
                 ),
@@ -851,11 +933,13 @@ def photo_strip() -> rx.Component:
         rx.el.div(
             rx.icon("images", class_name="h-5 w-5 text-[#e08b12] mb-1.5"),
             rx.el.p(
-                "No photos on this postcard yet.",
+                ui("No photos on this postcard yet."),
                 class_name="text-xs font-bold text-[#111827]",
             ),
             rx.el.p(
-                "Either of you can add up to five pictures of the finished work.",
+                ui(
+                    "Either of you can add up to five pictures of the finished work."
+                ),
                 class_name="mt-0.5 text-xs font-medium text-[#4b5563]",
             ),
             class_name="flex flex-col items-center justify-center text-center w-full rounded-2xl border border-dashed border-[#fff7e8] bg-white px-4 py-6",
@@ -875,13 +959,22 @@ def photo_uploader() -> rx.Component:
                 rx.el.span(
                     rx.cond(
                         MessagingState.photo_busy,
-                        "Adding photos…",
-                        "Add completed-work photos",
+                        ui("Adding photos…"),
+                        ui("Add completed-work photos"),
                     ),
                     class_name="text-xs font-bold text-[#111827]",
                 ),
                 rx.el.span(
-                    MessagingState.photo_slots_label,
+                    rx.match(
+                        MessagingState.photo_slots_left,
+                        (0, ui("All 5 photo slots used")),
+                        (1, ui("1 photo slot left")),
+                        ui_template(
+                            "{count} photo slots left",
+                            "count",
+                            MessagingState.photo_slots_left.to_string(),
+                        ),
+                    ),
                     class_name="text-[10px] font-semibold uppercase tracking-wide text-[#4b5563]",
                 ),
                 class_name="flex flex-col items-center justify-center gap-1 text-center",
@@ -902,7 +995,9 @@ def photo_uploader() -> rx.Component:
             class_name="w-full cursor-pointer rounded-2xl border-2 border-dashed border-[#fff7e8] bg-[#fff7e8] px-4 py-5 transition-colors hover:border-[#e08b12]",
         ),
         rx.el.p(
-            "JPEG/JPG, PNG or WebP only. Maximum 3 MB per source; stored as static WebP under 1 MB. No video or animated images. Completion photos are separate from original request photos.",
+            ui(
+                "JPEG/JPG, PNG or WebP only. Maximum 3 MB per source; stored as static WebP under 1 MB. No video or animated images. Completion photos are separate from original request photos."
+            ),
             class_name="mt-2 text-[11px] font-medium leading-relaxed text-[#4b5563]",
         ),
         rx.cond(
@@ -936,7 +1031,11 @@ def share_link_button(
         href=MessagingState.share_links[key],
         target="_blank",
         rel="noopener noreferrer",
-        title=f"Open {label} with your caption ready — you still press post",
+        title=ui_template(
+            "Open {service} with your caption ready — you still press post",
+            "service",
+            label,
+        ),
         class_name=f"{SHARE_MARK_BASE} {tone}",
     )
 
@@ -948,9 +1047,10 @@ def device_share_button(label: str, icon: str, tone: str) -> rx.Component:
         label,
         type="button",
         on_click=lambda: MessagingState.share_via_device(label),
-        title=(
-            f"{label} has no public web posting link, so we open your device "
-            "share sheet or copy the caption for you"
+        title=ui_template(
+            "{service} has no public web posting link, so we open your device share sheet or copy the caption for you",
+            "service",
+            label,
         ),
         class_name=f"{SHARE_MARK_BASE} {tone}",
     )
@@ -975,7 +1075,7 @@ def share_marks() -> rx.Component:
             "pinterest", "Pinterest", "pin", "bg-[#fff7e8] text-[#e08b12]"
         ),
         share_link_button(
-            "email", "Email", "mail", "bg-[#fff7e8] text-[#b86e08]"
+            "email", ui("Email"), "mail", "bg-[#fff7e8] text-[#b86e08]"
         ),
         device_share_button(
             "Instagram", "inbox", "bg-[#fff7e8] text-[#b86e08]"
@@ -993,17 +1093,17 @@ def success_story_card() -> rx.Component:
             rx.el.div(
                 rx.el.span(
                     rx.icon("party-popper", class_name="h-3.5 w-3.5"),
-                    "Five stars both ways",
+                    ui("Five stars both ways"),
                     class_name="w-fit flex items-center gap-2 rounded-full bg-[#fba922] px-3 py-1 text-xs font-bold text-[#111827]",
                 ),
                 rx.el.h3(
-                    "Share the success",
+                    ui("Share the success"),
                     class_name="mt-2 text-xl font-bold tracking-tight text-[#111827]",
                 ),
                 rx.el.p(
-                    "You both gave each other a perfect score. Add a few "
-                    "pictures of the finished work and send the postcard "
-                    "wherever you like — nothing is ever posted for you.",
+                    ui(
+                        "You both gave each other a perfect score. Add a few pictures of the finished work and send the postcard wherever you like — nothing is ever posted for you."
+                    ),
                     class_name="mt-1 text-sm font-medium leading-relaxed text-[#4b5563]",
                 ),
                 class_name="w-full",
@@ -1018,27 +1118,28 @@ def success_story_card() -> rx.Component:
                 rx.el.textarea(
                     rows="3",
                     default_value=MessagingState.share_text,
-                    placeholder="Say what you managed together.",
+                    placeholder=ui("Say what you managed together."),
                     on_change=MessagingState.set_share_caption.debounce(400),
                     class_name=INPUT_CLASS + " resize-y leading-relaxed",
                 ),
                 rx.el.p(
-                    "Only the caption travels with the link. Go and Help does "
-                    "not keep a copy of anything you post elsewhere.",
+                    ui(
+                        "Only the caption travels with the link. Go and Help does not keep a copy of anything you post elsewhere."
+                    ),
                     class_name="mt-1.5 text-[11px] font-medium text-[#4b5563]",
                 ),
                 class_name="w-full mt-4",
             ),
             rx.el.div(
                 rx.el.p(
-                    "Send it to",
+                    ui("Send it to"),
                     class_name="text-[11px] font-bold uppercase tracking-[0.12em] text-[#4b5563] mb-2",
                 ),
                 share_marks(),
                 rx.el.div(
                     rx.el.button(
                         rx.icon("copy", class_name="h-3.5 w-3.5"),
-                        "Copy caption and link",
+                        ui("Copy caption and link"),
                         type="button",
                         on_click=MessagingState.copy_share_caption,
                         class_name="w-fit flex items-center gap-1.5 rounded-full border border-[#d4d4d4] bg-white px-3 py-2 text-xs font-bold text-[#4b5563] transition-colors hover:border-[#e08b12] hover:text-[#e08b12]",
@@ -1046,9 +1147,9 @@ def success_story_card() -> rx.Component:
                     class_name="mt-2",
                 ),
                 rx.el.p(
-                    "Instagram and TikTok have no public link that fills a post "
-                    "in advance, so we open your device share sheet — or copy "
-                    "the caption if your browser can't share.",
+                    ui(
+                        "Instagram and TikTok have no public link that fills a post in advance, so we open your device share sheet — or copy the caption if your browser can't share."
+                    ),
                     class_name="mt-2 text-[11px] font-medium leading-relaxed text-[#4b5563]",
                 ),
                 rx.cond(
@@ -1069,7 +1170,7 @@ def success_story_card() -> rx.Component:
 
 
 def report_category_option(item: dict[str, str]) -> rx.Component:
-    return rx.el.option(item["label"], value=item["value"])
+    return rx.el.option(ui(item["label"]), value=item["value"])
 
 
 def safety_report_form() -> rx.Component:
@@ -1079,7 +1180,7 @@ def safety_report_form() -> rx.Component:
             select_wrapper(
                 rx.el.select(
                     rx.el.option(
-                        "Choose the closest description",
+                        ui("Choose the closest description"),
                         value="",
                         disabled=True,
                     ),
@@ -1103,7 +1204,9 @@ def safety_report_form() -> rx.Component:
                 rows="4",
                 max_length=2000,
                 required=True,
-                placeholder="Where and when it happened, what was said or done, and anything you'd like us to check.",
+                placeholder=ui(
+                    "Where and when it happened, what was said or done, and anything you'd like us to check."
+                ),
                 class_name=INPUT_CLASS + " resize-y leading-relaxed",
             ),
             class_name="w-full",
@@ -1112,7 +1215,7 @@ def safety_report_form() -> rx.Component:
             MessagingState.report_ready,
             rx.fragment(),
             rx.el.p(
-                "Please choose what happened before sending.",
+                ui("Please choose what happened before sending."),
                 class_name="text-xs font-semibold text-[#b86e08]",
             ),
         ),
@@ -1121,12 +1224,12 @@ def safety_report_form() -> rx.Component:
                 MessagingState.is_reporting,
                 rx.el.span(
                     rx.spinner(class_name="h-4 w-4"),
-                    "Sending privately…",
+                    ui("Sending privately…"),
                     class_name="flex items-center justify-center gap-2",
                 ),
                 rx.el.span(
                     rx.icon("shield", class_name="h-4 w-4"),
-                    "Send this report privately",
+                    ui("Send this report privately"),
                     class_name="flex items-center justify-center gap-2",
                 ),
             ),
@@ -1152,12 +1255,13 @@ def safety_report_card() -> rx.Component:
                     ),
                     rx.el.div(
                         rx.el.p(
-                            "Report a bad experience",
+                            ui("Report a bad experience"),
                             class_name="text-sm font-bold text-[#111827] text-left",
                         ),
                         rx.el.p(
-                            "Private, read only by our review team. Your star "
-                            "score makes no difference to this.",
+                            ui(
+                                "Private, read only by our review team. Your star score makes no difference to this."
+                            ),
                             class_name="mt-0.5 text-xs font-medium text-[#4b5563] text-left leading-relaxed",
                         ),
                         class_name="min-w-0 flex-1",
@@ -1180,18 +1284,18 @@ def safety_report_card() -> rx.Component:
             rx.cond(
                 MessagingState.selected_thread["my_report_done"],
                 rx.el.p(
-                    "You've already told us about this job. Our team is "
-                    "looking at it privately — nothing is published.",
+                    ui(
+                        "You've already told us about this job. Our team is looking at it privately — nothing is published."
+                    ),
                     class_name="mt-3 rounded-xl bg-[#fff7e8] px-3 py-2 text-xs font-semibold text-[#e08b12]",
                 ),
                 rx.cond(
                     MessagingState.report_open,
                     rx.el.div(
                         rx.el.p(
-                            "Nothing you write here is shown to the other "
-                            "person or published anywhere. We never accuse "
-                            "anyone in public, and an account is never "
-                            "suspended automatically because of a report.",
+                            ui(
+                                "Nothing you write here is shown to the other person or published anywhere. We never accuse anyone in public, and an account is never suspended automatically because of a report."
+                            ),
                             class_name="rounded-xl border border-[#e5e5e5] bg-white px-3 py-2 text-xs font-medium leading-relaxed text-[#4b5563]",
                         ),
                         safety_report_form(),
@@ -1250,15 +1354,23 @@ def job_conversation_panel(dedicated: bool = False) -> rx.Component:
                         MessagingState.selected_thread["is_completed"],
                         (
                             True,
-                            f"You have confirmed. {MessagingState.selected_thread['other_name']} has confirmed.",
+                            ui_template(
+                                "You have confirmed. {name} has confirmed.",
+                                "name",
+                                MessagingState.selected_thread["other_name"],
+                            ),
                         ),
                         rx.cond(
                             MessagingState.awaiting_other_confirm,
-                            f"You have confirmed. Awaiting confirmation from {MessagingState.selected_thread['other_name']}.",
+                            ui_template(
+                                "You have confirmed. Awaiting confirmation from {name}.",
+                                "name",
+                                MessagingState.selected_thread["other_name"],
+                            ),
                             rx.cond(
                                 MessagingState.selected_thread["can_complete"],
-                                "Help confirmed · agree the details below",
-                                "Help not yet confirmed",
+                                ui("Help confirmed · agree the details below"),
+                                ui("Help not yet confirmed"),
                             ),
                         ),
                     ),
@@ -1285,11 +1397,13 @@ def job_conversation_panel(dedicated: bool = False) -> rx.Component:
             rx.el.div(
                 rx.icon("mails", class_name="h-6 w-6 text-[#fba922] mb-2"),
                 rx.el.p(
-                    "Pick a job conversation",
+                    ui("Pick a job conversation"),
                     class_name="text-sm font-semibold text-[#404040]",
                 ),
                 rx.el.p(
-                    "Message history, completion controls and reviews open here.",
+                    ui(
+                        "Message history, completion controls and reviews open here."
+                    ),
                     class_name="text-sm font-medium text-[#4b5563] mt-1",
                 ),
                 class_name="flex flex-col items-center justify-center text-center w-full rounded-2xl border border-dashed border-[#d4d4d4] bg-[#fafafa] px-6 py-16",
@@ -1316,9 +1430,9 @@ def compact_heading(
 def hub_empty(title: str, body: str, icon: str) -> rx.Component:
     return rx.el.div(
         rx.icon(icon, class_name="h-5 w-5 text-[#fba922] mb-1.5"),
-        rx.el.p(title, class_name="text-sm font-bold text-[#111827]"),
+        rx.el.p(ui(title), class_name="text-sm font-bold text-[#111827]"),
         rx.el.p(
-            body,
+            ui(body),
             class_name="mt-1 max-w-xl text-sm font-medium leading-relaxed text-[#4b5563]",
         ),
         class_name="w-full flex flex-col items-center justify-center text-center rounded-2xl bg-white px-5 py-6",
@@ -1343,27 +1457,27 @@ def inbox_disclosure(
                         "Offers to help you",
                         rx.cond(
                             count == 1,
-                            "Offer to help you",
-                            "Offers to help you",
+                            ui("Offer to help you"),
+                            ui("Offers to help you"),
                         ),
                     ),
                     (
                         "Requests for your help",
                         rx.cond(
                             count == 1,
-                            "Request for your help",
-                            "Requests for your help",
+                            ui("Request for your help"),
+                            ui("Requests for your help"),
                         ),
                     ),
                     (
                         "Messages from contacts",
                         rx.cond(
                             count == 1,
-                            "Message from contacts",
-                            "Messages from contacts",
+                            ui("Message from contacts"),
+                            ui("Messages from contacts"),
                         ),
                     ),
-                    title,
+                    ui(title),
                 ),
                 class_name="w-full min-w-0 text-center",
             ),
@@ -1392,7 +1506,7 @@ def offer_disclosure(offer: dict[str, str]) -> rx.Component:
                 ),
                 offer["helper_verified"],
                 "size-11 shrink-0 rounded-full bg-[#fff7e8] object-cover",
-                "Helper photo",
+                ui("Helper photo"),
             ),
             rx.el.span(
                 rx.el.span(
@@ -1400,11 +1514,15 @@ def offer_disclosure(offer: dict[str, str]) -> rx.Component:
                     class_name="block text-sm font-bold text-black",
                 ),
                 rx.el.span(
-                    f"Offered {offer['applied']}",
+                    ui_template("Offered {date}", "date", offer["applied"]),
                     class_name="mt-1 block text-xs text-[#4b5563]",
                 ),
                 rx.el.span(
-                    f"Helper offering you help for: {offer['title']}",
+                    ui_template(
+                        "Helper offering you help for: {title}",
+                        "title",
+                        offer["title"],
+                    ),
                     class_name="mt-2 block text-sm text-black",
                 ),
                 class_name="min-w-0 flex-1 break-words",
@@ -1484,7 +1602,7 @@ def helpee_request_card(request: dict[str, str]) -> rx.Component:
                 ),
                 request["other_verified"],
                 "size-11 rounded-full bg-[#fff7e8] shrink-0",
-                "Helpee photo",
+                ui("Helpee photo"),
             ),
             rx.el.div(
                 rx.el.div(
@@ -1518,9 +1636,13 @@ def helpee_request_card(request: dict[str, str]) -> rx.Component:
         rx.el.div(
             rx.el.button(
                 rx.icon("check", class_name="h-3.5 w-3.5"),
-                "Accept",
+                ui("Accept"),
                 type="button",
-                aria_label=f"Accept the request to help with {request['post_title']}",
+                aria_label=ui_template(
+                    "Accept the request to help with {title}",
+                    "title",
+                    request["post_title"],
+                ),
                 disabled=MessagingState.deciding_request_id
                 == request["application_id"],
                 on_click=lambda: MessagingState.accept_direct_request(
@@ -1530,9 +1652,13 @@ def helpee_request_card(request: dict[str, str]) -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("x", class_name="h-3.5 w-3.5"),
-                "Decline",
+                ui("Decline"),
                 type="button",
-                aria_label=f"Decline the request to help with {request['post_title']}",
+                aria_label=ui_template(
+                    "Decline the request to help with {title}",
+                    "title",
+                    request["post_title"],
+                ),
                 disabled=MessagingState.deciding_request_id
                 == request["application_id"],
                 on_click=lambda: MessagingState.decline_direct_request(
@@ -1542,7 +1668,7 @@ def helpee_request_card(request: dict[str, str]) -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("message-square", class_name="h-3.5 w-3.5"),
-                "Open conversation",
+                ui("Open conversation"),
                 type="button",
                 on_click=lambda: UnifiedInboxState.open_item(
                     "job", request["id"]
@@ -1628,7 +1754,7 @@ def inbox_thread_view() -> rx.Component:
                         ),
                         MessagingState.selected_thread["other_verified"],
                         "size-12 shrink-0 rounded-full bg-[#fff7e8] object-cover",
-                        "Member profile photo",
+                        ui("Member profile photo"),
                         MessagingState.selected_thread["other_id"],
                     ),
                 ),
@@ -1648,7 +1774,7 @@ def inbox_thread_view() -> rx.Component:
                         ),
                         ContactsState.selected_contact["other_verified"],
                         "size-12 shrink-0 rounded-full bg-[#fff7e8] object-cover",
-                        "Member profile photo",
+                        ui("Member profile photo"),
                         ContactsState.selected_contact["other_id"],
                     ),
                 ),
@@ -1666,7 +1792,7 @@ def inbox_thread_view() -> rx.Component:
                     ),
                     NonContactMessagingState.selected["other_verified"],
                     "size-12 shrink-0 rounded-full bg-[#fff7e8] object-cover",
-                    "Member profile photo",
+                    ui("Member profile photo"),
                     NonContactMessagingState.selected["other_id"],
                 ),
             ),
@@ -1693,7 +1819,7 @@ def inbox_thread_view() -> rx.Component:
             success_banner(MessageDeletionState.success),
             id="gah-thread-history",
             role="region",
-            aria_label="Conversation history and actions",
+            aria_label=ui("Conversation history and actions"),
             tab_index=0,
             class_name="gah-screen-scroll flex-1 min-h-0 w-full min-w-0 overflow-y-auto overscroll-contain pb-4 bg-white",
         ),
@@ -1723,7 +1849,7 @@ def inbox_thread_view() -> rx.Component:
             class_name="shrink-0 w-full min-w-0 bg-white pt-2 pb-3",
         ),
         id="gah-inbox-thread",
-        aria_label="Inbox conversation",
+        aria_label=ui("Inbox conversation"),
         on_mount=rx.call_script("""
             window.gahThreadCleanup?.();
             const frame = document.getElementById('gah-inbox-thread');
