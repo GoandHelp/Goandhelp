@@ -1,7 +1,11 @@
 import ast
 import inspect
+import json
+import re
+import subprocess
 import unittest
 from pathlib import Path
+from string import Formatter
 
 import reflex as rx
 
@@ -23,6 +27,14 @@ from app.interface_catalog_job_conversation import (
     JOB_CONVERSATION_KEYS,
     JOB_CONVERSATION_ROWS,
 )
+from app.interface_catalog_job_compose import (
+    JOB_COMPOSE_CATALOGS,
+    JOB_COMPOSE_KEYS,
+)
+from app.interface_catalog_job_review import (
+    JOB_REVIEW_CATALOGS,
+    JOB_REVIEW_KEYS,
+)
 from app.interface_catalog_shared import SHARED_KEYS
 from app.interface_catalog_shared_interface import SHARED_INTERFACE_KEYS
 from app.interface_catalog_skills_prompt import SKILLS_PROMPT_KEYS
@@ -30,8 +42,10 @@ from app.interface_i18n import (
     CATALOGS,
     COMPLETE_KEYS,
     translate,
+    ui,
     ui_template_multi,
 )
+from app.states.contacts_state import ContactsState
 from app.models import LANGUAGE_OPTIONS, SAFETY_REPORT_CATEGORY_LABELS
 from app.states.messaging_state import MessagingState
 
@@ -44,6 +58,31 @@ class JobConversationTranslationTests(unittest.TestCase):
         self.assertEqual(len(expected_locales), 36)
         self.assertEqual(set(JOB_CONVERSATION_ROWS), expected_locales)
         self.assertEqual(set(JOB_CONVERSATION_CATALOGS), expected_locales)
+        self.assertEqual(set(JOB_COMPOSE_CATALOGS), expected_locales)
+        self.assertEqual(set(JOB_REVIEW_CATALOGS), expected_locales)
+        for keys, catalogs in (
+            (JOB_COMPOSE_KEYS, JOB_COMPOSE_CATALOGS),
+            (JOB_REVIEW_KEYS, JOB_REVIEW_CATALOGS),
+        ):
+            self.assertEqual(len(keys), len(set(keys)))
+            for locale in expected_locales:
+                self.assertEqual(set(catalogs[locale]), set(keys))
+                for source, translated in catalogs[locale].items():
+                    self.assertTrue(translated.strip())
+                    self.assertNotEqual(translated, source)
+                    self.assertEqual(CATALOGS[locale][source], translated)
+                    source_slots = [
+                        slot
+                        for _, slot, _, _ in Formatter().parse(source)
+                        if slot
+                    ]
+                    translated_slots = [
+                        slot
+                        for _, slot, _, _ in Formatter().parse(translated)
+                        if slot
+                    ]
+                    self.assertCountEqual(source_slots, translated_slots)
+                    self.assertEqual(translate(locale, source), translated)
         self.assertEqual(
             len(JOB_CONVERSATION_KEYS), len(set(JOB_CONVERSATION_KEYS))
         )
@@ -71,6 +110,8 @@ class JobConversationTranslationTests(unittest.TestCase):
             INBOX_FEED_KEYS,
             SKILLS_PROMPT_KEYS,
             JOB_CONVERSATION_KEYS,
+            JOB_COMPOSE_KEYS,
+            JOB_REVIEW_KEYS,
         )
         self.assertTrue(all(set(keys) <= set(COMPLETE_KEYS) for keys in groups))
         for locale, _label in LANGUAGE_OPTIONS:
@@ -130,12 +171,119 @@ class JobConversationTranslationTests(unittest.TestCase):
         self.assertIn('"name"', expression)
         self.assertIn('"title"', expression)
         self.assertIn("$&", expression)
-        self.assertIn("Zoë", expression)
-        self.assertIn("名", expression)
+        self.assertIn("\\u00eb", expression)
+        self.assertIn("\\u540d", expression)
         self.assertIsNotNone(value._get_all_var_data())
         self.assertIn("interface_text", str(value._get_all_var_data()))
         for inserted in dynamic_values.values():
-            self.assertTrue(inserted._get_all_var_data())
+            self.assertIn(str(inserted), expression)
+
+    def test_named_template_executes_for_translated_catalog_values(self):
+        source = "{name} received your help with {title}."
+        values = {
+            "name": "$& {title} 'Zoë'\\n名",
+            "title": '{name} +\\nrepaired "bikes"',
+        }
+        for locale in ("en", "fr", "ar", "ja"):
+            translated = translate(locale, source)
+            expression = str(ui_template_multi(source, values)).replace(
+                str(ui(source)), json.dumps(translated)
+            )
+            result = subprocess.run(
+                [
+                    "node",
+                    "-e",
+                    f"process.stdout.write(JSON.stringify(eval({json.dumps(expression)})))",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            expected = re.sub(
+                r"\\{(name|title)\\}",
+                lambda match: values[match.group(1)],
+                translated,
+            )
+            self.assertEqual(json.loads(result.stdout), expected)
+        self.assertEqual(
+            translate("fr", "An unknown source"), "An unknown source"
+        )
+
+    def test_named_template_retains_reactive_state_dependencies(self):
+        template = "Write to {name} about {title}"
+        rendered = ui_template_multi(
+            template,
+            {
+                "name": ContactsState.compose_search,
+                "title": MessagingState.selected_thread["post_title"],
+            },
+        )
+        data = rendered._get_all_var_data()
+        self.assertIsNotNone(data)
+        dependencies = str(data)
+        self.assertIn("interface_text", dependencies)
+        self.assertIn("compose_search", dependencies)
+        self.assertIn("selected_thread", dependencies)
+        self.assertIn("post_title", dependencies)
+
+    def test_message_panel_authored_sources_have_all_locale_catalog_coverage(
+        self,
+    ):
+        panel = ast.parse(Path("app/components/messages_panel.py").read_text())
+        function_names = {
+            "ui",
+            "ui_template",
+            "ui_template_multi",
+            "field_label",
+            "hub_empty",
+            "inbox_disclosure",
+            "inbox_subview_header",
+        }
+        sources: set[str] = set()
+        for node in ast.walk(panel):
+            if not isinstance(node, ast.Call):
+                continue
+            func = node.func
+            name = func.id if isinstance(func, ast.Name) else ""
+            if name not in function_names or not node.args:
+                continue
+            first = node.args[0]
+            if isinstance(first, ast.Constant) and isinstance(first.value, str):
+                sources.add(first.value)
+            if name == "hub_empty" and len(node.args) > 1:
+                body = node.args[1]
+                if isinstance(body, ast.Constant) and isinstance(
+                    body.value, str
+                ):
+                    sources.add(body.value)
+            if name == "field_label" and len(node.args) > 1:
+                hint = node.args[1]
+                if isinstance(hint, ast.Constant) and isinstance(
+                    hint.value, str
+                ):
+                    sources.add(hint.value)
+        sources.update(JOB_COMPOSE_KEYS)
+        sources.update(JOB_REVIEW_KEYS)
+        formatter = Formatter()
+        for locale, _label in LANGUAGE_OPTIONS:
+            for source in sources:
+                with self.subTest(locale=locale, source=source):
+                    translated = translate(locale, source)
+                    if locale != "en":
+                        self.assertIn(source, CATALOGS[locale])
+                    source_slots = [
+                        slot
+                        for _, slot, _, _ in formatter.parse(source)
+                        if slot
+                    ]
+                    translated_slots = [
+                        slot
+                        for _, slot, _, _ in formatter.parse(translated)
+                        if slot
+                    ]
+                    self.assertCountEqual(source_slots, translated_slots)
+                    if locale == "en":
+                        self.assertEqual(translated, source)
 
     def test_rating_and_photo_count_display_logic_uses_canonical_numeric_state(
         self,
