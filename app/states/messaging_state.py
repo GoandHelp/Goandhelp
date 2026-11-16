@@ -21,6 +21,7 @@ from app.image_processing import (
     read_image_upload,
 )
 from app.member_blocks import BLOCK_UNAVAILABLE_MESSAGE, are_members_blocked
+from app.interface_i18n import translate
 from app.models import (
     CATEGORY_LABELS,
     CHECK_IN_NOTE_MAX_LENGTH,
@@ -715,6 +716,11 @@ class MessagingState(rx.State):
     def set_review_score(self, field: str, value: int):
         if field in REVIEW_FIELD_KEYS and 0 <= value <= 5:
             self.review_scores[field] = value
+
+    async def _localized_feedback_text(self, source: str) -> str:
+        async with self:
+            language = (await self.get_state(AuthState)).preferred_language
+        return translate(language, source)
 
     def _reset_review_scores(self):
         self.review_scores = {key: 0 for key in REVIEW_FIELD_KEYS}
@@ -1439,7 +1445,12 @@ class MessagingState(rx.State):
         async with self:
             self.deciding_request_id = 0
             self.success = f"Accepted — you're helping with “{title}”."
-        yield rx.toast("Request accepted. Job confirmed.", duration=4000)
+        yield rx.toast(
+            await self._localized_feedback_text(
+                "Request accepted. Job confirmed."
+            ),
+            duration=4000,
+        )
         yield MessagingState.load_threads
         from app.states.help_hub_state import HelpHubState
 
@@ -1495,7 +1506,10 @@ class MessagingState(rx.State):
         async with self:
             self.deciding_request_id = 0
             self.success = "Request declined — the conversation stays open."
-        yield rx.toast("Request declined.", duration=3000)
+        yield rx.toast(
+            await self._localized_feedback_text("Request declined."),
+            duration=3000,
+        )
         yield MessagingState.load_threads
 
     async def _ensure_job_thread(
@@ -2244,9 +2258,11 @@ class MessagingState(rx.State):
                 if finalized
                 else "Your side is confirmed. Waiting for the other person."
             )
+        toast_source = (
+            "Task completed." if finalized else "Completion confirmed."
+        )
         yield rx.toast(
-            "Task completed." if finalized else "Completion confirmed.",
-            duration=3500,
+            await self._localized_feedback_text(toast_source), duration=3500
         )
         yield MessagingState.load_threads
         from app.states.profile_state import ProfileState
@@ -2360,7 +2376,10 @@ class MessagingState(rx.State):
                 t for t in self.review_targets if t["task_id"] != task_id
             ]
             self.success = "Your review is now public. Thank you for sharing your experience."
-        yield rx.toast("Your review is now public.", duration=4000)
+        yield rx.toast(
+            await self._localized_feedback_text("Your review is now public."),
+            duration=4000,
+        )
         yield MessagingState.load_threads
         from app.states.profile_state import ProfileState
 
@@ -2869,5 +2888,10 @@ class MessagingState(rx.State):
                 "Thank you — this report is private and now with our review "
                 "team. Nothing is published and no one is accused publicly."
             )
-        yield rx.toast("Report sent privately to our team.", duration=4000)
+        yield rx.toast(
+            await self._localized_feedback_text(
+                "Report sent privately to our team."
+            ),
+            duration=4000,
+        )
         yield MessagingState.load_threads

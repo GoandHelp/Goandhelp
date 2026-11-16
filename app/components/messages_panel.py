@@ -1,6 +1,7 @@
 import reflex as rx
 
 from app.interface_i18n import ui, ui_template, ui_template_multi
+from app.components.job_feedback import job_feedback
 from app.avatars import animal_avatar, member_avatar
 
 from app.states.message_deletion_state import MessageDeletionState
@@ -684,7 +685,7 @@ def review_response(review: ReviewItem) -> rx.Component:
             (MessagingState.response_error_id == review["id"])
             & (MessagingState.response_error != ""),
             rx.el.p(
-                MessagingState.response_error,
+                job_feedback(MessagingState.response_error),
                 role="alert",
                 class_name="mt-2 text-xs text-[#e08b12]",
             ),
@@ -794,7 +795,7 @@ def pending_review_card(target: ThreadItem) -> rx.Component:
                     class_name="text-xs text-[#4b5563]",
                 ),
                 review_form(),
-                error_banner(MessagingState.error),
+                error_banner(job_feedback(MessagingState.error)),
                 rx.foreach(MessagingState.reviews, review_card),
                 id=f"pending-review-{target['task_id']}",
                 class_name="flex flex-col gap-4 w-full",
@@ -882,7 +883,7 @@ def review_section() -> rx.Component:
             rx.foreach(MessagingState.review_targets, pending_review_card),
             class_name="gah-edge-stack flex flex-col gap-0 w-full",
         ),
-        success_banner(MessagingState.success),
+        success_banner(job_feedback(MessagingState.success)),
         class_name="flex flex-col gap-4 w-full",
     )
 
@@ -1003,7 +1004,7 @@ def photo_uploader() -> rx.Component:
         rx.cond(
             MessagingState.photo_error,
             rx.el.p(
-                MessagingState.photo_error,
+                job_feedback(MessagingState.photo_error),
                 role="alert",
                 class_name="mt-2 rounded-xl bg-[#fff7e8] px-3 py-2 text-xs font-bold text-[#e08b12]",
             ),
@@ -1012,7 +1013,7 @@ def photo_uploader() -> rx.Component:
         rx.cond(
             MessagingState.photo_success,
             rx.el.p(
-                MessagingState.photo_success,
+                job_feedback(MessagingState.photo_success),
                 class_name="mt-2 rounded-xl bg-[#fba922] px-3 py-2 text-xs font-bold text-[#111827]",
             ),
             rx.fragment(),
@@ -1155,7 +1156,7 @@ def success_story_card() -> rx.Component:
                 rx.cond(
                     MessagingState.share_note,
                     rx.el.p(
-                        MessagingState.share_note,
+                        job_feedback(MessagingState.share_note),
                         role="status",
                         class_name="mt-2 rounded-xl bg-[#fff7e8] px-3 py-2 text-xs font-bold text-[#e08b12]",
                     ),
@@ -1307,7 +1308,7 @@ def safety_report_card() -> rx.Component:
             rx.cond(
                 MessagingState.report_error,
                 rx.el.p(
-                    MessagingState.report_error,
+                    job_feedback(MessagingState.report_error),
                     role="alert",
                     class_name="mt-3 rounded-xl bg-[#fff7e8] px-3 py-2 text-xs font-bold text-[#e08b12]",
                 ),
@@ -1316,7 +1317,7 @@ def safety_report_card() -> rx.Component:
             rx.cond(
                 MessagingState.report_success,
                 rx.el.p(
-                    MessagingState.report_success,
+                    job_feedback(MessagingState.report_success),
                     class_name="mt-3 rounded-xl bg-[#fba922] px-3 py-2 text-xs font-bold text-[#111827]",
                 ),
                 rx.fragment(),
@@ -1811,8 +1812,8 @@ def inbox_thread_view() -> rx.Component:
         error_banner(UnifiedInboxState.error),
         rx.el.div(
             reading_pane(True),
-            error_banner(MessagingState.error),
-            success_banner(MessagingState.success),
+            error_banner(job_feedback(MessagingState.error)),
+            success_banner(job_feedback(MessagingState.success)),
             error_banner(ContactsState.error),
             success_banner(ContactsState.success),
             error_banner(MessageDeletionState.error),
@@ -1908,8 +1909,8 @@ def messages_panel() -> rx.Component:
                 messages_block(),
             ),
         ),
-        error_banner(MessagingState.error),
-        success_banner(MessagingState.success),
+        error_banner(job_feedback(MessagingState.error)),
+        success_banner(job_feedback(MessagingState.success)),
         error_banner(MessageDeletionState.error),
         success_banner(MessageDeletionState.success),
         on_mount=[
