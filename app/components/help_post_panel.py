@@ -3,6 +3,7 @@ from app.components.header import BRAND_LOGO_SRC, BRAND_LOGO_ALT
 from app.components.request_draft import compact_request_fields
 
 from app.components.language_control import browser_translatable_text
+from app.interface_i18n import ui, ui_template, ui_template_multi
 from app.components.disclosure import disclosure_arrow
 
 from app.components.notification_badge import corner_activity_dot
@@ -82,7 +83,7 @@ def category_card(item: dict[str, str]) -> rx.Component:
             },
             class_name="flex size-7 shrink-0 items-center justify-center rounded-full",
         ),
-        rx.el.span(item["label"], class_name="flex-1 text-left"),
+        rx.el.span(ui(item["label"]), class_name="flex-1 text-left"),
         rx.el.span(
             rx.cond(
                 HelpPostState.selected_categories.contains(item["value"]),
@@ -104,13 +105,23 @@ def category_card(item: dict[str, str]) -> rx.Component:
 
 
 def option_item(item: dict[str, str]) -> rx.Component:
-    return rx.el.option(item["label"], value=item["value"])
+    return rx.el.option(ui(item["label"]), value=item["value"])
+
+
+def urgency_label(value: rx.Var[str]) -> rx.Var[str]:
+    return rx.match(
+        value,
+        ("flexible", ui("Flexible")),
+        ("soon", ui("Soon")),
+        ("urgent", ui("Urgent")),
+        ui(value),
+    )
 
 
 def photo_thumbnail(photo_path: rx.Var[str]) -> rx.Component:
     return rx.image(
         src=rx.get_upload_url(photo_path),
-        alt="Attached job photo",
+        alt=ui("Attached job photo"),
         class_name="h-20 w-full rounded-xl border border-[#e5e5e5] object-cover bg-[#fff7e8]",
     )
 
@@ -119,7 +130,7 @@ def square_photo_thumbnail(photo_path: rx.Var[str]) -> rx.Component:
     """Recent-request thumbnail: a true square crop at every breakpoint."""
     return rx.image(
         src=rx.get_upload_url(photo_path),
-        alt="Attached job photo",
+        alt=ui("Attached job photo"),
         class_name="aspect-square w-full rounded-xl border border-[#e5e5e5] object-cover bg-[#fff7e8]",
     )
 
@@ -128,7 +139,7 @@ def pending_photo_tile(photo_path: rx.Var[str], index: int) -> rx.Component:
     return rx.el.div(
         rx.image(
             src=rx.get_upload_url(photo_path),
-            alt="Photo ready to post",
+            alt=ui("Photo ready to post"),
             class_name="aspect-square w-full rounded-xl border border-[#d4d4d4] object-cover bg-[#fff7e8]",
         ),
         rx.el.span(
@@ -138,12 +149,12 @@ def pending_photo_tile(photo_path: rx.Var[str], index: int) -> rx.Component:
         rx.el.button(
             rx.icon("x", class_name="h-3.5 w-3.5"),
             type="button",
-            title="Remove this photo",
+            title=ui("Remove this photo"),
             on_click=lambda: HelpPostState.remove_photo(photo_path),
             class_name="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-white/95 text-[#e08b12] border border-[#d4d4d4] transition-colors hover:bg-[#e08b12] hover:text-white",
         ),
         rx.el.span(
-            "WebP - under 1 MB",
+            ui("WebP - under 1 MB"),
             class_name="absolute inset-x-2 bottom-2 rounded-full bg-[#111827]/75 px-2 py-0.5 text-center text-[10px] font-semibold text-white",
         ),
         class_name="relative w-full",
@@ -157,17 +168,25 @@ def job_info_field() -> rx.Component:
             name="description",
             rows="6",
             max_length=500,
-            placeholder="I'm moving out of a fourth-floor flat and need someone strong for an hour. Lift is broken, boxes are packed and light-ish...",
+            placeholder=ui(
+                "I'm moving out of a fourth-floor flat and need someone strong for an hour. Lift is broken, boxes are packed and light-ish..."
+            ),
             on_change=HelpPostState.set_job_info.debounce(250),
             class_name=INPUT_CLASS + " resize-y leading-relaxed",
         ),
         rx.el.div(
             rx.el.span(
-                "Describe the job, the place and what a helper should bring.",
+                ui(
+                    "Describe the job, the place and what a helper should bring."
+                ),
                 class_name="text-xs font-medium text-[#4b5563]",
             ),
             rx.el.span(
-                f"{HelpPostState.job_info_remaining} characters left",
+                ui_template(
+                    "{count} characters left",
+                    "count",
+                    HelpPostState.job_info_remaining.to_string(),
+                ),
                 class_name=rx.cond(
                     HelpPostState.job_info_near_limit,
                     "text-xs font-semibold text-[#e08b12] shrink-0",
@@ -196,7 +215,7 @@ def photo_upload_section() -> rx.Component:
                             class_name="size-10 rounded-full object-cover motion-safe:animate-pulse",
                         ),
                         rx.el.p(
-                            "Pictures are being uploaded",
+                            ui("Pictures are being uploaded"),
                             class_name="text-sm font-semibold text-[#111827]",
                         ),
                         role="status",
@@ -206,15 +225,21 @@ def photo_upload_section() -> rx.Component:
                     rx.el.div(
                         rx.icon("camera", class_name="h-6 w-6 text-[#e08b12]"),
                         rx.el.p(
-                            "Drop or click to select photos",
+                            ui("Drop or click to select photos"),
                             class_name="text-sm font-semibold text-[#111827]",
                         ),
                         rx.el.p(
-                            "Static JPEG/JPG, PNG or WebP only · 3 MB maximum · no video",
+                            ui(
+                                "Static JPEG/JPG, PNG or WebP only · 3 MB maximum · no video"
+                            ),
                             class_name="text-xs font-medium text-[#4b5563]",
                         ),
                         rx.el.p(
-                            f"{HelpPostState.photo_slots_left} of 5 slots free",
+                            ui_template(
+                                "{count} of 5 slots free",
+                                "count",
+                                HelpPostState.photo_slots_left.to_string(),
+                            ),
                             class_name="text-xs font-semibold text-[#e08b12]",
                         ),
                         class_name="flex min-h-28 w-full flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-[#fba922] bg-[#fff7e8] px-5 py-5 text-center transition-colors hover:border-[#e08b12] hover:bg-[#fff0d6]",
@@ -232,13 +257,13 @@ def photo_upload_section() -> rx.Component:
             rx.el.div(
                 rx.icon("check", class_name="h-5 w-5 text-[#111827]"),
                 rx.el.p(
-                    "Five photos attached - remove one to swap it out",
+                    ui("Five photos attached - remove one to swap it out"),
                     class_name="text-sm font-semibold text-[#111827]",
                 ),
                 class_name="flex min-h-28 w-full items-center justify-center gap-2 rounded-2xl border border-[#f6c66f] bg-[#fff7e8] px-5 py-5 text-center",
             ),
         ),
-        error_banner(HelpPostState.photo_error),
+        error_banner(ui(HelpPostState.localized_feedback["photo_error"])),
         rx.cond(
             HelpPostState.photo_notice,
             rx.el.div(
@@ -247,7 +272,7 @@ def photo_upload_section() -> rx.Component:
                     class_name="h-3.5 w-3.5 text-[#111827] shrink-0",
                 ),
                 rx.el.span(
-                    HelpPostState.photo_notice,
+                    ui(HelpPostState.localized_feedback["photo_notice"]),
                     class_name="text-xs font-semibold text-[#111827]",
                 ),
                 class_name="flex items-center gap-2 rounded-xl border border-[#fba922] bg-[#fba922] px-3 py-2 w-full",
@@ -260,11 +285,15 @@ def photo_upload_section() -> rx.Component:
                 rx.el.div(
                     rx.icon("image", class_name="h-3.5 w-3.5 text-[#e08b12]"),
                     rx.el.span(
-                        f"{HelpPostState.pending_photo_paths.length()} / 5 attached",
+                        ui_template(
+                            "{count} / 5 attached",
+                            "count",
+                            HelpPostState.pending_photo_paths.length().to_string(),
+                        ),
                         class_name="text-xs font-semibold text-[#e08b12]",
                     ),
                     rx.el.span(
-                        "Tap the cross to remove a photo before posting.",
+                        ui("Tap the cross to remove a photo before posting."),
                         class_name="text-xs font-medium text-[#4b5563]",
                     ),
                     class_name="flex flex-wrap items-center gap-x-2 gap-y-1",
@@ -298,7 +327,7 @@ def cadence_card(item: dict[str, str]) -> rx.Component:
         ),
         rx.el.div(
             rx.el.p(
-                item["label"],
+                ui(item["label"]),
                 class_name=rx.cond(
                     HelpPostState.repeat_enabled
                     & (HelpPostState.repeat_cadence == item["value"]),
@@ -307,7 +336,7 @@ def cadence_card(item: dict[str, str]) -> rx.Component:
                 ),
             ),
             rx.el.p(
-                item["blurb"],
+                ui(item["blurb"]),
                 class_name=rx.cond(
                     HelpPostState.repeat_enabled
                     & (HelpPostState.repeat_cadence == item["value"]),
@@ -341,11 +370,11 @@ def repeat_section() -> rx.Component:
             rx.el.div(
                 rx.icon("repeat", class_name="h-4 w-4 text-[#e08b12]"),
                 rx.el.h3(
-                    "Repeat this request",
+                    ui("Repeat this request"),
                     class_name="text-sm font-bold text-[#111827]",
                 ),
                 rx.el.span(
-                    HelpPostState.repeat_summary,
+                    ui(HelpPostState.repeat_summary),
                     class_name=rx.cond(
                         HelpPostState.repeat_enabled,
                         "w-fit rounded-full bg-[#fba922] px-3 py-1 text-xs font-bold text-[#111827]",
@@ -362,8 +391,8 @@ def repeat_section() -> rx.Component:
                 ),
                 rx.cond(
                     HelpPostState.repeat_enabled,
-                    "Repeating",
-                    "One-time",
+                    ui("Repeating"),
+                    ui("One-time"),
                 ),
                 type="button",
                 aria_pressed=rx.cond(
@@ -379,9 +408,9 @@ def repeat_section() -> rx.Component:
             class_name="flex w-full flex-wrap items-center justify-between gap-3",
         ),
         rx.el.p(
-            "Off by default. When on, each date is created automatically from "
-            "the date and time you picked above — always within your posting "
-            "allowance.",
+            ui(
+                "Off by default. When on, each date is created automatically from the date and time you picked above — always within your posting allowance."
+            ),
             class_name="mt-1.5 text-xs font-medium leading-relaxed text-[#4b5563]",
         ),
         rx.cond(
@@ -412,7 +441,7 @@ def repeat_section() -> rx.Component:
                         rx.el.div(
                             field_label("How often", "fixed"),
                             rx.el.p(
-                                "Every two weeks, on the same weekday.",
+                                ui("Every two weeks, on the same weekday."),
                                 class_name="rounded-xl border border-[#f6c66f] bg-[#fff7e8]/60 px-4 py-3 text-xs font-semibold text-[#e08b12]",
                             ),
                             class_name="w-full",
@@ -441,7 +470,7 @@ def repeat_section() -> rx.Component:
 
 def schedule_status_badge(schedule: dict[str, str]) -> rx.Component:
     return rx.el.span(
-        schedule["status_label"],
+        ui(schedule["status_label"]),
         class_name=rx.cond(
             schedule["is_active"],
             "w-fit shrink-0 rounded-full bg-[#fba922] px-3 py-1 text-xs font-bold text-[#111827]",
@@ -467,7 +496,7 @@ def schedule_card(schedule: dict[str, str]) -> rx.Component:
                     class_name="text-sm font-bold text-[#111827] leading-tight",
                 ),
                 rx.el.p(
-                    schedule["cadence_label"],
+                    ui(schedule["cadence_label"]),
                     class_name="mt-0.5 text-xs font-semibold text-[#e08b12]",
                 ),
                 class_name="min-w-0 flex-1",
@@ -478,17 +507,19 @@ def schedule_card(schedule: dict[str, str]) -> rx.Component:
         rx.el.div(
             rx.el.span(
                 rx.icon("calendar-clock", class_name="h-3 w-3"),
-                schedule["next_label"],
+                ui(schedule["next_label"]),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#e08b12]",
             ),
             rx.el.span(
                 rx.icon("calendar-x", class_name="h-3 w-3"),
-                schedule["end_label"],
+                ui(schedule["end_label"]),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#4b5563]",
             ),
             rx.el.span(
                 rx.icon("layers", class_name="h-3 w-3"),
-                f"{schedule['count']} created",
+                ui_template(
+                    "{count} created", "count", schedule["count"].to_string()
+                ),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#e08b12]",
             ),
             class_name="mt-3 flex flex-wrap items-center gap-2",
@@ -496,7 +527,7 @@ def schedule_card(schedule: dict[str, str]) -> rx.Component:
         rx.cond(
             schedule["is_ended"],
             rx.el.p(
-                "This repeating request has finished.",
+                ui("This repeating request has finished."),
                 class_name="mt-3 text-xs font-medium text-[#4b5563]",
             ),
             rx.el.div(
@@ -504,7 +535,7 @@ def schedule_card(schedule: dict[str, str]) -> rx.Component:
                     schedule["is_active"],
                     rx.el.button(
                         rx.icon("pause", class_name="h-3.5 w-3.5"),
-                        "Pause",
+                        ui("Pause"),
                         type="button",
                         disabled=HelpPostState.schedule_busy_id
                         == schedule["id"],
@@ -515,7 +546,7 @@ def schedule_card(schedule: dict[str, str]) -> rx.Component:
                     ),
                     rx.el.button(
                         rx.icon("play", class_name="h-3.5 w-3.5"),
-                        "Resume",
+                        ui("Resume"),
                         type="button",
                         disabled=HelpPostState.schedule_busy_id
                         == schedule["id"],
@@ -527,7 +558,7 @@ def schedule_card(schedule: dict[str, str]) -> rx.Component:
                 ),
                 rx.el.button(
                     rx.icon("square", class_name="h-3.5 w-3.5"),
-                    "End",
+                    ui("End"),
                     type="button",
                     disabled=HelpPostState.schedule_busy_id == schedule["id"],
                     on_click=lambda: HelpPostState.end_schedule(schedule["id"]),
@@ -547,7 +578,7 @@ def recurring_section() -> rx.Component:
             rx.el.div(
                 rx.icon("repeat", class_name="h-4 w-4 text-[#e08b12]"),
                 rx.el.h3(
-                    "Recurring requests",
+                    ui("Recurring requests"),
                     class_name="text-sm font-bold text-[#111827]",
                 ),
                 class_name="flex items-center gap-2 min-w-0",
@@ -559,18 +590,18 @@ def recurring_section() -> rx.Component:
             class_name="flex w-full items-center justify-between gap-3",
         ),
         rx.cond(
-            HelpPostState.schedule_error,
+            ui(HelpPostState.localized_feedback["schedule_error"]),
             rx.el.p(
-                HelpPostState.schedule_error,
+                HelpPostState.localized_feedback["schedule_error"],
                 role="alert",
                 class_name="mt-2 rounded-xl bg-[#fff7e8] px-3 py-2 text-xs font-bold text-[#e08b12]",
             ),
             rx.fragment(),
         ),
         rx.cond(
-            HelpPostState.schedule_notice,
+            ui(HelpPostState.localized_feedback["schedule_notice"]),
             rx.el.p(
-                HelpPostState.schedule_notice,
+                HelpPostState.localized_feedback["schedule_notice"],
                 class_name="mt-2 rounded-xl bg-[#fba922] px-3 py-2 text-xs font-bold text-[#111827]",
             ),
             rx.fragment(),
@@ -597,12 +628,13 @@ def recurring_section() -> rx.Component:
                         "repeat", class_name="h-5 w-5 text-[#e08b12] mb-1.5"
                     ),
                     rx.el.p(
-                        "No repeating requests yet",
+                        ui("No repeating requests yet"),
                         class_name="text-sm font-bold text-[#111827]",
                     ),
                     rx.el.p(
-                        "Turn on “Repeat this request” in the form above and "
-                        "each date will be created for you.",
+                        ui(
+                            "Turn on “Repeat this request” in the form above and each date will be created for you."
+                        ),
                         class_name="mt-1 max-w-xl text-xs font-medium leading-relaxed text-[#4b5563]",
                     ),
                     class_name="mt-3 flex flex-col items-center justify-center text-center rounded-2xl border border-dashed border-[#f6c66f] bg-white px-5 py-6",
@@ -619,12 +651,12 @@ def submit_button() -> rx.Component:
             HelpPostState.is_saving,
             rx.el.span(
                 rx.spinner(class_name="h-4 w-4"),
-                "Posting your request…",
+                ui("Posting your request…"),
                 class_name="flex items-center justify-center gap-2",
             ),
             rx.el.span(
                 rx.icon("send", class_name="h-4 w-4"),
-                "Post help request",
+                ui("Post help request"),
                 class_name="flex items-center justify-center gap-2",
             ),
         ),
@@ -665,13 +697,13 @@ CATEGORY_LISTENERS = """
 
 def category_section() -> rx.Component:
     return rx.el.div(
-        field_label("Job category", HelpPostState.category_slot_hint),
+        field_label("Job category", HelpPostState.localized_category_slot_hint),
         rx.el.button(
             rx.el.span(
                 rx.cond(
-                    HelpPostState.category_summary_label,
-                    HelpPostState.category_summary_label,
-                    "Choose job categories",
+                    ui(HelpPostState.category_summary_label),
+                    ui(HelpPostState.category_summary_label),
+                    ui("Choose job categories"),
                 ),
                 class_name="flex-1 text-left",
             ),
@@ -691,19 +723,19 @@ def category_section() -> rx.Component:
             rx.el.div(
                 rx.foreach(HelpPostState.categories, category_card),
                 role="group",
-                aria_label="Job categories",
+                aria_label=ui("Job categories"),
                 id="job-category-options",
                 class_name="mt-2 max-h-72 overflow-y-auto rounded-xl border border-[#f6c66f] bg-white p-1",
             ),
             rx.fragment(),
         ),
         rx.el.p(
-            HelpPostState.category_count_label,
+            ui(HelpPostState.localized_category_count_label),
             class_name="mt-2 text-xs text-[#4b5563]",
         ),
-        error_banner(HelpPostState.error),
+        error_banner(ui(HelpPostState.localized_feedback["error"])),
         rx.el.button(
-            "Close job categories",
+            ui("Close job categories"),
             type="button",
             custom_attrs={"data-category-close": "true"},
             on_click=HelpPostState.close_category_dropdown,
@@ -743,7 +775,9 @@ def reward_section() -> rx.Component:
             ),
             rx.el.input(
                 name="reward_details",
-                placeholder="Home-cooked dinner with my family in the old town",
+                placeholder=ui(
+                    "Home-cooked dinner with my family in the old town"
+                ),
                 class_name=INPUT_CLASS,
             ),
             class_name="w-full",
@@ -756,11 +790,11 @@ def details_heading() -> rx.Component:
     return rx.el.div(
         rx.icon("notebook-pen", class_name="h-4 w-4 text-[#e08b12]"),
         rx.el.h3(
-            "Posting details",
+            ui("Posting details"),
             class_name="text-sm font-semibold text-[#111827]",
         ),
         rx.el.span(
-            "reward, meeting point and timing",
+            ui("reward, meeting point and timing"),
             class_name="text-xs font-medium text-[#4b5563]",
         ),
         class_name="flex flex-wrap items-center gap-2 w-full border-t border-[#e5e5e5] pt-5",
@@ -773,7 +807,7 @@ def post_form() -> rx.Component:
             field_label("Job title", "required"),
             rx.el.input(
                 name="title",
-                placeholder="Two hands to carry boxes up three flights",
+                placeholder=ui("Two hands to carry boxes up three flights"),
                 class_name=INPUT_CLASS,
             ),
             class_name="w-full",
@@ -788,7 +822,7 @@ def post_form() -> rx.Component:
                 name="requester_name",
                 default_value=AuthState.display_name,
                 key=AuthState.display_name,
-                placeholder="Maya from Lisbon",
+                placeholder=ui("Maya from Lisbon"),
                 class_name=INPUT_CLASS,
             ),
             class_name="w-full",
@@ -799,7 +833,7 @@ def post_form() -> rx.Component:
                 field_label("Meeting point", "required"),
                 rx.el.input(
                     name="location_name",
-                    placeholder="Rua das Flores 22, by the blue door",
+                    placeholder=ui("Rua das Flores 22, by the blue door"),
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full",
@@ -808,7 +842,7 @@ def post_form() -> rx.Component:
                 field_label("City", "required"),
                 rx.el.input(
                     name="city",
-                    placeholder="Porto",
+                    placeholder=ui("Porto"),
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full",
@@ -817,7 +851,7 @@ def post_form() -> rx.Component:
                 field_label("Country", "optional"),
                 rx.el.input(
                     name="country",
-                    placeholder="Portugal",
+                    placeholder=ui("Portugal"),
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full",
@@ -877,17 +911,21 @@ def post_form() -> rx.Component:
                     step=1,
                     default_value="1",
                     required=True,
-                    aria_label="Number of people required",
+                    aria_label=ui("Number of people required"),
                     class_name=INPUT_CLASS,
                 ),
                 rx.el.p(
-                    "Premium lets you confirm up to 500 helpers. Your request stays open until all places are filled.",
+                    ui(
+                        "Premium lets you confirm up to 500 helpers. Your request stays open until all places are filled."
+                    ),
                     class_name="mt-1.5 text-xs font-medium text-[#4b5563]",
                 ),
                 class_name="w-full",
             ),
             rx.el.p(
-                "Free requests are for one helper. Premium members can request 1–500 people.",
+                ui(
+                    "Free requests are for one helper. Premium members can request 1–500 people."
+                ),
                 class_name="text-xs font-medium text-[#4b5563]",
             ),
         ),
@@ -908,7 +946,7 @@ def count_card(label: str, value: rx.Var[int], icon: str) -> rx.Component:
         ),
         rx.el.p(value, class_name="mt-3 text-3xl font-bold text-[#111827]"),
         rx.el.p(
-            label,
+            ui(label),
             class_name="text-xs font-semibold uppercase tracking-wide text-[#4b5563]",
         ),
         class_name="w-full rounded-2xl border border-[#e5e5e5] bg-white p-5",
@@ -917,7 +955,15 @@ def count_card(label: str, value: rx.Var[int], icon: str) -> rx.Component:
 
 def status_badge(status: rx.Var[str]) -> rx.Component:
     return rx.el.span(
-        status,
+        rx.match(
+            status,
+            ("open", ui("Open")),
+            ("matched", ui("Confirmed")),
+            ("completed", ui("Completed")),
+            ("cancelled", ui("Cancelled")),
+            ("expired", ui("Expired")),
+            ui(status),
+        ),
         class_name=rx.cond(
             status == "open",
             "ml-auto w-fit rounded-full bg-[#fba922] px-3 py-1 text-xs font-semibold text-[#111827] capitalize shrink-0",
@@ -930,7 +976,9 @@ def delete_confirm_row(post: dict[str, str]) -> rx.Component:
     """Inline confirm/keep controls for this exact journal entry."""
     return rx.el.div(
         rx.el.p(
-            f"Remove “{post['title']}” from the board?",
+            ui_template_multi(
+                "Remove “{title}” from the board?", {"title": post["title"]}
+            ),
             class_name="text-xs font-bold text-[#111827] text-center",
         ),
         rx.el.div(
@@ -940,19 +988,19 @@ def delete_confirm_row(post: dict[str, str]) -> rx.Component:
                     rx.spinner(class_name="h-3.5 w-3.5"),
                     rx.icon("trash-2", class_name="h-3.5 w-3.5"),
                 ),
-                "Yes, remove it",
+                ui("Yes, remove it"),
                 type="button",
                 disabled=HelpHubState.removal_busy,
-                aria_label="Confirm removing this help request",
+                aria_label=ui("Confirm removing this help request"),
                 on_click=HelpHubState.confirm_removal,
                 class_name="flex w-fit items-center gap-1.5 rounded-full bg-[#e08b12] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[#b86e08] disabled:opacity-60 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#f6c66f]",
             ),
             rx.el.button(
                 rx.icon("x", class_name="h-3.5 w-3.5"),
-                "Keep it",
+                ui("Keep it"),
                 type="button",
                 disabled=HelpHubState.removal_busy,
-                aria_label="Keep this help request",
+                aria_label=ui("Keep this help request"),
                 on_click=HelpHubState.cancel_removal,
                 class_name="flex w-fit items-center gap-1.5 rounded-full border border-[#d4d4d4] bg-white px-4 py-2 text-xs font-bold text-[#4b5563] transition-colors hover:bg-[#fff7e8] disabled:opacity-60",
             ),
@@ -965,25 +1013,29 @@ def delete_confirm_row(post: dict[str, str]) -> rx.Component:
 def owner_edit_form() -> rx.Component:
     return rx.el.div(
         rx.el.h3(
-            "Edit help request",
+            ui("Edit help request"),
             class_name="text-center text-base font-semibold text-[#292929]",
         ),
         rx.el.p(
-            "Keep your current location, or place a replacement pin below. Editing closes as soon as any help offer arrives.",
+            ui(
+                "Keep your current location, or place a replacement pin below. Editing closes as soon as any help offer arrives."
+            ),
             class_name="text-sm text-[#525252]",
         ),
         compact_request_fields(HelpPostState, "edit-help-request"),
-        error_banner(HelpPostState.edit_error),
+        error_banner(ui(HelpPostState.localized_feedback["edit_error"])),
         rx.el.div(
             rx.el.button(
-                rx.cond(HelpPostState.edit_busy, "Saving…", "Save changes"),
+                rx.cond(
+                    HelpPostState.edit_busy, ui("Saving…"), ui("Save changes")
+                ),
                 type="button",
                 disabled=HelpPostState.edit_busy,
                 on_click=HelpPostState.save_edit,
                 class_name="rounded-full bg-[#fba922] px-4 py-2 text-sm font-bold text-[#292929] disabled:opacity-50",
             ),
             rx.el.button(
-                "Cancel",
+                ui("Cancel"),
                 type="button",
                 disabled=HelpPostState.edit_busy,
                 on_click=HelpPostState.cancel_edit,
@@ -1007,7 +1059,7 @@ def owner_delete_footer(post: dict[str, str]) -> rx.Component:
                     post.get("can_edit", False).to(bool),
                     rx.el.button(
                         rx.icon("pencil", class_name="size-3.5"),
-                        "Edit",
+                        ui("Edit"),
                         type="button",
                         on_click=lambda: HelpPostState.begin_edit(post["id"]),
                         class_name="flex w-fit items-center gap-1.5 rounded-full border border-[#f6c66f] bg-white px-4 py-2 text-xs font-bold text-[#e08b12]",
@@ -1016,9 +1068,11 @@ def owner_delete_footer(post: dict[str, str]) -> rx.Component:
                 ),
                 rx.el.button(
                     rx.icon("trash-2", class_name="h-3.5 w-3.5"),
-                    "Delete",
+                    ui("Delete"),
                     type="button",
-                    aria_label=f"Delete {post['title']}",
+                    aria_label=ui_template_multi(
+                        "Delete {title}", {"title": post["title"]}
+                    ),
                     on_click=lambda: HelpHubState.select_removal(
                         post["id"], post["title"]
                     ),
@@ -1057,7 +1111,8 @@ def photo_caption(flat: bool) -> rx.Component:
         rx.el.div(
             rx.icon("camera", class_name="h-3.5 w-3.5 text-[#e08b12]"),
             rx.el.span(
-                "Job photos", class_name="text-xs font-semibold text-[#e08b12]"
+                ui("Job photos"),
+                class_name="text-xs font-semibold text-[#e08b12]",
             ),
             class_name="flex items-center gap-1.5",
         ),
@@ -1074,7 +1129,7 @@ def post_card(
     return rx.el.div(
         corner_activity_dot(
             NotificationState.unread_help_post_ids.contains(post["id"].to(int)),
-            "New activity on this help request",
+            ui("New activity on this help request"),
         ),
         rx.cond(
             compact,
@@ -1105,12 +1160,12 @@ def post_card(
         rx.el.div(
             rx.el.span(
                 rx.icon("compass", class_name="h-3 w-3"),
-                post["category_label"],
+                ui(post["category_label"]),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#eaf1ff] px-3 py-1 text-xs font-bold text-[#b86e08]",
             ),
             rx.el.span(
                 rx.icon("gift", class_name="h-3 w-3"),
-                post["reward_label"],
+                ui(post["reward_label"]),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#e08b12]",
             ),
             rx.el.span(
@@ -1125,7 +1180,7 @@ def post_card(
             ),
             rx.el.span(
                 rx.icon("clock", class_name="h-3 w-3"),
-                post["urgency"],
+                urgency_label(post["urgency"]),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#4b5563] capitalize",
             ),
             class_name="flex flex-wrap items-center gap-2 mt-4",
@@ -1158,7 +1213,7 @@ def post_card(
         ),
         rx.cond(
             deletable & (HelpPostState.edit_post_id == 0),
-            error_banner(HelpPostState.edit_error),
+            error_banner(ui(HelpPostState.localized_feedback["edit_error"])),
             rx.fragment(),
         ),
         class_name=rx.cond(
@@ -1174,7 +1229,11 @@ def recent_post_card(post: dict[str, str]) -> rx.Component:
         post_card(post, deletable=True),
         rx.el.p(
             rx.icon("users", class_name="h-3.5 w-3.5"),
-            f"People required: {post['helpers_needed']}",
+            ui_template(
+                "People required: {count}",
+                "count",
+                post["helpers_needed"].to_string(),
+            ),
             class_name="flex items-center gap-1.5 px-5 pb-3 text-xs font-semibold text-[#e08b12]",
         ),
         class_name="w-full",
@@ -1186,18 +1245,18 @@ def recent_posts_section() -> rx.Component:
         rx.el.div(
             rx.el.div(
                 rx.el.h3(
-                    "Your help requests",
+                    ui("Your help requests"),
                     class_name="text-lg font-semibold text-[#111827]",
                 ),
                 rx.el.p(
-                    "The last six pages of your journal — freshest first.",
+                    ui("The last six pages of your journal — freshest first."),
                     class_name="text-sm font-medium text-[#4b5563] mt-1",
                 ),
                 class_name="min-w-0",
             ),
             rx.el.button(
                 rx.icon("refresh-cw", class_name="h-3.5 w-3.5"),
-                "Refresh",
+                ui("Refresh"),
                 type="button",
                 on_click=HelpPostState.load_recent,
                 class_name="w-fit flex items-center gap-2 rounded-full border border-[#d4d4d4] bg-white px-4 py-2 text-xs font-semibold text-[#4b5563] transition-colors hover:border-[#e08b12] hover:text-[#e08b12]",
@@ -1237,11 +1296,13 @@ def recent_posts_section() -> rx.Component:
                         class_name="h-6 w-6 text-[#4b5563] mb-2",
                     ),
                     rx.el.p(
-                        "No help requests posted yet.",
+                        ui("No help requests posted yet."),
                         class_name="text-sm font-semibold text-[#4b5563]",
                     ),
                     rx.el.p(
-                        "Fill in the form above and your first request will appear here.",
+                        ui(
+                            "Fill in the form above and your first request will appear here."
+                        ),
                         class_name="text-sm font-medium text-[#4b5563] mt-1",
                     ),
                     class_name="flex flex-col items-center justify-center text-center w-full rounded-2xl border border-dashed border-[#d4d4d4] bg-white/60 px-6 py-10",
@@ -1258,23 +1319,25 @@ def help_post_panel() -> rx.Component:
             rx.el.div(
                 rx.el.span(
                     rx.icon("notebook-pen", class_name="h-3.5 w-3.5"),
-                    "Ask for help",
+                    ui("Ask for help"),
                     class_name="w-fit flex items-center gap-2 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#e08b12]",
                 ),
                 rx.el.h2(
-                    "Post what you need a hand with.",
+                    ui("Post what you need a hand with."),
                     class_name="mt-3 text-2xl font-bold tracking-tight text-[#111827]",
                 ),
                 rx.el.p(
-                    "Describe the task, offer something warm in return, and pick the moment you need someone there.",
+                    ui(
+                        "Describe the task, offer something warm in return, and pick the moment you need someone there."
+                    ),
                     class_name="mt-1 text-sm font-medium text-[#4b5563] leading-relaxed",
                 ),
                 class_name="min-w-0",
             ),
             class_name="gah-main-card w-full bg-white p-6",
         ),
-        error_banner(HelpPostState.error),
-        success_banner(HelpPostState.success),
+        error_banner(ui(HelpPostState.localized_feedback["error"])),
+        success_banner(ui(HelpPostState.localized_feedback["success"])),
         post_form(),
         recurring_section(),
         recent_posts_section(),

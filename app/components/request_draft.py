@@ -55,8 +55,8 @@ def draft_select(
                     lambda item: rx.el.option(
                         rx.cond(
                             onboarding_rewards,
-                            f"{item['label']} – {item.get('blurb', '')}",
-                            item["label"],
+                            f"{ui(item['label'])} – {ui(item.get('blurb', ''))}",
+                            ui(item["label"]),
                         ),
                         value=item["value"],
                     ),
@@ -86,8 +86,8 @@ def onboarding_reward_row(item: dict[str, str]) -> rx.Component:
             ),
         ),
         rx.el.span(
-            rx.el.strong(item["label"], class_name="font-bold"),
-            rx.el.span(f" – {item['blurb']}", class_name="font-normal"),
+            rx.el.strong(ui(item["label"]), class_name="font-bold"),
+            rx.el.span(f" – {ui(item['blurb'])}", class_name="font-normal"),
         ),
         type="button",
         role="checkbox",
@@ -127,7 +127,7 @@ def onboarding_rewards() -> rx.Component:
                 ui("Rewards"), class_name="text-sm font-semibold text-[#404040]"
             ),
             rx.el.p(
-                "optional — defaults to Free",
+                ui("optional — defaults to Free"),
                 class_name="text-right text-xs text-[#525252]",
             ),
             class_name="flex w-full items-center justify-between gap-2",
@@ -135,7 +135,7 @@ def onboarding_rewards() -> rx.Component:
         rx.el.div(
             rx.foreach(REWARD_CHOICES, onboarding_reward_row),
             role="group",
-            aria_label="Rewards — select any number",
+            aria_label=ui("Rewards — select any number"),
             class_name="w-full overflow-hidden rounded-xl border border-[#f6c66f] divide-y divide-[#f6c66f] bg-white",
         ),
         rx.cond(

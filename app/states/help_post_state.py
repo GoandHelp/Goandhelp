@@ -3,6 +3,7 @@
 import datetime
 import calendar
 import logging
+import re
 from pathlib import Path
 from typing import Any, TypedDict
 from uuid import uuid4
@@ -10,6 +11,7 @@ from uuid import uuid4
 import reflex as rx
 
 from app.reward_display import reward_display
+from app.interface_i18n import translate
 from sqlalchemy import text
 
 from app.membership import (
@@ -306,7 +308,10 @@ class HelpPostState(rx.State):
         yield HelpHubState.load_help_hub
         yield ProfileState.load_profile
         yield DiscoveryState.load_jobs
-        yield rx.toast("Help request updated.", duration=3500)
+        yield rx.toast(
+            translate(auth.preferred_language, "Help request updated."),
+            duration=3500,
+        )
 
     # Legacy PRIMARY category: always mirrors the first multi-select choice.
     selected_category: str = ""
@@ -455,11 +460,237 @@ class HelpPostState(rx.State):
         return category_labels(self.selected_categories)
 
     @rx.var
-    def category_summary_label(self) -> str:
-        labels = self.selected_category_labels
-        if not labels:
+    async def category_summary_label(self) -> str:
+        if not self.selected_categories:
             return ""
+        auth = await self.get_state(AuthState)
+        labels = [
+            translate(auth.preferred_language, CATEGORY_LABELS[value])
+            for value in self.selected_categories
+            if value in CATEGORY_LABELS
+        ]
         return ", ".join(labels)
+
+    @rx.var
+    async def localized_category_count_label(self) -> str:
+        auth = await self.get_state(AuthState)
+        language = auth.preferred_language
+        limit = await self.category_limit
+        chosen = len(self.selected_categories)
+        left = max(limit - chosen, 0)
+        if left > 0 and limit <= FREE_REQUEST_CATEGORIES:
+            return translate(
+                language,
+                "Choose 1 category. Select or unselect an option. Premium members can add up to 3.",
+            )
+        if left > 0:
+            return translate(
+                language,
+                "{chosen} of {limit} chosen — you can add {left} more.",
+            ).format(chosen=chosen, limit=limit, left=left)
+        if limit == FREE_REQUEST_CATEGORIES:
+            return translate(
+                language,
+                "Free members choose {limit} category. Tap it again to swap it, or go premium for up to 3.",
+            ).format(limit=limit)
+        return translate(
+            language, "All {limit} categories chosen. Unselect one to swap it."
+        ).format(limit=limit)
+
+    @rx.var
+    async def localized_feedback(self) -> dict[str, str]:
+        auth = await self.get_state(AuthState)
+        language = auth.preferred_language
+        return {
+            "error": self._localized_feedback_text(language, self.error),
+            "success": self._localized_feedback_text(language, self.success),
+            "photo_error": self._localized_feedback_text(
+                language, self.photo_error
+            ),
+            "photo_notice": self._localized_feedback_text(
+                language, self.photo_notice
+            ),
+            "schedule_error": self._localized_feedback_text(
+                language, self.schedule_error
+            ),
+            "schedule_notice": self._localized_feedback_text(
+                language, self.schedule_notice
+            ),
+            "edit_error": self._localized_feedback_text(
+                language, self.edit_error
+            ),
+        }
+
+    @staticmethod
+    def _localized_feedback_text(language: str, source: str) -> str:
+        if not source:
+            return ""
+        known_templates = (
+            (
+                r'^"(?P<title>.*)" is live - helpers nearby can see it now\.(?: It repeats: (?P<cadence>.*)\.)?$',
+                '"{title}" is live - helpers nearby can see it now.{repeat}',
+            ),
+            (
+                r"^Couldn't accept (?P<files>.+?)\. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source\. No video; stored results are under 1 MB\.$",
+                "Couldn't accept {files}. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source. No video; stored results are under 1 MB.",
+            ),
+            (
+                r"^(?P<count>\d+) photo\(s\) were skipped: 5 photos is the maximum\.$",
+                "{count} photo(s) were skipped: 5 photos is the maximum.",
+            ),
+            (
+                r"^(?P<count>\d+) photo\(s\) optimised to WebP under 1 MB and ready to post\.$",
+                "{count} photo(s) optimised to WebP under 1 MB and ready to post.",
+            ),
+            (r"^People required: (?P<count>\d+)$", "People required: {count}"),
+        )
+        for pattern, template in known_templates:
+            match = re.fullmatch(pattern, source)
+            if match:
+                localized = translate(language, template)
+                values = match.groupdict()
+                repeat = ""
+                if values.get("cadence"):
+                    cadence = translate(language, values["cadence"])
+                    repeat = translate(
+                        language, " It repeats: {cadence}."
+                    ).format(cadence=cadence)
+                values["repeat"] = repeat
+                return localized.format(**values)
+        upload_parts = re.fullmatch(
+            r"(?:Couldn't accept (?P<files>.+?)\. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source\. No video; stored results are under 1 MB\.)?(?: ?(?P<skipped>\d+) photo\(s\) were skipped: 5 photos is the maximum\.)?",
+            source,
+        )
+        if upload_parts and (
+            upload_parts.group("files") or upload_parts.group("skipped")
+        ):
+            localized_parts: list[str] = []
+            if upload_parts.group("files"):
+                localized_parts.append(
+                    translate(
+                        language,
+                        "Couldn't accept {files}. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source. No video; stored results are under 1 MB.",
+                    ).format(files=upload_parts.group("files"))
+                )
+            if upload_parts.group("skipped"):
+                localized_parts.append(
+                    translate(
+                        language,
+                        "{count} photo(s) were skipped: 5 photos is the maximum.",
+                    ).format(count=upload_parts.group("skipped"))
+                )
+            return " ".join(localized_parts)
+        category_limit = re.fullmatch(
+            r"A help request can have up to (\d+) categories\. Remove one first\.",
+            source,
+        )
+        if category_limit:
+            return translate(
+                language,
+                "A help request can have up to {limit} categories. Remove one first.",
+            ).format(limit=category_limit.group(1))
+        photo_rejection = re.fullmatch(
+            r"Couldn't accept (.+?)\. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source\. No video; stored results are under 1 MB\.",
+            source,
+        )
+        if photo_rejection:
+            return translate(
+                language,
+                "Couldn't accept {files}. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source. No video; stored results are under 1 MB.",
+            ).format(files=photo_rejection.group(1))
+        skipped_photo = re.fullmatch(
+            r"(\d+) photo\(s\) were skipped: 5 photos is the maximum\.",
+            source,
+        )
+        if skipped_photo:
+            return translate(
+                language,
+                "{count} photo(s) were skipped: 5 photos is the maximum.",
+            ).format(count=skipped_photo.group(1))
+        premium_limit = re.fullmatch(
+            r"You already have (\d+) open help requests — close or complete one before posting another\.",
+            source,
+        )
+        if premium_limit:
+            return translate(
+                language,
+                "You already have {limit} open help requests — close or complete one before posting another.",
+            ).format(limit=premium_limit.group(1))
+        free_limit = re.fullmatch(
+            r"Free membership allows (\d+) open help requests at a time\. Upgrade to keep up to 10 running, each visible for a whole year\.",
+            source,
+        )
+        if free_limit:
+            return translate(
+                language,
+                "Free membership allows {limit} open help requests at a time. Upgrade to keep up to 10 running, each visible for a whole year.",
+            ).format(limit=free_limit.group(1))
+        exact_templates = {
+            "error": (
+                "Job Title must contain 4–160 characters.",
+                "Job description must contain 15–500 characters.",
+                "Choose one valid Job category.",
+                "Choose a valid date.",
+                "Date must be from today through two calendar years from today.",
+                "Choose a valid reward.",
+                "Choose a supported currency.",
+                "Describe your other reward in 3–500 characters.",
+                "Choose a valid replacement map pin.",
+                "You can attach up to 5 photos per help request.",
+                "Your session expired — please sign in again.",
+                "Add the name helpers should ask for.",
+                "Pick at least one category so helpers know what kind of task this is.",
+                "Choose at most 3 categories for one help request.",
+                "Give your request a short title (4+ characters).",
+                "Keep the title under 160 characters.",
+                "Describe the task in a little more detail (15+ characters).",
+                "Job info must stay within 500 characters.",
+                "Choose the reward you can offer.",
+                "Tell helpers what your custom reward is.",
+                "Keep the reward details under 255 characters.",
+                "Add the meeting point or address for this task.",
+                "Add the city so nearby helpers can find you.",
+                "Pick the date and time you need help.",
+                "Choose a future date and time (UTC).",
+                "Choose a date no more than two calendar years from now (UTC).",
+                "That date and time couldn't be read — pick it again.",
+                "Choose roughly how long the task will take.",
+                "Choose how urgent this request is.",
+                "Choose how often this request should repeat.",
+                "Choose a valid repeat interval.",
+                "That repeat end date couldn't be read.",
+                "The repeat end date cannot be more than two calendar years from today (UTC).",
+                "The repeat end date must be on or after the first date you need help.",
+                "Number of people required must be a whole number from 1 to 500.",
+                "We couldn't create that help request. Please try again.",
+                "We couldn't create that request. Please try again.",
+                "We couldn't attach those photos. Please try again.",
+                "We couldn't set up the repeating schedule. Please try again.",
+                "This request cannot be edited after any help offer has been sent, or when it is no longer open.",
+                "Could not open this request for editing. Please try again.",
+                "Please sign in again.",
+                "Cannot edit: someone has sent a help offer, or this request is no longer open. Your changes were not saved.",
+                "Could not save your changes. Please try again.",
+            ),
+            "photo": (
+                "Pictures could not be uploaded. Please try again.",
+                "You already have 5 photos attached — remove one before adding another.",
+                "Photo removed.",
+            ),
+            "schedule": (
+                "Your session expired — please sign in again.",
+                "That repeating request is no longer available.",
+                "That repeating request can't be resumed.",
+                "Repeating request paused — no new posts will be created.",
+                "Repeating request ended. Existing posts stay as they are.",
+                "Repeating request resumed.",
+                "Repeating request reached its end date.",
+            ),
+        }
+        for messages in exact_templates.values():
+            if source in messages:
+                return translate(language, source)
+        return translate(language, source)
 
     @rx.var
     async def category_limit(self) -> int:
@@ -478,6 +709,17 @@ class HelpPostState(rx.State):
         if limit <= 1:
             return "required — choose 1"
         return f"required — choose 1 to {limit}"
+
+    @rx.var
+    async def localized_category_slot_hint(self) -> str:
+        auth = await self.get_state(AuthState)
+        limit = await self.category_limit
+        if limit <= FREE_REQUEST_CATEGORIES:
+            return translate(auth.preferred_language, "required — choose 1")
+        return translate(
+            auth.preferred_language,
+            "required — choose 1 to {limit}",
+        ).format(limit=limit)
 
     @rx.var
     async def category_count_label(self) -> str:
@@ -1003,6 +1245,7 @@ class HelpPostState(rx.State):
         async with self:
             auth = await self.get_state(AuthState)
             sid = auth.subscriber_id
+            interface_language = auth.preferred_language
             categories = normalize_categories(self.selected_categories)
             reward_type = self.reward_type
             photo_paths = list(self.pending_photo_paths)
@@ -1384,7 +1627,10 @@ class HelpPostState(rx.State):
             )
             auth = await self.get_state(AuthState)
             auth.display_name = requester
-        yield rx.toast("Help request posted.", duration=4000)
+        yield rx.toast(
+            translate(interface_language, "Help request posted."),
+            duration=4000,
+        )
         yield HelpPostState.load_recent
         from app.states.profile_state import ProfileState
 
