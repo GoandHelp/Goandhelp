@@ -103,6 +103,26 @@ from app.interface_catalog_job_review import (
     JOB_REVIEW_CATALOGS,
     JOB_REVIEW_KEYS,
 )
+from app.interface_catalog_job_requests import (
+    JOB_REQUEST_CATALOGS,
+    JOB_REQUEST_KEYS,
+)
+from app.interface_catalog_job_completion import (
+    JOB_COMPLETION_CATALOGS,
+    JOB_COMPLETION_KEYS,
+)
+from app.interface_catalog_job_sharing import (
+    JOB_SHARING_CATALOGS,
+    JOB_SHARING_KEYS,
+)
+from app.interface_catalog_job_private_report import (
+    JOB_PRIVATE_REPORT_CATALOGS,
+    JOB_PRIVATE_REPORT_KEYS,
+)
+from app.interface_catalog_job_review_responses import (
+    JOB_REVIEW_RESPONSE_CATALOGS,
+    JOB_REVIEW_RESPONSE_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -574,6 +594,11 @@ for _catalogs in (
     JOB_CONVERSATION_CATALOGS,
     JOB_COMPOSE_CATALOGS,
     JOB_REVIEW_CATALOGS,
+    JOB_REQUEST_CATALOGS,
+    JOB_COMPLETION_CATALOGS,
+    JOB_SHARING_CATALOGS,
+    JOB_PRIVATE_REPORT_CATALOGS,
+    JOB_REVIEW_RESPONSE_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -618,6 +643,11 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *JOB_CONVERSATION_KEYS,
             *JOB_COMPOSE_KEYS,
             *JOB_REVIEW_KEYS,
+            *JOB_REQUEST_KEYS,
+            *JOB_COMPLETION_KEYS,
+            *JOB_SHARING_KEYS,
+            *JOB_PRIVATE_REPORT_KEYS,
+            *JOB_REVIEW_RESPONSE_KEYS,
             "clear",
             "optional",
         ]

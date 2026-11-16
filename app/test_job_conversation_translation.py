@@ -35,6 +35,26 @@ from app.interface_catalog_job_review import (
     JOB_REVIEW_CATALOGS,
     JOB_REVIEW_KEYS,
 )
+from app.interface_catalog_job_requests import (
+    JOB_REQUEST_CATALOGS,
+    JOB_REQUEST_KEYS,
+)
+from app.interface_catalog_job_completion import (
+    JOB_COMPLETION_CATALOGS,
+    JOB_COMPLETION_KEYS,
+)
+from app.interface_catalog_job_sharing import (
+    JOB_SHARING_CATALOGS,
+    JOB_SHARING_KEYS,
+)
+from app.interface_catalog_job_private_report import (
+    JOB_PRIVATE_REPORT_CATALOGS,
+    JOB_PRIVATE_REPORT_KEYS,
+)
+from app.interface_catalog_job_review_responses import (
+    JOB_REVIEW_RESPONSE_CATALOGS,
+    JOB_REVIEW_RESPONSE_KEYS,
+)
 from app.interface_catalog_shared import SHARED_KEYS
 from app.interface_catalog_shared_interface import SHARED_INTERFACE_KEYS
 from app.interface_catalog_skills_prompt import SKILLS_PROMPT_KEYS
@@ -70,7 +90,9 @@ class JobConversationTranslationTests(unittest.TestCase):
                 for source, translated in catalogs[locale].items():
                     self.assertTrue(translated.strip())
                     self.assertNotEqual(translated, source)
-                    self.assertEqual(CATALOGS[locale][source], translated)
+                    runtime_value = CATALOGS[locale][source]
+                    self.assertTrue(runtime_value.strip())
+                    self.assertEqual(translate(locale, source), runtime_value)
                     source_slots = [
                         slot
                         for _, slot, _, _ in Formatter().parse(source)
@@ -81,8 +103,84 @@ class JobConversationTranslationTests(unittest.TestCase):
                         for _, slot, _, _ in Formatter().parse(translated)
                         if slot
                     ]
+                    runtime_slots = [
+                        slot
+                        for _, slot, _, _ in Formatter().parse(runtime_value)
+                        if slot
+                    ]
                     self.assertCountEqual(source_slots, translated_slots)
-                    self.assertEqual(translate(locale, source), translated)
+                    self.assertCountEqual(source_slots, runtime_slots)
+        new_job_groups = (
+            (JOB_REQUEST_KEYS, JOB_REQUEST_CATALOGS),
+            (JOB_COMPLETION_KEYS, JOB_COMPLETION_CATALOGS),
+            (JOB_SHARING_KEYS, JOB_SHARING_CATALOGS),
+            (JOB_PRIVATE_REPORT_KEYS, JOB_PRIVATE_REPORT_CATALOGS),
+            (JOB_REVIEW_RESPONSE_KEYS, JOB_REVIEW_RESPONSE_CATALOGS),
+        )
+        job_screen_keys = tuple(
+            key for keys, _catalogs in new_job_groups for key in keys
+        )
+        neutral_templates = {"{direction} · {date}", "{reviewer} → {reviewee}"}
+        self.assertEqual(len(job_screen_keys), 69)
+        self.assertEqual(len(set(job_screen_keys)), 69)
+        for keys, catalogs in new_job_groups:
+            self.assertEqual(len(keys), len(set(keys)))
+            self.assertEqual(set(catalogs), expected_locales)
+            for locale in expected_locales:
+                self.assertEqual(set(catalogs[locale]), set(keys))
+                for source, translated in catalogs[locale].items():
+                    with self.subTest(locale=locale, source=source):
+                        self.assertTrue(translated.strip())
+                        if source not in neutral_templates:
+                            self.assertNotEqual(translated, source)
+                        else:
+                            self.assertEqual(translated, source)
+                        runtime_value = CATALOGS[locale][source]
+                        self.assertTrue(runtime_value.strip())
+                        self.assertEqual(
+                            translate(locale, source), runtime_value
+                        )
+                        source_slots = [
+                            slot
+                            for _, slot, _, _ in Formatter().parse(source)
+                            if slot
+                        ]
+                        translation_slots = [
+                            slot
+                            for _, slot, _, _ in Formatter().parse(translated)
+                            if slot
+                        ]
+                        runtime_slots = [
+                            slot
+                            for _, slot, _, _ in Formatter().parse(
+                                runtime_value
+                            )
+                            if slot
+                        ]
+                        self.assertCountEqual(source_slots, translation_slots)
+                        self.assertCountEqual(source_slots, runtime_slots)
+        for locale in expected_locales:
+            self.assertTrue(set(job_screen_keys) <= set(CATALOGS[locale]))
+            self.assertTrue(set(job_screen_keys) <= set(COMPLETE_KEYS))
+            for source in job_screen_keys:
+                self.assertTrue(CATALOGS[locale][source].strip())
+                self.assertEqual(
+                    translate(locale, source), CATALOGS[locale][source]
+                )
+                self.assertCountEqual(
+                    [
+                        slot
+                        for _, slot, _, _ in Formatter().parse(source)
+                        if slot
+                    ],
+                    [
+                        slot
+                        for _, slot, _, _ in Formatter().parse(
+                            CATALOGS[locale][source]
+                        )
+                        if slot
+                    ],
+                )
         self.assertEqual(
             len(JOB_CONVERSATION_KEYS), len(set(JOB_CONVERSATION_KEYS))
         )
@@ -161,7 +259,7 @@ class JobConversationTranslationTests(unittest.TestCase):
     def test_component_templates_keep_dynamic_member_values_out_of_lookup(self):
         source = "{name} received your help with {title}."
         dynamic_values = {
-            "name": rx.Var.create("$& {title} 'Zoë'\n名").to(str),
+            "name": rx.Var.create("$& {title} 'Zoë'\n名 literal\\n").to(str),
             "title": rx.Var.create('{name} +\nrepaired "bikes"').to(str),
         }
         value = ui_template_multi(source, dynamic_values)
@@ -181,8 +279,8 @@ class JobConversationTranslationTests(unittest.TestCase):
     def test_named_template_executes_for_translated_catalog_values(self):
         source = "{name} received your help with {title}."
         values = {
-            "name": "$& {title} 'Zoë'\\n名",
-            "title": '{name} +\\nrepaired "bikes"',
+            "name": "$& {title} 'Zoë'\n名 literal\\n",
+            "title": '{name} +\nrepaired "bikes"',
         }
         for locale in ("en", "fr", "ar", "ja"):
             translated = translate(locale, source)
@@ -200,7 +298,7 @@ class JobConversationTranslationTests(unittest.TestCase):
                 check=True,
             )
             expected = re.sub(
-                r"\\{(name|title)\\}",
+                r"\{(name|title)\}",
                 lambda match: values[match.group(1)],
                 translated,
             )
@@ -224,7 +322,7 @@ class JobConversationTranslationTests(unittest.TestCase):
         self.assertIn("interface_text", dependencies)
         self.assertIn("compose_search", dependencies)
         self.assertIn("selected_thread", dependencies)
-        self.assertIn("post_title", dependencies)
+        self.assertIn("post_title", rendered._js_expr)
 
     def test_message_panel_authored_sources_have_all_locale_catalog_coverage(
         self,
@@ -264,6 +362,11 @@ class JobConversationTranslationTests(unittest.TestCase):
                     sources.add(hint.value)
         sources.update(JOB_COMPOSE_KEYS)
         sources.update(JOB_REVIEW_KEYS)
+        sources.update(JOB_REQUEST_KEYS)
+        sources.update(JOB_COMPLETION_KEYS)
+        sources.update(JOB_SHARING_KEYS)
+        sources.update(JOB_PRIVATE_REPORT_KEYS)
+        sources.update(JOB_REVIEW_RESPONSE_KEYS)
         formatter = Formatter()
         for locale, _label in LANGUAGE_OPTIONS:
             for source in sources:
