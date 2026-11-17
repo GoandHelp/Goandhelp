@@ -138,8 +138,25 @@ from app.interface_catalog_help_post_controls import (
     HELP_POST_CONTROL_CATALOGS,
     HELP_POST_CONTROL_KEYS,
 )
+from app.interface_catalog_help_post_fields import (
+    HELP_POST_FIELD_CATALOGS,
+    HELP_POST_FIELD_KEYS,
+)
+from app.interface_catalog_help_post_guidance import (
+    HELP_POST_GUIDANCE_CATALOGS,
+    HELP_POST_GUIDANCE_KEYS,
+)
+from app.interface_catalog_help_post_details import (
+    HELP_POST_DETAIL_CATALOGS,
+    HELP_POST_DETAIL_KEYS,
+)
+from app.interface_catalog_help_post_templates import (
+    HELP_POST_COUNT_LABEL_KEYS,
+    HELP_POST_TEMPLATE_CATALOGS,
+    HELP_POST_UI_TEMPLATE_KEYS,
+)
 
-# Source strings are stable keys.
+# Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
     "|"
 )
@@ -619,6 +636,10 @@ for _catalogs in (
     JOB_FEEDBACK_TOAST_CATALOGS,
     JOB_FEEDBACK_LITERAL_CATALOGS,
     HELP_POST_CONTROL_CATALOGS,
+    HELP_POST_FIELD_CATALOGS,
+    HELP_POST_GUIDANCE_CATALOGS,
+    HELP_POST_DETAIL_CATALOGS,
+    HELP_POST_TEMPLATE_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -673,6 +694,11 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *JOB_FEEDBACK_LITERAL_TRANSLATION_KEYS,
             *JOB_FEEDBACK_LITERAL_KEYS,
             *HELP_POST_CONTROL_KEYS,
+            *HELP_POST_FIELD_KEYS,
+            *HELP_POST_GUIDANCE_KEYS,
+            *HELP_POST_DETAIL_KEYS,
+            *HELP_POST_UI_TEMPLATE_KEYS,
+            *HELP_POST_COUNT_LABEL_KEYS,
             "clear",
             "optional",
         ]

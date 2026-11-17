@@ -25,6 +25,10 @@ from app.interface_catalog_help_post_controls import (
     HELP_POST_CONTROL_CATALOGS,
     HELP_POST_CONTROL_KEYS,
 )
+from app.interface_catalog_help_post_fields import (
+    HELP_POST_FIELD_CATALOGS,
+    HELP_POST_FIELD_KEYS,
+)
 from app.models import LANGUAGE_OPTIONS
 from app.states.help_post_state import HelpPostState
 
@@ -90,12 +94,76 @@ class HelpPostInterfaceTranslationTests(unittest.TestCase):
                     if (code, source) not in {
                         ("nl", "Open"),
                         ("fr", "Flexible"),
+                        ("es", "Flexible"),
                         ("de", "Pause"),
                     }:
                         self.assertNotEqual(value, source)
                         self.assertNotEqual(runtime_value, source)
         for source in expected_keys:
-            self.assertNotIn(source, CATALOGS["en"])
+            self.assertEqual(translate("en", source), source)
+            self.assertEqual(translate("unknown-locale", source), source)
+
+    def test_help_post_field_catalogs_cover_all_sources_and_locales(self):
+        expected_keys = (
+            "Ask helper for an estimate price",
+            "Drop or click to select photos",
+            "No help requests posted yet.",
+            "No repeating requests yet",
+            "Photo ready to post",
+            "Pictures are being uploaded",
+            "Please specify for each one below",
+            "Post help request",
+            "Posting details",
+            "Posting your request…",
+            "Premium · 1–500",
+            "Recurring requests",
+            "Refresh",
+            "Remove this photo",
+            "Repeat this request",
+            "Repeating",
+            "Requester name",
+            "Resume",
+            "Reward details",
+            "Reward you can offer",
+            "Rewards — select any number",
+            "Soon",
+            "Stop repeating on",
+            "Urgency",
+            "Urgent",
+            "WebP - under 1 MB",
+            "Yes, remove it",
+            "Your help requests",
+            "fixed",
+            "optional - maximum 5",
+            "optional — defaults to Free",
+            "required - max 500 characters",
+            "required · UTC · within two years",
+            "reward, meeting point and timing",
+            "who helpers should ask for",
+        )
+        offered_codes = {code for code, _label in LANGUAGE_OPTIONS}
+        non_english_codes = offered_codes - {"en"}
+        self.assertEqual(HELP_POST_FIELD_KEYS, expected_keys)
+        self.assertEqual(len(HELP_POST_FIELD_KEYS), 35)
+        self.assertEqual(len(set(HELP_POST_FIELD_KEYS)), 35)
+        self.assertEqual(set(HELP_POST_FIELD_CATALOGS), non_english_codes)
+        self.assertTrue(set(HELP_POST_FIELD_KEYS) <= set(COMPLETE_KEYS))
+        for code in non_english_codes:
+            self.assertIn(code, CATALOGS)
+            self.assertEqual(
+                set(HELP_POST_FIELD_CATALOGS[code]), set(expected_keys)
+            )
+            for source in expected_keys:
+                with self.subTest(locale=code, source=source):
+                    value = HELP_POST_FIELD_CATALOGS[code][source]
+                    self.assertIsInstance(value, str)
+                    self.assertTrue(value.strip())
+                    self.assertIn(source, CATALOGS[code])
+                    runtime_value = CATALOGS[code][source]
+                    self.assertIsInstance(runtime_value, str)
+                    self.assertTrue(runtime_value.strip())
+                    self.assertEqual(translate(code, source), runtime_value)
+        for source in expected_keys:
             self.assertEqual(translate("en", source), source)
             self.assertEqual(translate("unknown-locale", source), source)
 
