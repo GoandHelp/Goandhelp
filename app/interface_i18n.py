@@ -134,8 +134,12 @@ from app.interface_catalog_job_feedback_literals import (
     JOB_FEEDBACK_LITERAL_CATALOGS,
     JOB_FEEDBACK_LITERAL_TRANSLATION_KEYS,
 )
+from app.interface_catalog_help_post_controls import (
+    HELP_POST_CONTROL_CATALOGS,
+    HELP_POST_CONTROL_KEYS,
+)
 
-# Source strings are stable keys. Never pass member-authored text to ui().
+# Source strings are stable keys.
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
     "|"
 )
@@ -597,6 +601,7 @@ for _language, _entries in SHARED_INTERFACE_CATALOGS.items():
     for _key, _value in _entries.items():
         CATALOGS[_language].setdefault(_key, _value)
 
+
 for _catalogs in (
     INBOX_CONTACT_CATALOGS,
     INBOX_DIRECT_CATALOGS,
@@ -613,6 +618,7 @@ for _catalogs in (
     JOB_FEEDBACK_TEMPLATE_CATALOGS,
     JOB_FEEDBACK_TOAST_CATALOGS,
     JOB_FEEDBACK_LITERAL_CATALOGS,
+    HELP_POST_CONTROL_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -666,6 +672,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *JOB_FEEDBACK_TOAST_KEYS,
             *JOB_FEEDBACK_LITERAL_TRANSLATION_KEYS,
             *JOB_FEEDBACK_LITERAL_KEYS,
+            *HELP_POST_CONTROL_KEYS,
             "clear",
             "optional",
         ]

@@ -21,11 +21,84 @@ from app.interface_i18n import (
     ui,
     ui_template_multi,
 )
+from app.interface_catalog_help_post_controls import (
+    HELP_POST_CONTROL_CATALOGS,
+    HELP_POST_CONTROL_KEYS,
+)
 from app.models import LANGUAGE_OPTIONS
 from app.states.help_post_state import HelpPostState
 
 
 class HelpPostInterfaceTranslationTests(unittest.TestCase):
+    def test_help_post_control_catalogs_cover_all_sources_and_locales(self):
+        expected_keys = (
+            "Ask for help",
+            "Attached job photo",
+            "Cancelled",
+            "Choose job categories",
+            "Choose…",
+            "Close job categories",
+            "Completed",
+            "Confirm removing this help request",
+            "Confirmed",
+            "Date & time needed",
+            "Delete",
+            "Describe your reward",
+            "Edit",
+            "Edit help request",
+            "End",
+            "Expired",
+            "Flexible",
+            "How long will it take?",
+            "How often",
+            "Job categories",
+            "Job info",
+            "Job photos",
+            "Job title",
+            "Keep it",
+            "Keep this help request",
+            "Location of this request",
+            "Meeting point",
+            "New activity on this help request",
+            "Number of people required",
+            "One-time",
+            "Open",
+            "Pause",
+        )
+        offered_codes = {code for code, _label in LANGUAGE_OPTIONS}
+        non_english_codes = offered_codes - {"en"}
+        self.assertEqual(HELP_POST_CONTROL_KEYS, expected_keys)
+        self.assertEqual(len(HELP_POST_CONTROL_KEYS), 32)
+        self.assertEqual(len(set(HELP_POST_CONTROL_KEYS)), 32)
+        self.assertEqual(set(HELP_POST_CONTROL_CATALOGS), non_english_codes)
+        self.assertTrue(set(HELP_POST_CONTROL_KEYS) <= set(COMPLETE_KEYS))
+        for code in non_english_codes:
+            self.assertIn(code, CATALOGS)
+            self.assertEqual(
+                set(HELP_POST_CONTROL_CATALOGS[code]), set(expected_keys)
+            )
+            for source in expected_keys:
+                with self.subTest(locale=code, source=source):
+                    value = HELP_POST_CONTROL_CATALOGS[code][source]
+                    self.assertIsInstance(value, str)
+                    self.assertTrue(value.strip())
+                    self.assertIn(source, CATALOGS[code])
+                    runtime_value = CATALOGS[code][source]
+                    self.assertIsInstance(runtime_value, str)
+                    self.assertTrue(runtime_value.strip())
+                    self.assertEqual(translate(code, source), runtime_value)
+                    if (code, source) not in {
+                        ("nl", "Open"),
+                        ("fr", "Flexible"),
+                        ("de", "Pause"),
+                    }:
+                        self.assertNotEqual(value, source)
+                        self.assertNotEqual(runtime_value, source)
+        for source in expected_keys:
+            self.assertNotIn(source, CATALOGS["en"])
+            self.assertEqual(translate("en", source), source)
+            self.assertEqual(translate("unknown-locale", source), source)
+
     def test_all_offered_locales_and_existing_shared_copy_fallback(self):
         locales = {code for code, _label in LANGUAGE_OPTIONS}
         self.assertEqual(len(locales), 37)
@@ -44,8 +117,15 @@ class HelpPostInterfaceTranslationTests(unittest.TestCase):
             self.assertIn(locale, CATALOGS)
             for source in existing_sources:
                 with self.subTest(locale=locale, source=source):
-                    self.assertTrue(translate(locale, source))
-                    self.assertNotEqual(translate(locale, source), source)
+                    self.assertIn(source, CATALOGS[locale])
+                    self.assertTrue(CATALOGS[locale][source])
+                    self.assertEqual(
+                        translate(locale, source), CATALOGS[locale][source]
+                    )
+                    if (locale, source) != ("fr", "Date"):
+                        self.assertNotEqual(translate(locale, source), source)
+                    else:
+                        self.assertEqual(translate(locale, source), "Date")
         for source in existing_sources:
             self.assertEqual(translate("en", source), source)
             self.assertEqual(translate("unknown-locale", source), source)
