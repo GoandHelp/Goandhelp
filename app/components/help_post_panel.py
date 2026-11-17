@@ -4,6 +4,11 @@ from app.components.request_draft import compact_request_fields
 
 from app.components.language_control import browser_translatable_text
 from app.interface_i18n import ui, ui_template, ui_template_multi
+from app.components.help_post_metadata import (
+    localized_date_time,
+    localized_metadata,
+    localized_reward,
+)
 from app.components.disclosure import disclosure_arrow
 
 from app.components.notification_badge import corner_activity_dot
@@ -105,7 +110,7 @@ def category_card(item: dict[str, str]) -> rx.Component:
 
 
 def option_item(item: dict[str, str]) -> rx.Component:
-    return rx.el.option(ui(item["label"]), value=item["value"])
+    return rx.el.option(localized_metadata(item["label"]), value=item["value"])
 
 
 def urgency_label(value: rx.Var[str]) -> rx.Var[str]:
@@ -263,7 +268,7 @@ def photo_upload_section() -> rx.Component:
                 class_name="flex min-h-28 w-full items-center justify-center gap-2 rounded-2xl border border-[#f6c66f] bg-[#fff7e8] px-5 py-5 text-center",
             ),
         ),
-        error_banner(ui(HelpPostState.localized_feedback["photo_error"])),
+        error_banner(HelpPostState.localized_feedback["photo_error"]),
         rx.cond(
             HelpPostState.photo_notice,
             rx.el.div(
@@ -272,7 +277,7 @@ def photo_upload_section() -> rx.Component:
                     class_name="h-3.5 w-3.5 text-[#111827] shrink-0",
                 ),
                 rx.el.span(
-                    ui(HelpPostState.localized_feedback["photo_notice"]),
+                    HelpPostState.localized_feedback["photo_notice"],
                     class_name="text-xs font-semibold text-[#111827]",
                 ),
                 class_name="flex items-center gap-2 rounded-xl border border-[#fba922] bg-[#fba922] px-3 py-2 w-full",
@@ -374,7 +379,7 @@ def repeat_section() -> rx.Component:
                     class_name="text-sm font-bold text-[#111827]",
                 ),
                 rx.el.span(
-                    ui(HelpPostState.repeat_summary),
+                    localized_metadata(HelpPostState.repeat_summary),
                     class_name=rx.cond(
                         HelpPostState.repeat_enabled,
                         "w-fit rounded-full bg-[#fba922] px-3 py-1 text-xs font-bold text-[#111827]",
@@ -470,7 +475,7 @@ def repeat_section() -> rx.Component:
 
 def schedule_status_badge(schedule: dict[str, str]) -> rx.Component:
     return rx.el.span(
-        ui(schedule["status_label"]),
+        localized_metadata(schedule["status_label"]),
         class_name=rx.cond(
             schedule["is_active"],
             "w-fit shrink-0 rounded-full bg-[#fba922] px-3 py-1 text-xs font-bold text-[#111827]",
@@ -496,7 +501,7 @@ def schedule_card(schedule: dict[str, str]) -> rx.Component:
                     class_name="text-sm font-bold text-[#111827] leading-tight",
                 ),
                 rx.el.p(
-                    ui(schedule["cadence_label"]),
+                    localized_metadata(schedule["cadence_label"]),
                     class_name="mt-0.5 text-xs font-semibold text-[#e08b12]",
                 ),
                 class_name="min-w-0 flex-1",
@@ -507,12 +512,21 @@ def schedule_card(schedule: dict[str, str]) -> rx.Component:
         rx.el.div(
             rx.el.span(
                 rx.icon("calendar-clock", class_name="h-3 w-3"),
-                ui(schedule["next_label"]),
+                localized_date_time(
+                    schedule.get("next_iso", ""),
+                    fallback_key="No further dates",
+                    legacy_value=schedule.get("next_label", ""),
+                ),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#e08b12]",
             ),
             rx.el.span(
                 rx.icon("calendar-x", class_name="h-3 w-3"),
-                ui(schedule["end_label"]),
+                localized_date_time(
+                    schedule.get("end_iso", ""),
+                    date_only=True,
+                    fallback_key="No end date",
+                    legacy_value=schedule.get("end_label", ""),
+                ),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#4b5563]",
             ),
             rx.el.span(
@@ -590,7 +604,7 @@ def recurring_section() -> rx.Component:
             class_name="flex w-full items-center justify-between gap-3",
         ),
         rx.cond(
-            ui(HelpPostState.localized_feedback["schedule_error"]),
+            HelpPostState.localized_feedback["schedule_error"],
             rx.el.p(
                 HelpPostState.localized_feedback["schedule_error"],
                 role="alert",
@@ -599,7 +613,7 @@ def recurring_section() -> rx.Component:
             rx.fragment(),
         ),
         rx.cond(
-            ui(HelpPostState.localized_feedback["schedule_notice"]),
+            HelpPostState.localized_feedback["schedule_notice"],
             rx.el.p(
                 HelpPostState.localized_feedback["schedule_notice"],
                 class_name="mt-2 rounded-xl bg-[#fba922] px-3 py-2 text-xs font-bold text-[#111827]",
@@ -733,7 +747,7 @@ def category_section() -> rx.Component:
             ui(HelpPostState.localized_category_count_label),
             class_name="mt-2 text-xs text-[#4b5563]",
         ),
-        error_banner(ui(HelpPostState.localized_feedback["error"])),
+        error_banner(HelpPostState.localized_feedback["error"]),
         rx.el.button(
             ui("Close job categories"),
             type="button",
@@ -1023,7 +1037,7 @@ def owner_edit_form() -> rx.Component:
             class_name="text-sm text-[#525252]",
         ),
         compact_request_fields(HelpPostState, "edit-help-request"),
-        error_banner(ui(HelpPostState.localized_feedback["edit_error"])),
+        error_banner(HelpPostState.localized_feedback["edit_error"]),
         rx.el.div(
             rx.el.button(
                 rx.cond(
@@ -1165,7 +1179,10 @@ def post_card(
             ),
             rx.el.span(
                 rx.icon("gift", class_name="h-3 w-3"),
-                ui(post["reward_label"]),
+                localized_reward(
+                    post["reward_label"],
+                    post.get("is_custom_reward", False).to(bool),
+                ),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#e08b12]",
             ),
             rx.el.span(
@@ -1175,7 +1192,11 @@ def post_card(
             ),
             rx.el.span(
                 rx.icon("calendar", class_name="h-3 w-3"),
-                post["scheduled"],
+                localized_date_time(
+                    post.get("scheduled_iso", ""),
+                    fallback_key="Time to agree",
+                    legacy_value=post.get("scheduled", ""),
+                ),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#4b5563]",
             ),
             rx.el.span(
@@ -1213,7 +1234,7 @@ def post_card(
         ),
         rx.cond(
             deletable & (HelpPostState.edit_post_id == 0),
-            error_banner(ui(HelpPostState.localized_feedback["edit_error"])),
+            error_banner(HelpPostState.localized_feedback["edit_error"]),
             rx.fragment(),
         ),
         class_name=rx.cond(
@@ -1336,8 +1357,8 @@ def help_post_panel() -> rx.Component:
             ),
             class_name="gah-main-card w-full bg-white p-6",
         ),
-        error_banner(ui(HelpPostState.localized_feedback["error"])),
-        success_banner(ui(HelpPostState.localized_feedback["success"])),
+        error_banner(HelpPostState.localized_feedback["error"]),
+        success_banner(HelpPostState.localized_feedback["success"]),
         post_form(),
         recurring_section(),
         recent_posts_section(),

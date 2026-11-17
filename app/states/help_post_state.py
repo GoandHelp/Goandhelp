@@ -12,6 +12,12 @@ import reflex as rx
 
 from app.reward_display import reward_display
 from app.interface_i18n import translate
+from app.interface_catalog_help_post_feedback import HELP_POST_FEEDBACK_KEYS
+from app.interface_catalog_help_post_status_feedback import (
+    HELP_POST_STATUS_FEEDBACK_KEYS,
+)
+from app.interface_catalog_help_post_validation import HELP_POST_VALIDATION_KEYS
+from app.interface_catalog_help_post_metadata import HELP_POST_METADATA_KEYS
 from sqlalchemy import text
 
 from app.membership import (
@@ -98,6 +104,8 @@ class RecentPost(TypedDict):
     reward_details: str
     location: str
     scheduled: str
+    scheduled_iso: str
+    is_custom_reward: bool
     status: str
     urgency: str
     created: str
@@ -120,6 +128,8 @@ class RecurringSummary(TypedDict):
     status_label: str
     next_label: str
     end_label: str
+    next_iso: str
+    end_iso: str
     count: int
     is_active: bool
     is_paused: bool
@@ -525,172 +535,150 @@ class HelpPostState(rx.State):
     def _localized_feedback_text(language: str, source: str) -> str:
         if not source:
             return ""
-        known_templates = (
-            (
-                r'^"(?P<title>.*)" is live - helpers nearby can see it now\.(?: It repeats: (?P<cadence>.*)\.)?$',
-                '"{title}" is live - helpers nearby can see it now.{repeat}',
-            ),
-            (
-                r"^Couldn't accept (?P<files>.+?)\. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source\. No video; stored results are under 1 MB\.$",
-                "Couldn't accept {files}. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source. No video; stored results are under 1 MB.",
-            ),
-            (
-                r"^(?P<count>\d+) photo\(s\) were skipped: 5 photos is the maximum\.$",
-                "{count} photo(s) were skipped: 5 photos is the maximum.",
-            ),
-            (
-                r"^(?P<count>\d+) photo\(s\) optimised to WebP under 1 MB and ready to post\.$",
-                "{count} photo(s) optimised to WebP under 1 MB and ready to post.",
-            ),
-            (r"^People required: (?P<count>\d+)$", "People required: {count}"),
+
+        def replace_slots(template: str, values: dict[str, str]) -> str:
+            return re.sub(
+                r"\{([A-Za-z][A-Za-z0-9_]*)\}",
+                lambda match: values.get(match.group(1), match.group(0)),
+                template,
+            )
+
+        success = re.fullmatch(
+            r'^"(?P<title>.*)" is live - helpers nearby can see it now\.(?: It repeats: (?P<cadence>.*)\.)?$',
+            source,
+            flags=re.DOTALL,
         )
-        for pattern, template in known_templates:
-            match = re.fullmatch(pattern, source)
-            if match:
-                localized = translate(language, template)
-                values = match.groupdict()
-                repeat = ""
-                if values.get("cadence"):
-                    cadence = translate(language, values["cadence"])
-                    repeat = translate(
-                        language, " It repeats: {cadence}."
-                    ).format(cadence=cadence)
-                values["repeat"] = repeat
-                return localized.format(**values)
-        upload_parts = re.fullmatch(
-            r"(?:Couldn't accept (?P<files>.+?)\. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source\. No video; stored results are under 1 MB\.)?(?: ?(?P<skipped>\d+) photo\(s\) were skipped: 5 photos is the maximum\.)?",
+        if success:
+            repeat = ""
+            cadence_source = success.group("cadence")
+            if cadence_source:
+                cadence = cadence_source
+                interval = re.fullmatch(
+                    r"Every (?P<count>\d+) (?P<unit>days|weeks|months)",
+                    cadence_source,
+                )
+                if interval:
+                    cadence = replace_slots(
+                        translate(
+                            language,
+                            f"Every {{count}} {interval.group('unit')}",
+                        ),
+                        {"count": interval.group("count")},
+                    )
+                elif cadence_source in HELP_POST_METADATA_KEYS:
+                    cadence = translate(language, cadence_source)
+                else:
+                    return source
+                repeat = replace_slots(
+                    translate(language, " It repeats: {cadence}."),
+                    {"cadence": cadence},
+                )
+            return replace_slots(
+                translate(
+                    language,
+                    '"{title}" is live - helpers nearby can see it now.{repeat}',
+                ),
+                {"title": success.group("title"), "repeat": repeat},
+            )
+
+        upload_pattern = (
+            r"(?:Couldn't accept (?P<files>.*?)\. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source\. No video; stored results are under 1 MB\.)?"
+            r"(?: ?(?P<skipped>\d+) photo\(s\) were skipped: 5 photos is the maximum\.)?"
+        )
+        upload = re.fullmatch(upload_pattern, source, flags=re.DOTALL)
+        if upload and (
+            upload.group("files") is not None or upload.group("skipped")
+        ):
+            parts: list[str] = []
+            if upload.group("files") is not None:
+                parts.append(
+                    replace_slots(
+                        translate(
+                            language,
+                            "Couldn't accept {files}. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source. No video; stored results are under 1 MB.",
+                        ),
+                        {"files": upload.group("files")},
+                    )
+                )
+            if upload.group("skipped"):
+                parts.append(
+                    replace_slots(
+                        translate(
+                            language,
+                            "{count} photo(s) were skipped: 5 photos is the maximum.",
+                        ),
+                        {"count": upload.group("skipped")},
+                    )
+                )
+            return " ".join(parts)
+
+        optimized = re.fullmatch(
+            r"(?P<count>\d+) photo\(s\) optimised to WebP under 1 MB and ready to post\.",
             source,
         )
-        if upload_parts and (
-            upload_parts.group("files") or upload_parts.group("skipped")
-        ):
-            localized_parts: list[str] = []
-            if upload_parts.group("files"):
-                localized_parts.append(
-                    translate(
-                        language,
-                        "Couldn't accept {files}. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source. No video; stored results are under 1 MB.",
-                    ).format(files=upload_parts.group("files"))
-                )
-            if upload_parts.group("skipped"):
-                localized_parts.append(
-                    translate(
-                        language,
-                        "{count} photo(s) were skipped: 5 photos is the maximum.",
-                    ).format(count=upload_parts.group("skipped"))
-                )
-            return " ".join(localized_parts)
+        if optimized:
+            return replace_slots(
+                translate(
+                    language,
+                    "{count} photo(s) optimised to WebP under 1 MB and ready to post.",
+                ),
+                {"count": optimized.group("count")},
+            )
+
+        helpers = re.fullmatch(r"People required: (?P<count>\d+)", source)
+        if helpers:
+            return replace_slots(
+                translate(language, "People required: {count}"),
+                {"count": helpers.group("count")},
+            )
+
         category_limit = re.fullmatch(
-            r"A help request can have up to (\d+) categories\. Remove one first\.",
+            r"A help request can have up to (?P<limit>\d+) categories\. Remove one first\.",
             source,
         )
         if category_limit:
-            return translate(
-                language,
-                "A help request can have up to {limit} categories. Remove one first.",
-            ).format(limit=category_limit.group(1))
-        photo_rejection = re.fullmatch(
-            r"Couldn't accept (.+?)\. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source\. No video; stored results are under 1 MB\.",
-            source,
-        )
-        if photo_rejection:
-            return translate(
-                language,
-                "Couldn't accept {files}. Use static JPEG/JPG, PNG or WebP, maximum 3 MB per source. No video; stored results are under 1 MB.",
-            ).format(files=photo_rejection.group(1))
-        skipped_photo = re.fullmatch(
-            r"(\d+) photo\(s\) were skipped: 5 photos is the maximum\.",
-            source,
-        )
-        if skipped_photo:
-            return translate(
-                language,
-                "{count} photo(s) were skipped: 5 photos is the maximum.",
-            ).format(count=skipped_photo.group(1))
+            return replace_slots(
+                translate(
+                    language,
+                    "A help request can have up to {limit} categories. Remove one first.",
+                ),
+                {"limit": category_limit.group("limit")},
+            )
+
         premium_limit = re.fullmatch(
-            r"You already have (\d+) open help requests — close or complete one before posting another\.",
+            r"You already have (?P<limit>\d+) open help requests — close or complete one before posting another\.",
             source,
         )
         if premium_limit:
-            return translate(
-                language,
-                "You already have {limit} open help requests — close or complete one before posting another.",
-            ).format(limit=premium_limit.group(1))
+            return replace_slots(
+                translate(
+                    language,
+                    "You already have {limit} open help requests — close or complete one before posting another.",
+                ),
+                {"limit": premium_limit.group("limit")},
+            )
+
         free_limit = re.fullmatch(
-            r"Free membership allows (\d+) open help requests at a time\. Upgrade to keep up to 10 running, each visible for a whole year\.",
+            r"Free membership allows (?P<limit>\d+) open help requests at a time\. Upgrade to keep up to 10 running, each visible for a whole year\.",
             source,
         )
         if free_limit:
-            return translate(
-                language,
-                "Free membership allows {limit} open help requests at a time. Upgrade to keep up to 10 running, each visible for a whole year.",
-            ).format(limit=free_limit.group(1))
-        exact_templates = {
-            "error": (
-                "Job Title must contain 4–160 characters.",
-                "Job description must contain 15–500 characters.",
-                "Choose one valid Job category.",
-                "Choose a valid date.",
-                "Date must be from today through two calendar years from today.",
-                "Choose a valid reward.",
-                "Choose a supported currency.",
-                "Describe your other reward in 3–500 characters.",
-                "Choose a valid replacement map pin.",
-                "You can attach up to 5 photos per help request.",
-                "Your session expired — please sign in again.",
-                "Add the name helpers should ask for.",
-                "Pick at least one category so helpers know what kind of task this is.",
-                "Choose at most 3 categories for one help request.",
-                "Give your request a short title (4+ characters).",
-                "Keep the title under 160 characters.",
-                "Describe the task in a little more detail (15+ characters).",
-                "Job info must stay within 500 characters.",
-                "Choose the reward you can offer.",
-                "Tell helpers what your custom reward is.",
-                "Keep the reward details under 255 characters.",
-                "Add the meeting point or address for this task.",
-                "Add the city so nearby helpers can find you.",
-                "Pick the date and time you need help.",
-                "Choose a future date and time (UTC).",
-                "Choose a date no more than two calendar years from now (UTC).",
-                "That date and time couldn't be read — pick it again.",
-                "Choose roughly how long the task will take.",
-                "Choose how urgent this request is.",
-                "Choose how often this request should repeat.",
-                "Choose a valid repeat interval.",
-                "That repeat end date couldn't be read.",
-                "The repeat end date cannot be more than two calendar years from today (UTC).",
-                "The repeat end date must be on or after the first date you need help.",
-                "Number of people required must be a whole number from 1 to 500.",
-                "We couldn't create that help request. Please try again.",
-                "We couldn't create that request. Please try again.",
-                "We couldn't attach those photos. Please try again.",
-                "We couldn't set up the repeating schedule. Please try again.",
-                "This request cannot be edited after any help offer has been sent, or when it is no longer open.",
-                "Could not open this request for editing. Please try again.",
-                "Please sign in again.",
-                "Cannot edit: someone has sent a help offer, or this request is no longer open. Your changes were not saved.",
-                "Could not save your changes. Please try again.",
-            ),
-            "photo": (
-                "Pictures could not be uploaded. Please try again.",
-                "You already have 5 photos attached — remove one before adding another.",
-                "Photo removed.",
-            ),
-            "schedule": (
-                "Your session expired — please sign in again.",
-                "That repeating request is no longer available.",
-                "That repeating request can't be resumed.",
-                "Repeating request paused — no new posts will be created.",
-                "Repeating request ended. Existing posts stay as they are.",
-                "Repeating request resumed.",
-                "Repeating request reached its end date.",
-            ),
-        }
-        for messages in exact_templates.values():
-            if source in messages:
-                return translate(language, source)
-        return translate(language, source)
+            return replace_slots(
+                translate(
+                    language,
+                    "Free membership allows {limit} open help requests at a time. Upgrade to keep up to 10 running, each visible for a whole year.",
+                ),
+                {"limit": free_limit.group("limit")},
+            )
+
+        owned_sources = (
+            *HELP_POST_VALIDATION_KEYS,
+            *HELP_POST_FEEDBACK_KEYS,
+            *HELP_POST_STATUS_FEEDBACK_KEYS,
+        )
+        if source in owned_sources:
+            return translate(language, source)
+        return source
 
     @rx.var
     async def category_limit(self) -> int:
@@ -795,6 +783,20 @@ class HelpPostState(rx.State):
         city = str(row[7] or "")
         place = str(row[6] or "")
         location = place if not city else f"{place}, {city}" if place else city
+        reward_types = str(row[20] or "") if len(row) > 20 else reward
+        reward_details = str(row[5] or "")
+        reward_label = reward_display(
+            reward,
+            reward_types,
+            row[21] if len(row) > 21 else 0,
+            str(row[22] or "USD") if len(row) > 22 else "USD",
+            reward_details,
+        )
+        custom_reward = (
+            reward in ("other", "other_reward")
+            and bool(reward_details.strip())
+            and reward_label == f"Reward: {reward_details.strip()}"
+        )
         return {
             "id": int(row[0]),
             "title": str(row[1]),
@@ -803,13 +805,8 @@ class HelpPostState(rx.State):
             "category_label": CATEGORY_LABELS.get(
                 category, category.replace("_", " ").title()
             ),
-            "reward_label": reward_display(
-                reward,
-                str(row[20] or "") if len(row) > 20 else reward,
-                row[21] if len(row) > 21 else 0,
-                str(row[22] or "USD") if len(row) > 22 else "USD",
-                str(row[5] or ""),
-            ),
+            "reward_label": reward_label,
+            "is_custom_reward": custom_reward,
             "reward_details": (
                 ""
                 if "money"
@@ -823,6 +820,7 @@ class HelpPostState(rx.State):
             "scheduled": row[8].strftime("%b %d, %Y · %H:%M")
             if row[8] is not None
             else "Time to agree",
+            "scheduled_iso": row[8].isoformat() if row[8] is not None else "",
             "status": str(row[9] or "open"),
             "urgency": str(row[10] or "flexible"),
             "created": row[11].strftime("%b %d, %Y")
@@ -1089,6 +1087,8 @@ class HelpPostState(rx.State):
             "end_label": end_date.strftime("%b %d, %Y")
             if end_date is not None
             else "No end date",
+            "next_iso": next_at.isoformat() if next_at is not None else "",
+            "end_iso": end_date.isoformat() if end_date is not None else "",
             "count": int(row[7] or 0),
             "is_active": status == "active",
             "is_paused": status == "paused",

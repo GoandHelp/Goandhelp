@@ -155,6 +155,26 @@ from app.interface_catalog_help_post_templates import (
     HELP_POST_TEMPLATE_CATALOGS,
     HELP_POST_UI_TEMPLATE_KEYS,
 )
+from app.interface_catalog_help_post_metadata import (
+    HELP_POST_METADATA_CATALOGS,
+    HELP_POST_METADATA_KEYS,
+)
+from app.interface_catalog_help_post_category_hints import (
+    HELP_POST_CATEGORY_HINT_CATALOGS,
+    HELP_POST_CATEGORY_HINT_KEYS,
+)
+from app.interface_catalog_help_post_validation import (
+    HELP_POST_VALIDATION_CATALOGS,
+    HELP_POST_VALIDATION_KEYS,
+)
+from app.interface_catalog_help_post_feedback import (
+    HELP_POST_FEEDBACK_CATALOGS,
+    HELP_POST_FEEDBACK_KEYS,
+)
+from app.interface_catalog_help_post_status_feedback import (
+    HELP_POST_STATUS_FEEDBACK_CATALOGS,
+    HELP_POST_STATUS_FEEDBACK_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -640,6 +660,11 @@ for _catalogs in (
     HELP_POST_GUIDANCE_CATALOGS,
     HELP_POST_DETAIL_CATALOGS,
     HELP_POST_TEMPLATE_CATALOGS,
+    HELP_POST_METADATA_CATALOGS,
+    HELP_POST_CATEGORY_HINT_CATALOGS,
+    HELP_POST_VALIDATION_CATALOGS,
+    HELP_POST_FEEDBACK_CATALOGS,
+    HELP_POST_STATUS_FEEDBACK_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -699,6 +724,11 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *HELP_POST_DETAIL_KEYS,
             *HELP_POST_UI_TEMPLATE_KEYS,
             *HELP_POST_COUNT_LABEL_KEYS,
+            *HELP_POST_METADATA_KEYS,
+            *HELP_POST_CATEGORY_HINT_KEYS,
+            *HELP_POST_VALIDATION_KEYS,
+            *HELP_POST_FEEDBACK_KEYS,
+            *HELP_POST_STATUS_FEEDBACK_KEYS,
             "clear",
             "optional",
         ]

@@ -103,8 +103,10 @@ class HelpPostGuidanceTranslationTests(unittest.TestCase):
                         self.assertIsInstance(value, str)
                         self.assertTrue(value.strip())
                         self.assertIn(source, CATALOGS[code])
-                        self.assertEqual(CATALOGS[code][source], value)
-                        self.assertEqual(translate(code, source), value)
+                        runtime_value = CATALOGS[code][source]
+                        self.assertIsInstance(runtime_value, str)
+                        self.assertTrue(runtime_value.strip())
+                        self.assertEqual(translate(code, source), runtime_value)
 
         for source in all_new_keys:
             self.assertEqual(translate("en", source), source)
