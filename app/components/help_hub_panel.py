@@ -1,6 +1,6 @@
 import reflex as rx
 
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template, ui_template_multi
 from app.avatars import animal_avatar
 
 from app.components.language_control import browser_translatable_text
@@ -47,7 +47,10 @@ from app.states.help_hub_state import (
 from app.states.messaging_state import MessagingState
 from app.states.help_post_state import HelpPostState, RecentPost
 from app.states.auth_state import AuthState
-from app.components.request_heading import request_heading
+from app.components.request_heading import (
+    request_heading,
+    styled_count_template,
+)
 from app.states.notification_state import NotificationState
 from app.states.profile_state import ProfileState
 
@@ -1336,7 +1339,13 @@ def helper_stars(row: ConfirmedHelper) -> rx.Component:
         role="img",
         aria_label=rx.cond(
             row["helper_rating_count"] > 0,
-            f"{row['helper_rating']:.1f} out of 5 stars; {row['helper_rating_count']} reviews",
+            ui_template_multi(
+                "{rating} out of 5 stars; {count} reviews",
+                {
+                    "rating": f"{row['helper_rating']:.1f}",
+                    "count": row["helper_rating_count"].to(int).to_string(),
+                },
+            ),
             ui("No reviews yet"),
         ),
         class_name="inline-flex shrink-0 items-center gap-0.5",
@@ -1391,7 +1400,7 @@ def confirmed_helper_card(
         rx.el.div(
             rx.image(
                 src=avatar_src(row["helper_avatar"], row["helper_name"]),
-                alt="Helper photo",
+                alt=ui("Helper photo"),
                 class_name="size-14 shrink-0 rounded-full bg-[#fff7e8] object-cover",
             ),
             rx.el.div(
@@ -1514,7 +1523,7 @@ def help_offer_card(
                     offer["helper_verified"],
                 ),
                 rx.el.p(
-                    f"Offered {offer['applied']}",
+                    ui_template("Offered {date}", "date", offer["applied"]),
                     class_name="mt-1 text-xs text-[#4b5563]",
                 ),
             ),
@@ -1645,21 +1654,33 @@ def counts_summary() -> rx.Component:
     return rx.el.div(
         rx.el.span(
             rx.el.span(
-                f"{HelpPostState.counts['total']} Requested",
+                ui_template(
+                    "{count} Requested",
+                    "count",
+                    HelpPostState.counts["total"].to_string(),
+                ),
                 class_name="whitespace-nowrap",
             ),
             class_name="flex w-full min-w-0 justify-center text-center items-center rounded-xl bg-white px-2 py-2 text-xs font-bold text-[#b86e08] shadow-[0_2px_12px_rgba(17,24,39,0.10)]",
         ),
         rx.el.span(
             rx.el.span(
-                f"{HelpPostState.counts['open']} Open",
+                ui_template(
+                    "{count} Open",
+                    "count",
+                    HelpPostState.counts["open"].to_string(),
+                ),
                 class_name="whitespace-nowrap",
             ),
             class_name="flex w-full min-w-0 justify-center text-center items-center rounded-xl bg-white px-2 py-2 text-xs font-bold text-[#b86e08] shadow-[0_2px_12px_rgba(17,24,39,0.10)]",
         ),
         rx.el.span(
             rx.el.span(
-                f"{HelpPostState.counts['upcoming']} Upcoming",
+                ui_template(
+                    "{count} Upcoming",
+                    "count",
+                    HelpPostState.counts["upcoming"].to_string(),
+                ),
                 class_name="whitespace-nowrap",
             ),
             class_name="flex w-full min-w-0 justify-center text-center items-center rounded-xl bg-white px-2 py-2 text-xs font-bold text-[#b86e08] shadow-[0_2px_12px_rgba(17,24,39,0.10)]",
@@ -1696,7 +1717,10 @@ def own_request_summary(post: RecentPost) -> rx.Component:
                 rx.cond(
                     post["helpers_needed"] == 1,
                     ui("1 person required"),
-                    f"{post['helpers_needed']} people required",
+                    styled_count_template(
+                        ui("{count} people required"),
+                        post["helpers_needed"].to(int),
+                    ),
                 ),
                 class_name="mt-1 block text-sm font-semibold text-[#4b5563]",
             ),
@@ -1805,29 +1829,29 @@ def recent_requests_section() -> rx.Component:
 
 
 def help_summary_card(title: str, value: rx.Var[int]) -> rx.Component:
-    return rx.el.p(
+    template = rx.cond(
+        title == "help given",
         rx.cond(
             value == 0,
-            rx.fragment(
-                rx.el.span("0", class_name="text-[#e08b12]"),
-                rx.cond(title == "help given", " help given", " help received"),
-            ),
+            ui("{count} help given"),
             rx.cond(
                 value == 1,
-                rx.fragment(
-                    rx.cond(title == "help given", "Helped", "Received help"),
-                    " ",
-                    rx.el.span(value, class_name="text-[#e08b12]"),
-                    " time",
-                ),
-                rx.fragment(
-                    rx.cond(title == "help given", "Helped", "Received help"),
-                    " ",
-                    rx.el.span(value, class_name="text-[#e08b12]"),
-                    " times",
-                ),
+                ui("Helped {count} time"),
+                ui("Helped {count} times"),
             ),
         ),
+        rx.cond(
+            value == 0,
+            ui("{count} help received"),
+            rx.cond(
+                value == 1,
+                ui("Received help {count} time"),
+                ui("Received help {count} times"),
+            ),
+        ),
+    )
+    return rx.el.p(
+        styled_count_template(template, value),
         class_name="w-full rounded-xl bg-white px-3 py-4 text-center text-base sm:text-lg font-bold leading-tight text-black shadow-[0_2px_12px_rgba(17,24,39,0.10)]",
     )
 

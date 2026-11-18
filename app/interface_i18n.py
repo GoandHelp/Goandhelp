@@ -183,6 +183,10 @@ from app.interface_catalog_help_hub_details import (
     HELP_HUB_DETAIL_CATALOGS,
     HELP_HUB_DETAIL_KEYS,
 )
+from app.interface_catalog_request_counts import (
+    REQUEST_COUNT_CATALOGS,
+    REQUEST_COUNT_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -675,6 +679,7 @@ for _catalogs in (
     HELP_POST_STATUS_FEEDBACK_CATALOGS,
     HELP_HUB_CONTROL_CATALOGS,
     HELP_HUB_DETAIL_CATALOGS,
+    REQUEST_COUNT_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -741,6 +746,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *HELP_POST_STATUS_FEEDBACK_KEYS,
             *HELP_HUB_CONTROL_KEYS,
             *HELP_HUB_DETAIL_KEYS,
+            *REQUEST_COUNT_KEYS,
             "clear",
             "optional",
         ]

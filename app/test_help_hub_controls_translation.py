@@ -35,6 +35,9 @@ from app.components.help_hub_panel import (
 )
 
 
+NATIVE_IDENTICAL_WORDS = {("fr", "Date")}
+
+
 class HelpHubControlsTranslationTests(unittest.TestCase):
     def test_catalogs_are_strictly_complete_and_registered(self):
         locales = {code for code, _label in LANGUAGE_OPTIONS} - {"en"}
@@ -55,7 +58,10 @@ class HelpHubControlsTranslationTests(unittest.TestCase):
                         translate(locale, source), CATALOGS[locale][source]
                     )
                     self.assertTrue(CATALOGS[locale][source].strip())
-                    self.assertNotEqual(CATALOGS[locale][source], source)
+                    if (locale, source) in NATIVE_IDENTICAL_WORDS:
+                        self.assertEqual(CATALOGS[locale][source], source)
+                    else:
+                        self.assertNotEqual(CATALOGS[locale][source], source)
                     self.assertEqual(
                         Counter(
                             re.findall(r"\{([A-Za-z][A-Za-z0-9_]*)\}", source)
@@ -158,7 +164,7 @@ class HelpHubControlsTranslationTests(unittest.TestCase):
                 for finding in findings
                 if finding["kind"] == "template audit"
             },
-            {" Requested", " Open", " Upcoming", "Offered "},
+            set(),
         )
         missing = {
             (locale, source)
