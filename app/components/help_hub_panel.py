@@ -113,11 +113,11 @@ def section_heading(
             icon_tile(icon),
             rx.el.div(
                 rx.el.h2(
-                    title,
+                    ui(title),
                     class_name="text-center text-xl sm:text-2xl font-bold tracking-tight text-[#111827] leading-tight",
                 ),
                 rx.el.p(
-                    subtitle,
+                    ui(subtitle),
                     class_name="mt-1 text-sm font-semibold text-[#4b5563]",
                 ),
                 class_name="min-w-0 flex-1",
@@ -223,8 +223,8 @@ def date_chip(value: rx.Var[str]) -> rx.Component:
         rx.el.button(
             rx.icon("x", class_name="h-3 w-3"),
             type="button",
-            title="Remove this day",
-            aria_label="Remove this day",
+            title=ui("Remove this day"),
+            aria_label=ui("Remove this day"),
             on_click=lambda: HelpHubState.remove_date(value),
             class_name="ml-1 flex size-5 items-center justify-center rounded-full border border-[#f2bd5a] bg-white text-[#b86e08] transition-colors hover:bg-[#fff7e8] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]",
         ),
@@ -259,7 +259,7 @@ def inline_help_calendar() -> rx.Component:
             rx.el.button(
                 rx.icon("chevron-left", class_name="size-4"),
                 type="button",
-                aria_label="Previous month",
+                aria_label=ui("Previous month"),
                 disabled=~HelpHubState.calendar_can_previous,
                 on_click=HelpHubState.change_calendar_month(-1),
                 class_name="size-9 flex items-center justify-center rounded-lg bg-white text-[#e08b12] disabled:opacity-30",
@@ -272,7 +272,7 @@ def inline_help_calendar() -> rx.Component:
             rx.el.button(
                 rx.icon("chevron-right", class_name="size-4"),
                 type="button",
-                aria_label="Next month",
+                aria_label=ui("Next month"),
                 disabled=~HelpHubState.calendar_can_next,
                 on_click=HelpHubState.change_calendar_month(1),
                 class_name="size-9 flex items-center justify-center rounded-lg bg-white text-[#e08b12] disabled:opacity-30",
@@ -283,7 +283,7 @@ def inline_help_calendar() -> rx.Component:
             rx.foreach(
                 ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
                 lambda day: rx.el.span(
-                    day,
+                    ui(day),
                     class_name="text-center text-xs font-medium text-gray-600",
                 ),
             ),
@@ -291,14 +291,14 @@ def inline_help_calendar() -> rx.Component:
             class_name="grid grid-cols-7 gap-1 w-full",
         ),
         rx.el.button(
-            "Close calendar",
+            ui("Close calendar"),
             type="button",
             on_click=HelpHubState.close_calendar,
             class_name="mt-2 rounded-lg px-3 py-2 bg-white text-[#e08b12] text-sm",
         ),
         id="help-day-calendar",
         role="group",
-        aria_label="Choose a date",
+        aria_label=ui("Choose a date"),
         class_name="mt-2 w-full rounded-xl border border-[#fba922] bg-white p-3",
     )
 
@@ -314,7 +314,7 @@ def specific_help_day_field() -> rx.Component:
                     ),
                     type="button",
                     id="help-day-input",
-                    aria_label="Choose a date",
+                    aria_label=ui("Choose a date"),
                     aria_expanded=HelpHubState.calendar_open,
                     aria_controls="help-day-calendar",
                     on_click=HelpHubState.toggle_calendar,
@@ -329,7 +329,7 @@ def specific_help_day_field() -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("plus", class_name="h-4 w-4 text-black"),
-                "Add date",
+                ui("Add date"),
                 type="button",
                 on_click=HelpHubState.add_date,
                 class_name="w-full sm:w-fit shrink-0 flex items-center justify-center gap-2 rounded-xl border-[3px] border-[#fba922] bg-white px-5 py-2.5 text-sm font-bold text-black transition-colors hover:bg-[#fff7e8] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]",
@@ -343,7 +343,7 @@ def specific_help_day_field() -> rx.Component:
                 class_name="mt-2 flex flex-wrap items-center justify-center gap-2",
             ),
             rx.el.p(
-                "Choose then 'Add' as many dates as you need",
+                ui("Choose then 'Add' as many dates as you need"),
                 class_name="mt-2 text-center text-xs font-medium text-[#4b5563]",
             ),
         ),
@@ -367,7 +367,7 @@ def mode_button(
     label: str, selected: rx.Var[bool], action: rx.event.EventType
 ) -> rx.Component:
     return rx.el.button(
-        label,
+        ui(label),
         type="button",
         aria_pressed=selected,
         on_click=action,
@@ -395,7 +395,7 @@ def day_choice(
             rx.cond(selected, "square-check", "square"),
             class_name="h-4 w-4 shrink-0 text-[#e08b12]",
         ),
-        label,
+        ui(label),
         type="button",
         role="checkbox",
         aria_checked=selected,
@@ -450,7 +450,7 @@ def help_day_field() -> rx.Component:
                             ),
                         ),
                         role="group",
-                        aria_label="Flexible days",
+                        aria_label=ui("Flexible days"),
                         class_name="mt-2 flex flex-col rounded-xl border border-[#f6c66f] bg-white p-1",
                     ),
                     rx.fragment(),
@@ -463,7 +463,7 @@ def help_day_field() -> rx.Component:
                             weekday_choice,
                         ),
                         role="group",
-                        aria_label="Custom weekdays",
+                        aria_label=ui("Custom weekdays"),
                         class_name="mt-2 flex flex-wrap gap-1",
                     ),
                     rx.fragment(),
@@ -483,7 +483,7 @@ def clock_select(
         rx.el.select(
             rx.foreach(options, lambda value: rx.el.option(value, value=value)),
             name=name,
-            aria_label=label,
+            aria_label=ui(label),
             default_value=default,
             class_name="w-11 appearance-none rounded-xl border border-[#f6c66f] bg-white py-2 pl-1.5 pr-5 text-[11px] text-[#111827] focus-visible:ring-2 focus-visible:ring-[#e08b12]",
         ),
@@ -534,7 +534,7 @@ def start_time_field() -> rx.Component:
             ),
             rx.el.div(
                 rx.el.span(
-                    "Any time between",
+                    ui("Any time between"),
                     class_name="shrink-0 text-[10px] font-semibold",
                 ),
                 clock_select(
@@ -550,7 +550,7 @@ def start_time_field() -> rx.Component:
                     HelpHubState.minute_choices,
                     "00",
                 ),
-                rx.el.span("and"),
+                rx.el.span(ui("and")),
                 clock_select(
                     "to_hour", "Range end hour", HelpHubState.hour_choices, "17"
                 ),
@@ -583,9 +583,9 @@ def reward_checkbox(item: dict[str, str]) -> rx.Component:
             ),
         ),
         rx.el.span(
-            rx.el.strong(item["label"], class_name="font-bold"),
+            rx.el.strong(ui(item["label"]), class_name="font-bold"),
             " – ",
-            rx.el.span(item["blurb"], class_name="font-normal"),
+            rx.el.span(ui(item["blurb"]), class_name="font-normal"),
             class_name="min-w-0 text-left text-sm leading-relaxed text-[#111827]",
         ),
         type="button",
@@ -595,7 +595,7 @@ def reward_checkbox(item: dict[str, str]) -> rx.Component:
             "true",
             "false",
         ),
-        aria_label=item["label"],
+        aria_label=ui(item["label"]),
         on_click=lambda: HelpHubState.toggle_reward(item["value"]),
         class_name=rx.cond(
             HelpHubState.selected_rewards.contains(item["value"]),
@@ -613,7 +613,7 @@ def quote_control(
             rx.cond(selected, "square-check", "square"),
             class_name="size-5 shrink-0 text-[#e08b12]",
         ),
-        label,
+        ui(label),
         type="button",
         role="checkbox",
         aria_checked=selected,
@@ -627,7 +627,7 @@ def money_details_field() -> rx.Component:
         HelpHubState.selected_rewards.contains("money"),
         rx.el.div(
             rx.el.label(
-                "Currency",
+                ui("Currency"),
                 html_for="reward-currency",
                 class_name="text-sm font-bold text-gray-900",
             ),
@@ -647,7 +647,7 @@ def money_details_field() -> rx.Component:
                 )
             ),
             rx.el.label(
-                "Enter your budget",
+                ui("Enter your budget"),
                 html_for="money-budget",
                 class_name="text-sm font-bold text-gray-900",
             ),
@@ -677,7 +677,7 @@ def money_details_field() -> rx.Component:
                 "Ask helper for an estimate price",
             ),
             rx.el.p(
-                "Go and Help receives an 8% fee",
+                ui("Go and Help receives an 8% fee"),
                 class_name="text-center text-sm font-medium text-[#e08b12]",
             ),
             class_name="flex w-full flex-col gap-2 rounded-xl bg-white p-3",
@@ -711,7 +711,9 @@ def conditional_reward_fields() -> rx.Component:
                 field_label("Guided tour details", "required"),
                 rx.el.input(
                     name="guided_tour_details",
-                    placeholder="A half-day walk through the old town and the port",
+                    placeholder=ui(
+                        "A half-day walk through the old town and the port"
+                    ),
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full",
@@ -724,7 +726,9 @@ def conditional_reward_fields() -> rx.Component:
                 field_label("Activity details", "required"),
                 rx.el.input(
                     name="activity_details",
-                    placeholder="Surf lesson with my board, or a river swim after work",
+                    placeholder=ui(
+                        "Surf lesson with my board, or a river swim after work"
+                    ),
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full",
@@ -737,7 +741,9 @@ def conditional_reward_fields() -> rx.Component:
                 field_label("Other reward details", "required"),
                 rx.el.input(
                     name="other_reward_details",
-                    placeholder="I.e. Home-made Olive Oil and a ride to Milan",
+                    placeholder=ui(
+                        "I.e. Home-made Olive Oil and a ride to Milan"
+                    ),
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full",
@@ -756,7 +762,7 @@ def rewards_field() -> rx.Component:
                 ui("Rewards"), class_name="text-base font-bold text-[#111827]"
             ),
             rx.el.span(
-                "What you can offer – required",
+                ui("What you can offer – required"),
                 class_name="ml-auto text-right text-xs text-black",
             ),
             class_name="flex items-center gap-2",
@@ -769,7 +775,7 @@ def rewards_field() -> rx.Component:
                 ),
                 disclosure_arrow(HelpHubState.rewards_open),
                 type="button",
-                aria_label="Choose one or more rewards",
+                aria_label=ui("Choose one or more rewards"),
                 aria_expanded=HelpHubState.rewards_open,
                 aria_controls="help-reward-options",
                 on_click=HelpHubState.toggle_rewards,
@@ -780,7 +786,7 @@ def rewards_field() -> rx.Component:
                 rx.el.div(
                     rx.foreach(HelpHubState.reward_choices, reward_checkbox),
                     rx.el.button(
-                        "Done",
+                        ui("Done"),
                         type="button",
                         on_click=HelpHubState.close_rewards,
                         custom_attrs={"data-rewards-close": "true"},
@@ -788,7 +794,7 @@ def rewards_field() -> rx.Component:
                     ),
                     id="help-reward-options",
                     role="group",
-                    aria_label="Rewards — select multiple",
+                    aria_label=ui("Rewards — select multiple"),
                     class_name="mt-2 flex w-full flex-col gap-2 rounded-xl border border-[#f6c66f] bg-white p-2",
                 ),
                 rx.fragment(),
@@ -831,14 +837,14 @@ def job_location_section() -> rx.Component:
     return rx.el.div(
         rx.el.div(
             rx.el.h3(
-                "Location of this help request",
+                ui("Location of this help request"),
                 class_name="w-full text-center text-base font-bold text-[#111827]",
             ),
             class_name="w-full",
         ),
         map_picker(
             "help-request",
-            "Pin the exact spot for your help request",
+            ui("Pin the exact spot for your help request"),
             inline=True,
         ),
         rx.el.p(
@@ -852,7 +858,7 @@ def job_location_section() -> rx.Component:
             rx.el.input(
                 type="text",
                 name="address",
-                placeholder="Address",
+                placeholder=ui("Address"),
                 class_name=INPUT_CLASS,
             ),
             class_name="mt-4 w-full",
@@ -862,7 +868,7 @@ def job_location_section() -> rx.Component:
             rx.el.input(
                 type="text",
                 name="city",
-                placeholder="City",
+                placeholder=ui("City"),
                 class_name=INPUT_CLASS,
             ),
             class_name="mt-3 w-full",
@@ -871,13 +877,13 @@ def job_location_section() -> rx.Component:
             field_label("Country", "required when no map pin"),
             select_wrapper(
                 rx.el.select(
-                    rx.el.option("Country", value=""),
+                    rx.el.option(ui("Country"), value=""),
                     rx.foreach(
                         WORLD_COUNTRY_NAMES,
                         lambda country: rx.el.option(country, value=country),
                     ),
                     name="country",
-                    aria_label="Country",
+                    aria_label=ui("Country"),
                     value=HelpHubState.posting_country,
                     on_change=HelpHubState.set_posting_country,
                     class_name=SELECT_CLASS,
@@ -935,7 +941,7 @@ def required_languages_field() -> rx.Component:
             disclosure_arrow(HelpHubState.languages_open),
             type="button",
             aria_expanded=HelpHubState.languages_open,
-            aria_label="Choose required languages",
+            aria_label=ui("Choose required languages"),
             on_click=HelpHubState.toggle_languages,
             class_name="flex w-full items-center gap-2 rounded-xl border border-[#d4d4d4] bg-white px-4 py-3 text-sm text-[#111827] focus-visible:ring-2 focus-visible:ring-[#e08b12]",
         ),
@@ -946,7 +952,7 @@ def required_languages_field() -> rx.Component:
                     HelpHubState.language_choices, required_language_row
                 ),
                 role="group",
-                aria_label="Required languages",
+                aria_label=ui("Required languages"),
                 class_name="mt-2 max-h-64 overflow-y-auto rounded-xl border border-[#d4d4d4] bg-white p-1",
             ),
             rx.fragment(),
@@ -963,7 +969,7 @@ def duration_period_select() -> rx.Component:
                 lambda item: rx.el.option(item["label"], value=item["value"]),
             ),
             name="duration_period_unit",
-            aria_label="Duration period unit",
+            aria_label=ui("Duration period unit"),
             value=HelpHubState.duration_period_unit,
             on_change=HelpHubState.set_duration_period_unit,
             class_name="w-20 appearance-none rounded-xl border border-[#f6c66f] bg-white py-2 pl-2 pr-5 text-[11px] text-black focus-visible:ring-2 focus-visible:ring-[#e08b12]",
@@ -986,25 +992,25 @@ def duration_field() -> rx.Component:
             rx.el.div(
                 clock_select(
                     "duration_hours",
-                    "Duration hours",
+                    ui("Duration hours"),
                     HelpHubState.duration_hour_choices,
                     "0",
                 ),
-                rx.el.span("Hours", class_name="text-xs text-black"),
+                rx.el.span(ui("Hours"), class_name="text-xs text-black"),
                 class_name="flex flex-col items-center gap-1.5",
             ),
             rx.el.div(
                 clock_select(
                     "duration_minutes_part",
-                    "Duration minutes",
+                    ui("Duration minutes"),
                     HelpHubState.duration_minute_choices,
                     "0",
                 ),
-                rx.el.span("Minutes", class_name="text-xs text-black"),
+                rx.el.span(ui("Minutes"), class_name="text-xs text-black"),
                 class_name="flex flex-col items-center gap-1.5",
             ),
             rx.el.div(
-                rx.el.span("For"),
+                rx.el.span(ui("For")),
                 rx.el.div(
                     rx.el.select(
                         rx.foreach(
@@ -1012,7 +1018,7 @@ def duration_field() -> rx.Component:
                             lambda value: rx.el.option(value, value=value),
                         ),
                         name="duration_period_count",
-                        aria_label="Duration period count",
+                        aria_label=ui("Duration period count"),
                         value=HelpHubState.duration_period_count.to_string(),
                         on_change=HelpHubState.set_duration_period_count,
                         class_name="w-11 appearance-none rounded-xl border border-[#f6c66f] bg-white py-2 pl-1.5 pr-5 text-[11px] text-black focus-visible:ring-2 focus-visible:ring-[#e08b12]",
@@ -1044,7 +1050,7 @@ def post_help_form() -> rx.Component:
             field_label("Job title", "required"),
             rx.el.input(
                 name="title",
-                placeholder="Two hands to carry boxes up three flights",
+                placeholder=ui("Two hands to carry boxes up three flights"),
                 class_name=INPUT_CLASS,
             ),
             class_name="w-full",
@@ -1055,7 +1061,9 @@ def post_help_form() -> rx.Component:
                 name="description",
                 rows="5",
                 max_length=500,
-                placeholder="I'm moving out of a fourth-floor flat and need someone strong for a couple of hours…",
+                placeholder=ui(
+                    "I'm moving out of a fourth-floor flat and need someone strong for a couple of hours…"
+                ),
                 class_name=INPUT_CLASS + " resize-y leading-relaxed",
             ),
             class_name="w-full",
@@ -1071,7 +1079,7 @@ def post_help_form() -> rx.Component:
             HelpHubState.missing_fields.length() > 0,
             rx.el.div(
                 rx.el.p(
-                    "Please fill out all the fields",
+                    ui("Please fill out all the fields"),
                     class_name="font-semibold text-[#e08b12]",
                 ),
                 rx.foreach(
@@ -1091,12 +1099,12 @@ def post_help_form() -> rx.Component:
                 HelpHubState.is_saving,
                 rx.el.span(
                     rx.spinner(class_name="h-4 w-4"),
-                    "Posting your request…",
+                    ui("Posting your request…"),
                     class_name="flex items-center justify-center gap-2",
                 ),
                 rx.el.span(
                     rx.icon("send", class_name="h-4 w-4"),
-                    "Post help request",
+                    ui("Post help request"),
                     class_name="flex items-center justify-center gap-2",
                 ),
             ),
@@ -1118,7 +1126,7 @@ def post_help_section() -> rx.Component:
                 rx.el.div(
                     rx.el.div(
                         rx.el.h2(
-                            "Ask for Help",
+                            ui("Ask for Help"),
                             class_name="text-lg font-bold tracking-tight text-[#111827] leading-tight",
                         ),
                         rx.icon(
@@ -1134,7 +1142,7 @@ def post_help_section() -> rx.Component:
             ),
             type="button",
             aria_expanded=rx.cond(HelpHubState.form_open, "true", "false"),
-            aria_label="Ask for Help",
+            aria_label=ui("Ask for Help"),
             aria_controls="gah-ask-help-form",
             on_click=HelpHubState.toggle_form,
             class_name="gah-request-ask mx-auto flex min-h-0 w-fit max-w-full items-center justify-center rounded-2xl border border-[#fba922] bg-[#fba922] px-4 py-3 text-[#111827] transition-colors hover:bg-[#e08b12] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e08b12]",
@@ -1175,7 +1183,7 @@ def person_header(
             avatar_src(avatar, avatar_seed),
             verified,
             "size-14 shrink-0 rounded-full bg-[#fff7e8] object-cover ring-2 ring-[#fff7e8]",
-            "Profile photo",
+            ui("Profile photo"),
         ),
         rx.el.div(
             rx.el.p(
@@ -1192,7 +1200,7 @@ def person_header(
             ),
             class_name="min-w-0 flex-1",
         ),
-        rx.el.span(badge, class_name=badge_class),
+        rx.el.span(ui(badge), class_name=badge_class),
         class_name="flex w-full items-start gap-3",
     )
 
@@ -1200,7 +1208,7 @@ def person_header(
 def changes_guidance() -> rx.Component:
     return rx.el.p(
         rx.icon("messages-square", class_name="h-3.5 w-3.5 shrink-0"),
-        "Discuss any changes directly with your helping partner in Inbox.",
+        ui("Discuss any changes directly with your helping partner in Inbox."),
         class_name="mt-3 flex items-center gap-2 text-xs font-medium text-[#4b5563]",
     )
 
@@ -1217,11 +1225,13 @@ def directions_block(row: dict[str, str]) -> rx.Component:
         rx.el.div(
             rx.el.a(
                 rx.icon("navigation", class_name="h-4 w-4"),
-                "Get directions",
+                ui("Get directions"),
                 href=row["directions_url"],
                 target="_blank",
                 rel="noopener noreferrer",
-                aria_label="Get directions to this help job in an external map, opens in a new tab",
+                aria_label=ui(
+                    "Get directions to this help job in an external map, opens in a new tab"
+                ),
                 class_name="gah-primary-outline w-fit flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#111827]",
             ),
             class_name="w-fit",
@@ -1237,7 +1247,7 @@ def upcoming_help_card(job: HelperUpcoming) -> rx.Component:
                 avatar_src(job["other_avatar"], job["other_avatar_seed"]),
                 job["other_verified"],
                 "size-10 shrink-0 rounded-full bg-[#fff7e8] object-cover",
-                "Profile photo",
+                ui("Profile photo"),
                 member_id=job["other_id"].to(int),
             ),
             f"{job['other_name']} · {job['title']}",
@@ -1253,22 +1263,24 @@ def upcoming_help_body(job: HelperUpcoming) -> rx.Component:
     return rx.el.div(
         corner_activity_dot(
             NotificationState.unread_help_post_ids.contains(job["id"]),
-            "New activity on this job",
+            ui("New activity on this job"),
         ),
         browser_translatable_text(
             job["description"],
             class_name="mt-1 text-sm font-medium leading-relaxed text-[#4b5563]",
         ),
         rx.el.div(
-            info_strip("map-pin", "Where", job["location"]),
-            info_strip("calendar", "Help days", job["dates"]),
-            info_strip("clock", "Hours required", job["hours"]),
-            optional_strip("wrench", "Tools", job["tools"], "No tools listed"),
+            info_strip("map-pin", ui("Where"), job["location"]),
+            info_strip("calendar", ui("Help days"), job["dates"]),
+            info_strip("clock", ui("Hours required"), job["hours"]),
+            optional_strip(
+                "wrench", ui("Tools"), job["tools"], ui("No tools listed")
+            ),
             optional_strip(
                 "graduation-cap",
-                "Knowledge and skills",
+                ui("Knowledge and skills"),
                 job["knowledge"],
-                "No special skills needed",
+                ui("No special skills needed"),
             ),
             class_name="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 w-full",
         ),
@@ -1337,7 +1349,7 @@ def confirmed_helper_summary(row: ConfirmedHelper) -> rx.Component:
             avatar_src(row["helper_avatar"], row["helper_name"]),
             row["helper_verified"],
             "size-10 shrink-0 rounded-full object-cover",
-            "Helper photo",
+            ui("Helper photo"),
             member_id=row["helper_id"],
         ),
         rx.el.span(
@@ -1374,7 +1386,7 @@ def confirmed_helper_card(
     return rx.el.article(
         corner_activity_dot(
             NotificationState.unread_help_post_ids.contains(row["post_id"]),
-            "New activity on this job",
+            ui("New activity on this job"),
         ),
         rx.el.div(
             rx.image(
@@ -1400,7 +1412,7 @@ def confirmed_helper_card(
                             f"{row['helper_rating']:.1f} ({row['helper_rating_count']})",
                             class_name="flex items-center gap-1",
                         ),
-                        rx.el.span("New helper"),
+                        rx.el.span(ui("New helper")),
                     ),
                     class_name="mt-1 flex flex-wrap items-center gap-3 text-sm text-[#4b5563]",
                 ),
@@ -1423,7 +1435,7 @@ def confirmed_helper_card(
         rx.el.dl(
             rx.el.div(
                 rx.el.dt(
-                    "Date time and duration",
+                    ui("Date time and duration"),
                     class_name="text-sm font-bold text-[#111827]",
                 ),
                 rx.el.dd(
@@ -1433,17 +1445,19 @@ def confirmed_helper_card(
                 ),
                 class_name="col-span-full",
             ),
-            plain_detail("Where", row["location"]),
-            optional_plain_detail("Tools", row["tools"], "No tools listed"),
+            plain_detail(ui("Where"), row["location"]),
             optional_plain_detail(
-                "Knowledge and skills",
-                row["knowledge"],
-                "No special skills needed",
+                ui("Tools"), row["tools"], ui("No tools listed")
             ),
             optional_plain_detail(
-                "Exact meeting place",
+                ui("Knowledge and skills"),
+                row["knowledge"],
+                ui("No special skills needed"),
+            ),
+            optional_plain_detail(
+                ui("Exact meeting place"),
                 row["accepted_location"],
-                "Not shared yet",
+                ui("Not shared yet"),
             ),
             class_name="mt-5 grid w-full grid-cols-1 gap-4 [&_dt]:text-sm [&_dt]:normal-case [&_dt]:tracking-normal [&_dd]:font-medium [&_dd]:text-[#4b5563]",
         ),
@@ -1452,7 +1466,7 @@ def confirmed_helper_card(
                 row["thread_id"] > 0,
                 rx.el.button(
                     rx.icon("message-circle", class_name="size-4"),
-                    "Message Helper",
+                    ui("Message Helper"),
                     type="button",
                     on_click=MessagingState.focus_thread(row["thread_id"]),
                     class_name="gah-primary-outline flex w-fit items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold focus-visible:ring-2 focus-visible:ring-[#e08b12]",
@@ -1484,7 +1498,7 @@ def help_offer_card(
     return rx.el.article(
         corner_activity_dot(
             NotificationState.unread_help_post_ids.contains(offer["post_id"]),
-            "New activity on this request",
+            ui("New activity on this request"),
         ),
         rx.cond(
             detail_body,
@@ -1514,18 +1528,20 @@ def help_offer_card(
             class_name="mt-1 text-sm font-medium leading-relaxed text-[#4b5563]",
         ),
         rx.el.div(
-            info_strip("map-pin", "Where", offer["location"]),
-            info_strip("calendar", "Help days", offer["dates"]),
-            info_strip("clock", "Hours required", offer["hours"]),
-            info_strip("calendar-check", "Helper proposes", offer["proposed"]),
+            info_strip("map-pin", ui("Where"), offer["location"]),
+            info_strip("calendar", ui("Help days"), offer["dates"]),
+            info_strip("clock", ui("Hours required"), offer["hours"]),
+            info_strip(
+                "calendar-check", ui("Helper proposes"), offer["proposed"]
+            ),
             optional_strip(
-                "wrench", "Tools", offer["tools"], "No tools listed"
+                "wrench", ui("Tools"), offer["tools"], ui("No tools listed")
             ),
             optional_strip(
                 "graduation-cap",
-                "Knowledge and skills",
+                ui("Knowledge and skills"),
                 offer["knowledge"],
-                "No special skills needed",
+                ui("No special skills needed"),
             ),
             class_name="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 w-full",
         ),
@@ -1535,7 +1551,9 @@ def help_offer_card(
             ),
             rx.el.textarea(
                 rows="2",
-                placeholder="See you at the market gate at 9am — thank you!",
+                placeholder=ui(
+                    "See you at the market gate at 9am — thank you!"
+                ),
                 on_change=lambda value: ProfileState.set_response_draft(
                     offer["key"], value
                 ),
@@ -1546,7 +1564,7 @@ def help_offer_card(
         rx.el.div(
             rx.el.button(
                 rx.icon("circle-check-big", class_name="h-4 w-4"),
-                "Confirm",
+                ui("Confirm"),
                 type="button",
                 disabled=ProfileState.deciding_id == offer["id"],
                 on_click=lambda: ProfileState.confirm_application(offer["id"]),
@@ -1554,7 +1572,7 @@ def help_offer_card(
             ),
             rx.el.button(
                 rx.icon("circle-x", class_name="h-4 w-4"),
-                "Deny",
+                ui("Deny"),
                 type="button",
                 disabled=ProfileState.deciding_id == offer["id"],
                 on_click=lambda: ProfileState.deny_application(offer["id"]),
@@ -1573,7 +1591,7 @@ def help_offer_card(
                 class_name="mt-3 flex items-start gap-2.5 bg-white px-4 py-3",
             ),
             rx.el.p(
-                "This helper didn't add a message.",
+                ui("This helper didn't add a message."),
                 class_name="mt-3 text-sm font-medium italic text-[#4b5563]",
             ),
         ),
@@ -1647,7 +1665,7 @@ def counts_summary() -> rx.Component:
             class_name="flex w-full min-w-0 justify-center text-center items-center rounded-xl bg-white px-2 py-2 text-xs font-bold text-[#b86e08] shadow-[0_2px_12px_rgba(17,24,39,0.10)]",
         ),
         role="status",
-        aria_label="Your help request totals",
+        aria_label=ui("Your help request totals"),
         class_name="mt-3 grid grid-cols-3 w-full items-center gap-1 sm:gap-4",
     )
 
@@ -1658,7 +1676,7 @@ def own_request_summary(post: RecentPost) -> rx.Component:
             avatar_src(ProfileState.avatar_path, ProfileState.avatar_seed),
             AuthState.is_verified,
             "size-10 shrink-0 rounded-full object-cover",
-            "Your profile photo",
+            ui("Your profile photo"),
         ),
         rx.el.span(
             rx.el.span(
@@ -1677,7 +1695,7 @@ def own_request_summary(post: RecentPost) -> rx.Component:
                 " · ",
                 rx.cond(
                     post["helpers_needed"] == 1,
-                    "1 person required",
+                    ui("1 person required"),
                     f"{post['helpers_needed']} people required",
                 ),
                 class_name="mt-1 block text-sm font-semibold text-[#4b5563]",
@@ -1693,27 +1711,31 @@ def own_request_body(post: RecentPost) -> rx.Component:
     return rx.el.div(
         corner_activity_dot(
             NotificationState.unread_help_post_ids.contains(post["id"]),
-            "New activity on this help request",
+            ui("New activity on this help request"),
         ),
         browser_translatable_text(
             post["description"],
             class_name="text-sm font-medium leading-relaxed text-[#4b5563]",
         ),
         rx.el.dl(
-            plain_detail("Date time and duration", post["date_time_duration"]),
-            optional_plain_detail(
-                "Where", post["location"], "Location to agree"
+            plain_detail(
+                ui("Date time and duration"), post["date_time_duration"]
             ),
-            optional_plain_detail("Tools", post["tools"], "No tools listed"),
             optional_plain_detail(
-                "Knowledge and skills",
+                ui("Where"), post["location"], ui("Location to agree")
+            ),
+            optional_plain_detail(
+                ui("Tools"), post["tools"], ui("No tools listed")
+            ),
+            optional_plain_detail(
+                ui("Knowledge and skills"),
                 post["knowledge_skills"],
-                "No special skills listed",
+                ui("No special skills listed"),
             ),
             optional_plain_detail(
-                "Exact meeting place",
+                ui("Exact meeting place"),
                 post["accepted_location_name"],
-                "Not shared yet",
+                ui("Not shared yet"),
             ),
             class_name="mt-4 grid w-full grid-cols-1 gap-4 [&_dt]:text-sm [&_dt]:normal-case [&_dt]:tracking-normal [&_dd]:font-medium [&_dd]:text-[#4b5563]",
         ),
@@ -1822,7 +1844,7 @@ def help_summary_row() -> rx.Component:
             ProfileState.stats["tasks_received"],
         ),
         role="group",
-        aria_label="Your help summary",
+        aria_label=ui("Your help summary"),
         class_name="grid grid-cols-2 gap-x-6 sm:gap-x-12 w-full bg-transparent",
     )
 

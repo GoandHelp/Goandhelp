@@ -1,6 +1,7 @@
 import ast
 import inspect
 import re
+import textwrap
 import unittest
 from collections import Counter
 
@@ -100,8 +101,10 @@ class HelpPostFeedbackTranslationTests(unittest.TestCase):
         from app.request_draft import validate_request
         from app.skill_categories import category_limit_message
 
-        producer_sources = "\\n".join(
-            inspect.getsource(producer)
+        producer_sources = "\n".join(
+            textwrap.dedent(
+                inspect.getsource(getattr(producer, "fn", producer))
+            )
             for producer in (
                 HelpPostState.create_post,
                 HelpPostState.begin_edit,
@@ -111,6 +114,8 @@ class HelpPostFeedbackTranslationTests(unittest.TestCase):
                 HelpPostState.remove_photo,
                 HelpPostState._update_schedule,
                 HelpPostState.resume_schedule,
+                HelpPostState.pause_schedule,
+                HelpPostState.end_schedule,
                 validate_request,
                 cap_message,
                 category_limit_message,
