@@ -4,6 +4,17 @@ from app.interface_i18n import ui, ui_template, ui_template_multi
 from app.avatars import animal_avatar
 
 from app.components.language_control import browser_translatable_text
+from app.components.help_hub_metadata import (
+    localized_calendar_accessible_date,
+    localized_calendar_month,
+    localized_date_error,
+    localized_date_trigger,
+    localized_date_value,
+    localized_flexible_summary,
+    localized_help_privacy,
+    localized_rewards_summary,
+    localized_selected_date_count,
+)
 from app.countries import WORLD_COUNTRY_NAMES
 from app.components.disclosure import (
     disclosure_arrow,
@@ -222,7 +233,7 @@ def date_chip(value: rx.Var[str]) -> rx.Component:
             rx.icon("calendar", class_name="h-3 w-3 text-white"),
             class_name="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#e08b12]",
         ),
-        value,
+        localized_date_value(value),
         rx.el.button(
             rx.icon("x", class_name="h-3 w-3"),
             type="button",
@@ -240,7 +251,7 @@ def calendar_day(cell: dict[str, str | bool]) -> rx.Component:
         cell["label"].to(str),
         type="button",
         disabled=cell["disabled"].to(bool),
-        aria_label=cell["accessible_label"].to(str),
+        aria_label=localized_calendar_accessible_date(cell["date"].to(str)),
         aria_pressed=cell["selected"].to(bool),
         aria_current=rx.cond(cell["today"].to(bool), "date", "false"),
         on_click=HelpHubState.select_calendar_day(cell["date"].to(str)),
@@ -268,7 +279,7 @@ def inline_help_calendar() -> rx.Component:
                 class_name="size-9 flex items-center justify-center rounded-lg bg-white text-[#e08b12] disabled:opacity-30",
             ),
             rx.el.p(
-                HelpHubState.calendar_month_label,
+                localized_calendar_month(HelpHubState.calendar_month),
                 aria_live="polite",
                 class_name="text-sm font-semibold text-gray-900",
             ),
@@ -311,7 +322,7 @@ def specific_help_day_field() -> rx.Component:
         rx.el.div(
             rx.el.div(
                 rx.el.button(
-                    rx.el.span(HelpHubState.date_trigger_label),
+                    rx.el.span(localized_date_trigger(HelpHubState.date_input)),
                     rx.icon(
                         "calendar-days", class_name="size-4 text-[#e08b12]"
                     ),
@@ -351,14 +362,14 @@ def specific_help_day_field() -> rx.Component:
             ),
         ),
         rx.el.p(
-            HelpHubState.date_count_label,
+            localized_selected_date_count(HelpHubState.help_dates),
             class_name="mt-1.5 text-center text-xs font-bold text-[#e08b12]",
         ),
         rx.cond(
             HelpHubState.date_error,
             rx.el.p(
-                HelpHubState.date_error,
-                class_name="mt-1 text-xs font-semibold text-[#e08b12]",
+                localized_date_error(HelpHubState.date_error),
+                class_name="mt-1 break-words text-start text-xs font-semibold text-[#e08b12]",
             ),
             rx.fragment(),
         ),
@@ -432,8 +443,11 @@ def help_day_field() -> rx.Component:
             rx.el.div(
                 rx.el.button(
                     rx.el.span(
-                        HelpHubState.flexible_days_summary,
-                        class_name="flex-1 text-left",
+                        localized_flexible_summary(
+                            HelpHubState.flexible_days,
+                            HelpHubState.custom_weekdays,
+                        ),
+                        class_name="min-w-0 flex-1 break-words text-start",
                     ),
                     disclosure_arrow(HelpHubState.flexible_days_open),
                     type="button",
@@ -773,8 +787,8 @@ def rewards_field() -> rx.Component:
         rx.el.div(
             rx.el.button(
                 rx.el.span(
-                    HelpHubState.rewards_summary,
-                    class_name="min-w-0 flex-1 text-left",
+                    localized_rewards_summary(HelpHubState.selected_rewards),
+                    class_name="min-w-0 flex-1 break-words text-start",
                 ),
                 disclosure_arrow(HelpHubState.rewards_open),
                 type="button",
@@ -852,9 +866,9 @@ def job_location_section() -> rx.Component:
         ),
         rx.el.p(
             rx.icon("shield-check", class_name="mr-2 inline h-4 w-4"),
-            HelpHubState.job_location_description,
+            localized_help_privacy(HelpHubState.job_location_description),
             role="status",
-            class_name="mt-3 w-full rounded-2xl border border-[#fba922] bg-[#fff7e8] px-4 py-3 text-xs font-semibold leading-relaxed text-[#e08b12]",
+            class_name="mt-3 w-full break-words rounded-2xl border border-[#fba922] bg-[#fff7e8] px-4 py-3 text-start text-xs font-semibold leading-relaxed text-[#e08b12]",
         ),
         rx.el.div(
             field_label("Address", "required when no map pin"),
@@ -969,7 +983,9 @@ def duration_period_select() -> rx.Component:
         rx.el.select(
             rx.foreach(
                 HelpHubState.duration_period_options,
-                lambda item: rx.el.option(item["label"], value=item["value"]),
+                lambda item: rx.el.option(
+                    ui(item["label"]), value=item["value"]
+                ),
             ),
             name="duration_period_unit",
             aria_label=ui("Duration period unit"),

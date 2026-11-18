@@ -183,6 +183,10 @@ from app.interface_catalog_help_hub_details import (
     HELP_HUB_DETAIL_CATALOGS,
     HELP_HUB_DETAIL_KEYS,
 )
+from app.interface_catalog_help_hub_metadata import (
+    HELP_HUB_METADATA_CATALOGS,
+    HELP_HUB_METADATA_KEYS,
+)
 from app.interface_catalog_request_counts import (
     REQUEST_COUNT_CATALOGS,
     REQUEST_COUNT_KEYS,
@@ -679,6 +683,7 @@ for _catalogs in (
     HELP_POST_STATUS_FEEDBACK_CATALOGS,
     HELP_HUB_CONTROL_CATALOGS,
     HELP_HUB_DETAIL_CATALOGS,
+    HELP_HUB_METADATA_CATALOGS,
     REQUEST_COUNT_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
@@ -746,6 +751,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *HELP_POST_STATUS_FEEDBACK_KEYS,
             *HELP_HUB_CONTROL_KEYS,
             *HELP_HUB_DETAIL_KEYS,
+            *HELP_HUB_METADATA_KEYS,
             *REQUEST_COUNT_KEYS,
             "clear",
             "optional",
