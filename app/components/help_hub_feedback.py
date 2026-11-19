@@ -56,12 +56,16 @@ def _localized_exact(
 ) -> rx.Var[str]:
     source = rx.Var.create(value).to(str)
     localized = [(key, ui(key)) for key in sources]
-    expression = f"String({source} ?? '')"
-    for key, translation in reversed(localized):
-        expression = (
-            f"({expression} === {json.dumps(key, ensure_ascii=False)} "
-            f"? {translation} : {expression})"
-        )
+    translations = ", ".join(
+        f"{json.dumps(key, ensure_ascii=False)}: {translation}"
+        for key, translation in localized
+    )
+    expression = (
+        f"(() => {{ const text = String({source} ?? ''); "
+        f"const translations = {{{translations}}}; "
+        "return Object.prototype.hasOwnProperty.call(translations, text) "
+        "? translations[text] : text; })()"
+    )
     return rx.Var(
         _js_expr=expression,
         _var_type=str,

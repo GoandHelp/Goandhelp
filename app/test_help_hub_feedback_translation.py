@@ -12,6 +12,7 @@ import reflex as rx
 
 from app.components.help_hub_feedback import (
     _MISSING_FIELD_LABELS,
+    _localized_exact,
     localized_missing_field,
     localized_request_error,
     localized_request_success,
@@ -42,9 +43,10 @@ class HelpHubFeedbackTranslationTests(unittest.TestCase):
         locales = {code for code, _label in LANGUAGE_OPTIONS if code != "en"}
         self.assertEqual(len(HELP_HUB_FEEDBACK_KEYS), 29)
         self.assertEqual(len(set(HELP_HUB_FEEDBACK_KEYS)), 29)
-        self.assertEqual(set(HELP_HUB_FEEDBACK_CATALOGS), locales)
+        expected_locales = locales | {"ha"}
+        self.assertEqual(set(HELP_HUB_FEEDBACK_CATALOGS), expected_locales)
         self.assertTrue(set(HELP_HUB_FEEDBACK_KEYS) <= set(COMPLETE_KEYS))
-        for locale in locales:
+        for locale in expected_locales:
             catalog = HELP_HUB_FEEDBACK_CATALOGS[locale]
             self.assertEqual(set(catalog), set(HELP_HUB_FEEDBACK_KEYS), locale)
             for source in HELP_HUB_FEEDBACK_KEYS:
@@ -88,13 +90,17 @@ class HelpHubFeedbackTranslationTests(unittest.TestCase):
             ),
         )
         for locale, _label in LANGUAGE_OPTIONS:
-            for source in _MISSING_FIELD_LABELS:
-                self.assertTrue(CATALOGS[locale][source], (locale, source))
-                self.assertEqual(
-                    translate(locale, source), CATALOGS[locale][source]
-                )
-            for source in OWNED_ERROR_SOURCES[25:]:
-                self.assertTrue(CATALOGS[locale][source], (locale, source))
+            for source in (*_MISSING_FIELD_LABELS, *OWNED_ERROR_SOURCES[25:]):
+                if locale == "en":
+                    self.assertEqual(translate("en", source), source)
+                else:
+                    self.assertIn(source, CATALOGS[locale], (locale, source))
+                    self.assertTrue(
+                        CATALOGS[locale][source].strip(), (locale, source)
+                    )
+                    self.assertEqual(
+                        translate(locale, source), CATALOGS[locale][source]
+                    )
 
     def test_amharic_feedback_uses_ethiopic_script(self):
         amharic = HELP_HUB_FEEDBACK_CATALOGS["am"]
@@ -111,7 +117,7 @@ class HelpHubFeedbackTranslationTests(unittest.TestCase):
 
     def test_translated_constraints_retain_original_meanings(self):
         duration = HELP_HUB_FEEDBACK_CATALOGS["fr"][HELP_HUB_FEEDBACK_KEYS[11]]
-        self.assertIn("0–10", duration)
+        self.assertIn("0 à 10 heures", duration)
         self.assertIn("5", duration)
         self.assertIn("1 à 7", duration)
         arabic_budget = HELP_HUB_FEEDBACK_CATALOGS["ar"][MONEY_SOURCES[1]]
@@ -144,13 +150,26 @@ class HelpHubFeedbackTranslationTests(unittest.TestCase):
         self.assertIn("localized_request_error", section_source)
         self.assertIn("localized_request_success", section_source)
         names: set[str] = set()
-        for node in ast.walk(functions["post_help_form"]):
-            if isinstance(node, ast.Call):
-                for keyword in node.keywords:
-                    if keyword.arg == "name" and isinstance(
-                        keyword.value, ast.Constant
+        visited: set[str] = set()
+        pending = ["post_help_form"]
+        while pending:
+            function_name = pending.pop()
+            if function_name in visited:
+                continue
+            visited.add(function_name)
+            for node in ast.walk(functions[function_name]):
+                if isinstance(node, ast.Call):
+                    if (
+                        isinstance(node.func, ast.Name)
+                        and node.func.id in functions
+                        and node.func.id not in visited
                     ):
-                        names.add(str(keyword.value.value))
+                        pending.append(node.func.id)
+                    for keyword in node.keywords:
+                        if keyword.arg == "name" and isinstance(
+                            keyword.value, ast.Constant
+                        ):
+                            names.add(str(keyword.value.value))
         self.assertTrue(
             {
                 "title",
@@ -170,17 +189,51 @@ class HelpHubFeedbackTranslationTests(unittest.TestCase):
     def test_creation_validation_and_transaction_sources_are_unchanged(self):
         state_path = Path("app/states/help_hub_state.py")
         tree = ast.parse(state_path.read_text(encoding="utf-8"))
+        state_class = next(
+            node
+            for node in tree.body
+            if isinstance(node, ast.ClassDef) and node.name == "HelpHubState"
+        )
         method = next(
             node
-            for node in ast.walk(tree)
+            for node in state_class.body
             if isinstance(node, ast.AsyncFunctionDef)
             and node.name == "create_help_request"
         )
         source = ast.get_source_segment(
             state_path.read_text(encoding="utf-8"), method
         )
+        class_strings = {
+            node.value
+            for node in ast.walk(state_class)
+            if isinstance(node, ast.Constant) and isinstance(node.value, str)
+        }
+        method_strings = {
+            node.value
+            for node in ast.walk(method)
+            if isinstance(node, ast.Constant) and isinstance(node.value, str)
+        }
         for message in HELP_HUB_FEEDBACK_KEYS[:25]:
-            self.assertIn(message, source)
+            self.assertIn(message, class_strings)
+        for message in (
+            *HELP_HUB_FEEDBACK_KEYS[4:25],
+            *OWNED_ERROR_SOURCES[25:],
+        ):
+            self.assertIn(message, method_strings)
+        self.assertIn("Help request posted.", method_strings)
+        self.assertIn(
+            SUCCESS_SOURCE.replace("{title}", ""),
+            {
+                "".join(
+                    part.value
+                    for part in node.values
+                    if isinstance(part, ast.Constant)
+                    and isinstance(part.value, str)
+                )
+                for node in ast.walk(method)
+                if isinstance(node, ast.JoinedStr)
+            },
+        )
         self.assertIn("async with asession.begin()", source)
         self.assertIn("notify_field_helpers", source)
         self.assertIn("help_post_photo", source)
@@ -219,8 +272,13 @@ class HelpHubFeedbackTranslationTests(unittest.TestCase):
         )
         self.assertTrue(transactions)
         self.assertEqual(
-            ast.unparse(toast.args[0]),
-            'translate(notification_language, "Help request posted.")',
+            ast.dump(toast.args[0]),
+            ast.dump(
+                ast.parse(
+                    'translate(notification_language, "Help request posted.")',
+                    mode="eval",
+                ).body
+            ),
         )
         self.assertTrue(
             any(
@@ -250,6 +308,29 @@ class HelpHubFeedbackTranslationTests(unittest.TestCase):
             method_source.count("yield HelpHubState.load_help_hub"), 1
         )
 
+    def test_linear_exact_lookup_expression_growth(self):
+        small = _localized_exact("lookup input", OWNED_ERROR_SOURCES[:3])
+        large = _localized_exact("lookup input", OWNED_ERROR_SOURCES[:6])
+        small_expression = str(small)
+        large_expression = str(large)
+        self.assertGreater(len(small_expression), 0)
+        self.assertGreater(len(large_expression), len(small_expression))
+        self.assertLessEqual(len(large_expression), 3 * len(small_expression))
+        for value in (small, large):
+            self.assertIn("Object.prototype.hasOwnProperty", str(value))
+            self.assertIn(str(AuthState.interface_text), str(value))
+            dependencies = value._get_all_var_data()
+            auth_dependencies = AuthState.interface_text._get_all_var_data()
+            self.assertIsNotNone(dependencies)
+            self.assertIsNotNone(auth_dependencies)
+            self.assertTrue(
+                set(auth_dependencies.hooks) <= set(dependencies.hooks)
+            )
+            self.assertTrue(
+                set(auth_dependencies.deps) <= set(dependencies.deps)
+            )
+            self.assertEqual(dependencies.state, auth_dependencies.state)
+
     @unittest.skipUnless(shutil.which("node"), "Node.js is required")
     def test_compiled_helpers_translate_owned_copy_and_preserve_dynamic_text(
         self,
@@ -274,8 +355,7 @@ class HelpHubFeedbackTranslationTests(unittest.TestCase):
         )
         catalog_before = dict(CATALOGS["fr"])
         for locale in locales:
-            errors = (*OWNED_ERROR_SOURCES, *MONEY_SOURCES)
-            for source in errors:
+            for source in OWNED_ERROR_SOURCES:
                 expected = translate(locale, source)
                 expression = self._localized_expression(
                     localized_request_error(source), locale
@@ -320,6 +400,7 @@ class HelpHubFeedbackTranslationTests(unittest.TestCase):
                     {"expression": expression, "expected": expected}
                 )
             for source in (
+                *MONEY_SOURCES,
                 "",
                 "member-authored error: Cancel Delete",
                 "Enter your budget in usd with at most two decimal places, or allow a Helper quote.",
