@@ -373,8 +373,13 @@ def reset_password_page() -> rx.Component:
 
 
 def map_page() -> rx.Component:
-    """Compatible alias of the arrival page — no demo impersonation."""
-    return index()
+    """Lightweight alias that redirects to the arrival page."""
+    return rx.el.main(
+        rx.el.p(
+            "Opening the map…", class_name="text-sm font-medium text-[#4b5563]"
+        ),
+        class_name="font-['Inter'] flex h-dvh w-full items-center justify-center bg-[#ffffff]",
+    )
 
 
 _app_kwargs = dict(
@@ -398,15 +403,12 @@ _app_kwargs = dict(
 )
 
 
-app = rx.App(
-    **_app_kwargs,
-    theme=rx.theme(accent_color="orange", gray_color="gray"),
-)
+app = rx.App(**_app_kwargs)
 # Periodic 24h / 1h task reminder sweep.
 # blocked, and it is cancelled cleanly when the backend shuts down.
 app.register_lifespan_task(reminder_sweep_lifespan)
 app.add_page(index, route="/", on_load=AuthState.load_session)
-app.add_page(map_page, route="/map", on_load=AuthState.load_session)
+app.add_page(map_page, route="/map", on_load=rx.redirect("/"))
 app.add_page(
     membership_success_page,
     route="/membership/success",

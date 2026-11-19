@@ -1,6 +1,11 @@
 import reflex as rx
 
 from app.interface_i18n import ui, ui_template, ui_template_multi
+from app.components.help_hub_feedback import (
+    localized_missing_field,
+    localized_request_error,
+    localized_request_success,
+)
 from app.avatars import animal_avatar
 
 from app.components.language_control import browser_translatable_text
@@ -1106,7 +1111,9 @@ def post_help_form() -> rx.Component:
                 rx.foreach(
                     HelpHubState.missing_fields,
                     lambda label: rx.el.p(
-                        f"– {label}", class_name="text-[#e08b12]"
+                        rx.el.span("– "),
+                        localized_missing_field(label),
+                        class_name="break-words text-[#e08b12]",
                     ),
                 ),
                 role="alert",
@@ -1168,8 +1175,14 @@ def post_help_section() -> rx.Component:
             on_click=HelpHubState.toggle_form,
             class_name="gah-request-ask mx-auto flex min-h-0 w-fit max-w-full items-center justify-center rounded-2xl border border-[#fba922] bg-[#fba922] px-4 py-3 text-[#111827] transition-colors hover:bg-[#e08b12] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#e08b12]",
         ),
-        error_banner(HelpHubState.error),
-        success_banner(HelpHubState.success),
+        rx.el.div(
+            error_banner(localized_request_error(HelpHubState.error)),
+            class_name="w-full min-w-0 [overflow-wrap:anywhere]",
+        ),
+        rx.el.div(
+            success_banner(localized_request_success(HelpHubState.success)),
+            class_name="w-full min-w-0 [overflow-wrap:anywhere]",
+        ),
         rx.cond(
             HelpHubState.form_open,
             section_shell(

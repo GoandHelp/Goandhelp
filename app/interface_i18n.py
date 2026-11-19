@@ -191,6 +191,10 @@ from app.interface_catalog_request_counts import (
     REQUEST_COUNT_CATALOGS,
     REQUEST_COUNT_KEYS,
 )
+from app.interface_catalog_help_hub_feedback import (
+    HELP_HUB_FEEDBACK_CATALOGS,
+    HELP_HUB_FEEDBACK_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -684,10 +688,20 @@ for _catalogs in (
     HELP_HUB_CONTROL_CATALOGS,
     HELP_HUB_DETAIL_CATALOGS,
     HELP_HUB_METADATA_CATALOGS,
+    HELP_HUB_FEEDBACK_CATALOGS,
     REQUEST_COUNT_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
+            CATALOGS[_language].setdefault(_key, _value)
+
+for _language, _entries in HELP_HUB_FEEDBACK_CATALOGS.items():
+    for _key, _value in _entries.items():
+        if _key == "Help request posted." and CATALOGS[_language].get(
+            _key
+        ) == HELP_POST_VALIDATION_CATALOGS.get(_language, {}).get(_key):
+            CATALOGS[_language][_key] = _value
+        else:
             CATALOGS[_language].setdefault(_key, _value)
 
 COMPLETE_KEYS: tuple[str, ...] = tuple(
@@ -752,6 +766,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *HELP_HUB_CONTROL_KEYS,
             *HELP_HUB_DETAIL_KEYS,
             *HELP_HUB_METADATA_KEYS,
+            *HELP_HUB_FEEDBACK_KEYS,
             *REQUEST_COUNT_KEYS,
             "clear",
             "optional",

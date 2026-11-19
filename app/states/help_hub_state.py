@@ -2353,6 +2353,9 @@ ORDER BY latest.completed_at DESC NULLS LAST, latest.id DESC
                 self.is_saving = False
 
         async with self:
+            notification_language = (
+                await self.get_state(AuthState)
+            ).preferred_language
             self.is_saving = False
             self.form_open = False
             self.missing_fields = []
@@ -2394,7 +2397,12 @@ ORDER BY latest.completed_at DESC NULLS LAST, latest.id DESC
             help_state.selected_categories = []
             help_state.category_dropdown_open = False
             help_state.error = ""
-        yield rx.toast("Help request posted.", duration=4000)
+        from app.interface_i18n import translate
+
+        yield rx.toast(
+            translate(notification_language, "Help request posted."),
+            duration=4000,
+        )
         yield HelpHubState.load_help_hub
         yield HelpPostState.load_recent
         from app.states.profile_state import ProfileState
