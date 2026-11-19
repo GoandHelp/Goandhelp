@@ -4,6 +4,7 @@ import reflex as rx
 from reflex.vars.base import VarData
 
 from app.interface_i18n import ui, ui_template
+from app.interface_catalog_help_hub_metadata import HELP_HUB_METADATA_CATALOGS
 from app.states.auth_state import AuthState
 from app.states.help_hub_state import FLEXIBLE_CHOICES, REWARD_CHOICES, WEEKDAYS
 
@@ -19,6 +20,43 @@ DATE_ERROR_SOURCES: tuple[str, ...] = (
     "Choose a date from today through two calendar years from today.",
     "That date is already on your list.",
 )
+DURATION_UNIT_SOURCES: tuple[str, ...] = (
+    "Day",
+    "Days",
+    "Week",
+    "Weeks",
+    "Month",
+    "Months",
+)
+DURATION_UNIT_CATALOGS: dict[str, dict[str, str]] = {
+    locale: {source: entries[source] for source in DURATION_UNIT_SOURCES}
+    for locale, entries in HELP_HUB_METADATA_CATALOGS.items()
+}
+
+
+def localized_duration_unit(value: str | rx.Var[str]) -> rx.Var[str]:
+    source = rx.Var.create(value).to(str)
+    language = AuthState.preferred_language
+    catalogs = json.dumps(DURATION_UNIT_CATALOGS, ensure_ascii=False)
+    allowed_sources = json.dumps(DURATION_UNIT_SOURCES, ensure_ascii=False)
+    expression = (
+        f"(() => {{ const value = String({source} ?? ''); "
+        f"const units = {allowed_sources}; "
+        "if (!units.includes(value)) return value; "
+        f"const catalogs = {catalogs}; "
+        f"const locale = String({language} || 'en'); "
+        "if (!Object.prototype.hasOwnProperty.call(catalogs, locale)) return value; "
+        "const translations = catalogs[locale]; "
+        "return Object.prototype.hasOwnProperty.call(translations, value) "
+        "? translations[value] : value; })()"
+    )
+    return rx.Var(
+        _js_expr=expression,
+        _var_type=str,
+        _var_data=VarData.merge(
+            source._get_all_var_data(), language._get_all_var_data()
+        ),
+    ).to(str)
 
 
 def _localized_iso_date(value: str | rx.Var[str], options: str) -> rx.Var[str]:

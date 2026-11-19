@@ -4,6 +4,7 @@ import re
 import shutil
 import subprocess
 import unittest
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -11,12 +12,14 @@ import reflex as rx
 
 from app.components.help_hub_metadata import (
     DATE_ERROR_SOURCES,
+    DURATION_UNIT_CATALOGS,
     PRIVACY_SOURCE,
     localized_calendar_accessible_date,
     localized_calendar_month,
     localized_date_error,
     localized_date_trigger,
     localized_date_value,
+    localized_duration_unit,
     localized_flexible_summary,
     localized_help_privacy,
     localized_rewards_summary,
@@ -84,11 +87,23 @@ class HelpHubMetadataTranslationTests(unittest.TestCase):
                 native = entries[source]
                 self.assertTrue(native.strip(), (locale, source))
                 self.assertNotEqual(native, source, (locale, source))
-                self.assertEqual(translate(locale, source), native)
-                self.assertIn(source, CATALOGS[locale])
                 self.assertEqual(
                     Counter(re.findall(r"\{([A-Za-z][A-Za-z0-9_]*)\}", source)),
                     Counter(re.findall(r"\{([A-Za-z][A-Za-z0-9_]*)\}", native)),
+                    (locale, source),
+                )
+                self.assertIn(source, CATALOGS[locale])
+                runtime_value = CATALOGS[locale][source]
+                self.assertTrue(runtime_value.strip(), (locale, source))
+                self.assertNotEqual(runtime_value, source, (locale, source))
+                self.assertEqual(translate(locale, source), runtime_value)
+                self.assertEqual(
+                    Counter(re.findall(r"\{([A-Za-z][A-Za-z0-9_]*)\}", source)),
+                    Counter(
+                        re.findall(
+                            r"\{([A-Za-z][A-Za-z0-9_]*)\}", runtime_value
+                        )
+                    ),
                     (locale, source),
                 )
                 self.assertEqual(translate("en", source), source)
@@ -213,6 +228,57 @@ class HelpHubMetadataTranslationTests(unittest.TestCase):
             <= component_ids
         )
         self.assertIn("create_help_request", submit_handlers)
+        duration_function = next(
+            node
+            for node in panel_tree.body
+            if isinstance(node, ast.FunctionDef)
+            and node.name == "duration_period_select"
+        )
+        duration_helper_calls = [
+            node
+            for node in ast.walk(duration_function)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "localized_duration_unit"
+        ]
+        self.assertEqual(len(duration_helper_calls), 1)
+        self.assertEqual(
+            ast.dump(duration_helper_calls[0].args[0]),
+            ast.dump(ast.parse("item['label']", mode="eval").body),
+        )
+        self.assertEqual(
+            sum(
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id == "localized_duration_unit"
+                for node in ast.walk(panel_tree)
+            ),
+            1,
+        )
+        duration_option = next(
+            node
+            for node in ast.walk(duration_function)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "option"
+        )
+        self.assertEqual(
+            ast.dump(duration_option.args[0]),
+            ast.dump(
+                ast.parse(
+                    "localized_duration_unit(item['label'])", mode="eval"
+                ).body
+            ),
+        )
+        duration_value = next(
+            keyword.value
+            for keyword in duration_option.keywords
+            if keyword.arg == "value"
+        )
+        self.assertEqual(
+            ast.dump(duration_value),
+            ast.dump(ast.parse("item['value']", mode="eval").body),
+        )
         helper_tree = ast.parse(
             Path("app/components/help_hub_metadata.py").read_text(
                 encoding="utf-8"
@@ -279,6 +345,111 @@ class HelpHubMetadataTranslationTests(unittest.TestCase):
             post_help_form(),
         )
         self.assertTrue(all(component is not None for component in components))
+
+    def test_amharic_metadata_row_is_valid_native_text(self):
+        row = HELP_HUB_METADATA_CATALOGS["am"]
+        self.assertEqual(set(row), set(EXPECTED_METADATA_KEYS))
+        self.assertEqual(row["Day"], "ቀን")
+        self.assertEqual(row["Month"], "ወር")
+        for source in EXPECTED_METADATA_KEYS:
+            value = row[source]
+            self.assertTrue(value.strip(), source)
+            self.assertNotEqual(value, source, source)
+            self.assertEqual(
+                Counter(re.findall(r"\{([A-Za-z][A-Za-z0-9_]*)\}", source)),
+                Counter(re.findall(r"\{([A-Za-z][A-Za-z0-9_]*)\}", value)),
+                source,
+            )
+            without_slots = re.sub(r"\{[A-Za-z][A-Za-z0-9_]*\}", "", value)
+            self.assertTrue(
+                all(
+                    unicodedata.name(character, "").startswith("ETHIOPIC")
+                    for character in without_slots
+                    if character.isalpha()
+                ),
+                source,
+            )
+        privacy = row[PRIVACY_SOURCE]
+        self.assertIn("0.5–1", privacy)
+        self.assertIn("ሁለታችሁም ከተስማማችሁ", privacy)
+        self.assertIn("ትክክለኛው ቦታዎ የሚታየው", privacy)
+        self.assertIn("በኋላ ብቻ", privacy)
+
+    @unittest.skipUnless(shutil.which("node"), "Node.js is required")
+    def test_compiled_duration_unit_catalog_is_scoped_and_preserves_unknown_text(
+        self,
+    ):
+        locales = [code for code, _label in LANGUAGE_OPTIONS]
+        units = ("Day", "Days", "Week", "Weeks", "Month", "Months")
+        self.assertEqual(
+            set(DURATION_UNIT_CATALOGS), set(HELP_HUB_METADATA_CATALOGS)
+        )
+        for locale, entries in DURATION_UNIT_CATALOGS.items():
+            self.assertEqual(set(entries), set(units), locale)
+            self.assertEqual(
+                entries,
+                {
+                    unit: HELP_HUB_METADATA_CATALOGS[locale][unit]
+                    for unit in units
+                },
+                locale,
+            )
+        fixtures: list[dict[str, str]] = []
+        for locale in locales:
+            for source in units:
+                expected = (
+                    source
+                    if locale == "en"
+                    else HELP_HUB_METADATA_CATALOGS[locale][source]
+                )
+                expression = str(
+                    localized_duration_unit(rx.Var.create(source).to(str))
+                ).replace(
+                    str(AuthState.preferred_language),
+                    json.dumps(locale),
+                )
+                fixtures.append(
+                    {"expression": expression, "expected": expected}
+                )
+        for locale in ("id", "ja", "ar", "en", "unsupported"):
+            for source in (
+                "",
+                "Day\\nDays",
+                "member-authored 日 نهار",
+                "$& Day",
+                "__proto__",
+                "constructor",
+                "prototype",
+            ):
+                expression = str(
+                    localized_duration_unit(rx.Var.create(source).to(str))
+                ).replace(
+                    str(AuthState.preferred_language),
+                    json.dumps(locale),
+                )
+                fixtures.append({"expression": expression, "expected": source})
+        self.assertEqual(CATALOGS["id"]["Day"], "Siang")
+        self.assertEqual(HELP_HUB_METADATA_CATALOGS["id"]["Day"], "Hari")
+        self.assertEqual(CATALOGS["ja"]["Day"], "昼")
+        self.assertEqual(CATALOGS["ja"]["Month"], "月")
+        self.assertEqual(HELP_HUB_METADATA_CATALOGS["ja"]["Day"], "日")
+        self.assertEqual(HELP_HUB_METADATA_CATALOGS["ja"]["Month"], "か月")
+        self.assertEqual(CATALOGS["ar"]["Day"], "نهار")
+        self.assertEqual(HELP_HUB_METADATA_CATALOGS["ar"]["Day"], "يوم")
+        script = (
+            "const fixtures = JSON.parse(require('fs').readFileSync(0, 'utf8')); "
+            "const results = fixtures.map(item => eval(item.expression) === item.expected); "
+            "if (!results.every(Boolean)) { console.error(results.findIndex(value => !value)); process.exit(1); } "
+            "console.log(results.length);"
+        )
+        completed = subprocess.run(
+            ["node", "-e", script],
+            input=json.dumps(fixtures, ensure_ascii=False),
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        self.assertEqual(int(completed.stdout.strip()), len(fixtures))
 
     @unittest.skipUnless(
         shutil.which("node"), "Node.js is needed to evaluate Intl"

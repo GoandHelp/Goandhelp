@@ -10,6 +10,7 @@ from app.components.help_hub_metadata import (
     localized_date_error,
     localized_date_trigger,
     localized_date_value,
+    localized_duration_unit,
     localized_flexible_summary,
     localized_help_privacy,
     localized_rewards_summary,
@@ -984,7 +985,8 @@ def duration_period_select() -> rx.Component:
             rx.foreach(
                 HelpHubState.duration_period_options,
                 lambda item: rx.el.option(
-                    ui(item["label"]), value=item["value"]
+                    localized_duration_unit(item["label"]),
+                    value=item["value"],
                 ),
             ),
             name="duration_period_unit",
