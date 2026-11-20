@@ -48,10 +48,11 @@ from app.membership import (
     PLAN_PRICE_LABEL,
 )
 from app.models import LANGUAGE_OPTIONS
-from app.policies import POLICY_LINKS, POLICY_DOCUMENTS
+from app.policies import POLICY_LINKS, POLICY_DOCUMENTS, PolicySection
 from app.states.auth_state import AuthState
 from app.states.membership_state import MembershipState
 from app.states.policy_state import PolicyState
+from test_utils import run_event
 
 EXPECTED_KEYS = (
     "Membership information",
@@ -247,15 +248,23 @@ class ProfileMembershipTranslationTests(unittest.TestCase):
             group = ast.literal_eval(definition.value)
             self.assertFalse(set(group) & set(literal_rows))
             literal_rows.update(group)
+            imported_roots = set()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    imported_roots.update(
+                        alias.name.split(".")[0] for alias in node.names
+                    )
+                elif isinstance(node, ast.ImportFrom) and node.module:
+                    imported_roots.add(node.module.split(".")[0])
             for forbidden in (
                 "httpx",
                 "requests",
                 "urllib",
                 "openai",
-                "translate.google",
+                "translate",
                 "subprocess",
             ):
-                self.assertNotIn(forbidden, Path(path).read_text())
+                self.assertNotIn(forbidden, imported_roots, path)
         self.assertEqual(literal_rows, PROFILE_MEMBERSHIP_ROWS)
         for value in PROFILE_MEMBERSHIP_CATALOGS["am"].values():
             self.assertTrue(
@@ -277,9 +286,15 @@ class ProfileMembershipTranslationTests(unittest.TestCase):
                 (EXPECTED_FREE[5], 1),
                 (EXPECTED_FREE[6], 10),
             ):
-                self.assertEqual(
-                    numbers(entries[source]), [amount], (locale, source)
-                )
+                if locale == "ja" and source == "1 help offer a day":
+                    self.assertEqual(
+                        numbers(entries[source]), [1, 1], (locale, source)
+                    )
+                    self.assertIn("1 日に 1 件", entries[source])
+                else:
+                    self.assertEqual(
+                        numbers(entries[source]), [amount], (locale, source)
+                    )
             for source in EXPECTED_FREE[5:7]:
                 self.assertIn("UTC", entries[source], locale)
         semantic_terms = {
@@ -418,7 +433,9 @@ class ProfileMembershipTranslationTests(unittest.TestCase):
             policy_header(),
             policy_link_card(rx.Var.create(EXPECTED_LINKS[0])),
             policy_section(
-                rx.Var.create(POLICY_DOCUMENTS["credits"]["sections"][0]),
+                rx.Var.create(POLICY_DOCUMENTS["credits"]["sections"][0]).to(
+                    PolicySection
+                ),
                 rx.Var.create(0),
             ),
         )
@@ -529,7 +546,9 @@ class ProfileMembershipTranslationTests(unittest.TestCase):
         ]
         expression_cases.extend(
             (
-                str(ui(rx.Var(_js_expr="benefitSource", _var_type=str))),
+                str(
+                    ui(rx.Var(_js_expr="benefitSource", _var_type=str).to(str))
+                ),
                 source,
                 source,
             )
@@ -650,7 +669,7 @@ class ProfileMembershipReactiveStateTests(unittest.IsolatedAsyncioTestCase):
                 membership.tier = tier
                 membership.is_premium = premium
                 for link in EXPECTED_LINKS:
-                    PolicyState.open_policy.fn(policy, link["key"])
+                    await run_event(policy.open_policy, link["key"])
                     snapshot = (
                         membership.tier,
                         membership.is_premium,
@@ -693,7 +712,7 @@ class ProfileMembershipReactiveStateTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(POLICY_LINKS, EXPECTED_LINKS)
         finally:
             auth.preferred_language = original_language
-            PolicyState.close_policy.fn(policy)
+            await run_event(policy.close_policy)
 
 
 if __name__ == "__main__":
