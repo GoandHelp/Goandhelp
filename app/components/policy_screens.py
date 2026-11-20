@@ -3,6 +3,7 @@
 import reflex as rx
 
 from app.components.header import BRAND_LOGO_SRC, BRAND_LOGO_ALT
+from app.interface_i18n import ui, ui_template
 from app.policies import POLICY_LINKS, PolicySection
 from app.states.policy_state import PolicyState
 
@@ -23,7 +24,9 @@ def policy_section(section: PolicySection, index: rx.Var[int]) -> rx.Component:
             ),
             rx.el.div(
                 rx.el.p(
-                    f"Section {index + 1}",
+                    ui_template(
+                        "Section {count}", "count", (index + 1).to_string()
+                    ),
                     class_name="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8c91aa]",
                 ),
                 rx.el.h2(
@@ -46,10 +49,10 @@ def policy_header() -> rx.Component:
     return rx.el.div(
         rx.el.button(
             rx.icon("arrow-left", class_name="h-4 w-4"),
-            rx.el.span("Back", class_name="text-xs font-bold"),
+            rx.el.span(ui("Back"), class_name="text-xs font-bold"),
             type="button",
-            title="Back to your profile",
-            aria_label="Back to your profile",
+            title=ui("Back to your profile"),
+            aria_label=ui("Back to your profile"),
             on_click=PolicyState.close_policy,
             class_name="gah-inverse-text flex w-fit shrink-0 items-center gap-1.5 rounded-full bg-[#e08b12] px-3.5 py-2 text-white transition-colors hover:bg-[#b86e08] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]",
         ),
@@ -117,16 +120,16 @@ def policy_screen() -> rx.Component:
                 class_name="mt-4 flex w-full flex-col gap-3",
             ),
             rx.el.p(
-                "This screen is part of the Go and Help app. It is written for "
-                "adults everywhere and is not legal advice for any particular "
-                "country.",
+                ui(
+                    "This screen is part of the Go and Help app. It is written for adults everywhere and is not legal advice for any particular country."
+                ),
                 class_name="mt-5 text-center text-[11px] font-medium leading-relaxed text-[#68708f]",
             ),
             rx.el.button(
                 rx.icon("arrow-left", class_name="h-4 w-4"),
-                "Back to your profile",
+                ui("Back to your profile"),
                 type="button",
-                aria_label="Back to your profile",
+                aria_label=ui("Back to your profile"),
                 on_click=PolicyState.close_policy,
                 class_name="gah-inverse-text mx-auto mt-4 flex w-fit items-center gap-2 rounded-full bg-[#e08b12] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#b86e08] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]",
             ),
@@ -150,12 +153,12 @@ def policy_link_card(item: dict[str, str]) -> rx.Component:
             class_name="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#fff7e8] text-[#fba922]",
         ),
         rx.el.span(
-            item["label"],
-            class_name="min-w-0 flex-1 text-left text-[13px] font-bold leading-snug text-[#111827]",
+            ui(item["label"]),
+            class_name="min-w-0 flex-1 break-words text-start text-[13px] font-bold leading-snug text-[#111827]",
         ),
         rx.icon("chevron-right", class_name="h-4 w-4 shrink-0 text-[#e08b12]"),
         type="button",
-        aria_label=item["label"],
+        aria_label=ui(item["label"]),
         on_click=lambda: PolicyState.open_policy(item["key"]),
         class_name="flex w-full items-center gap-3 rounded-2xl border border-[#e08b12] bg-white px-3.5 py-3 transition-colors hover:border-[#e08b12] hover:bg-[#fff7e8] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]",
     )
@@ -167,7 +170,7 @@ def policy_links_row() -> rx.Component:
         rx.el.div(
             rx.icon("book-open", class_name="h-4 w-4 text-[#fba922]"),
             rx.el.h2(
-                "More information",
+                ui("More information"),
                 class_name="text-lg font-bold tracking-tight text-[#111827]",
             ),
             class_name="flex items-center justify-center gap-2",
