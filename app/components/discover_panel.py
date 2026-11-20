@@ -1,6 +1,7 @@
 import reflex as rx
 
 from app.interface_i18n import ui, ui_template
+from app.components import filter_layout as layout
 
 from app.components.language_control import (
     browser_translatable_text,
@@ -72,14 +73,7 @@ def urgency_pill(urgency: rx.Var[str]) -> rx.Component:
 
 def sheet_mode_button(label: str, value: str, description: str) -> rx.Component:
     return rx.el.button(
-        rx.el.span(
-            rx.el.span(ui(label), aria_hidden=True, class_name="invisible"),
-            rx.el.span(
-                ui(label),
-                class_name="absolute inset-0 flex items-center justify-center text-[length:calc(14px-1pt)]!",
-            ),
-            class_name="relative inline-block",
-        ),
+        rx.el.span(ui(label), dir="auto"),
         type="button",
         title=ui(description),
         aria_label=ui(description),
@@ -87,8 +81,8 @@ def sheet_mode_button(label: str, value: str, description: str) -> rx.Component:
         on_click=lambda: DiscoveryState.set_map_mode(value),
         class_name=rx.cond(
             DiscoveryState.map_mode == value,
-            "gah-segment-control flex h-[31px] items-center rounded-full bg-[#fba922] px-[11px] text-[11px] font-bold text-[#000000] whitespace-nowrap",
-            "gah-segment-control flex h-[31px] items-center rounded-full px-[11px] text-[11px] font-bold text-black whitespace-nowrap transition-colors hover:text-black",
+            layout.MODE_ON_CLASS,
+            layout.MODE_OFF_CLASS,
         ),
     )
 
@@ -175,7 +169,7 @@ def category_multiselect(compact: bool = False) -> rx.Component:
             on_click=DiscoveryState.toggle_category_list,
             class_name=rx.cond(
                 compact,
-                "gah-filter-field flex h-9 w-full items-center gap-2 rounded-xl border border-gray-300 bg-white px-3 text-sm font-medium text-[#404040] outline-hidden transition-colors focus:border-[#fba922] focus:ring-2 focus:ring-[#fba922]/30",
+                layout.FIELD_CLASS,
                 "gah-filter-field flex h-10 w-full items-center gap-2 rounded-xl border border-gray-300 bg-white px-3.5 text-sm font-medium text-[#404040] outline-hidden transition-colors focus:border-[#fba922] focus:ring-2 focus:ring-[#fba922]/30",
             ),
         ),
@@ -234,28 +228,7 @@ def distance_filter_label() -> rx.Var[str]:
 def distance_filter_block(compact: bool = False) -> rx.Component:
     """Free travel-radius slider, shown in both Give and Get modes."""
     return rx.el.div(
-        rx.el.div(
-            rx.el.span(
-                ui("1 km"),
-                class_name="shrink-0 whitespace-nowrap text-left text-[11px] font-bold text-black",
-            ),
-            rx.el.label(
-                ui("Distance"),
-                rx.el.span(
-                    distance_filter_label(),
-                    role="status",
-                    aria_live="polite",
-                    class_name="whitespace-nowrap text-[#e08b12]",
-                ),
-                html_for="gah-discover-distance",
-                class_name="min-w-0 flex-1 whitespace-nowrap text-center text-[11px] font-bold text-black",
-            ),
-            rx.el.span(
-                ui("Any"),
-                class_name="shrink-0 whitespace-nowrap text-right text-[11px] font-bold text-black",
-            ),
-            class_name="mb-1 flex w-full min-w-0 items-baseline justify-between gap-1 whitespace-nowrap",
-        ),
+        layout.distance_row(distance_filter_label(), "gah-discover-distance"),
         rx.el.input(
             id="gah-discover-distance",
             type="range",
@@ -275,12 +248,11 @@ def distance_filter_block(compact: bool = False) -> rx.Component:
             },
             class_name=rx.cond(
                 compact,
-                "gah-distance-range -translate-y-1 h-8 w-full min-w-0 touch-none cursor-pointer appearance-none bg-transparent outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]",
+                layout.RANGE_CLASS,
                 "gah-distance-range -translate-y-1 h-10 w-full min-w-0 touch-none cursor-pointer appearance-none bg-transparent outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]",
             ),
         ),
-        style=INDENT_STYLE,
-        class_name="w-full",
+        class_name=layout.DISTANCE_SPACING_CLASS,
     )
 
 
@@ -297,8 +269,8 @@ def sheet_view_button(value: str, icon: str, description: str) -> rx.Component:
         on_click=lambda: DiscoveryState.set_view_mode(value),
         class_name=rx.cond(
             DiscoveryState.view_mode == value,
-            "gah-segment-control flex size-7 shrink-0 items-center justify-center rounded-full bg-[#fba922] text-[#000000]",
-            "gah-segment-control flex size-7 shrink-0 items-center justify-center rounded-full text-[#404040] transition-colors hover:text-[#000000]",
+            layout.VIEW_ON_CLASS,
+            layout.VIEW_OFF_CLASS,
         ),
     )
 
@@ -329,7 +301,6 @@ def show_my_location_block(compact: bool = False) -> rx.Component:
         rx.cond(
             compact, location_selection(compact=True), location_selection()
         ),
-        style=INDENT_STYLE,
         class_name="w-full",
     )
 
@@ -341,7 +312,7 @@ def sheet_view_toggle() -> rx.Component:
         role="group",
         aria_label=ui("Switch between map view and list view"),
         custom_attrs={"data-tour-target": "view-toggle"},
-        class_name="gah-segment-group flex h-7 shrink-0 items-center gap-0 rounded-full border border-[#d4d4d4] bg-white p-0",
+        class_name=layout.VIEW_GROUP_CLASS,
     )
 
 
@@ -391,21 +362,10 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                         aria_label=ui(
                             "Filter people requesting help, or people offering help"
                         ),
-                        class_name="gah-segment-group flex h-[31px] shrink-0 items-center gap-0 rounded-full border border-[#d4d4d4] bg-white p-0",
+                        class_name=layout.MODE_GROUP_CLASS,
                     ),
-                    class_name=rx.cond(
-                        compact,
-                        "order-1 flex items-center justify-center",
-                        "absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center",
-                    ),
-                ),
-                rx.el.div(
                     sheet_view_toggle(),
-                    class_name=rx.cond(
-                        compact,
-                        "order-2 flex items-center",
-                        "order-none flex items-center",
-                    ),
+                    class_name=layout.HEADER_TOGGLES_CLASS,
                 ),
                 rx.el.span(
                     ui("Search filters"),
@@ -419,13 +379,9 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                     aria_label=ui("Close Search filters"),
                     id="gah-map-filter-close",
                     on_click=DiscoveryState.close_filters,
-                    class_name="ml-auto flex size-8 shrink-0 items-center justify-center rounded-full bg-[#fff7e8] text-[#b86e08] transition-colors hover:bg-[#ffedcc] focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]",
+                    class_name=layout.CLOSE_CLASS,
                 ),
-                class_name=rx.cond(
-                    compact,
-                    "relative flex min-h-8 w-full items-center justify-start gap-1.5",
-                    "relative flex min-h-8 w-full items-center justify-between gap-1.5",
-                ),
+                class_name=layout.HEADER_CLASS,
             ),
             rx.el.div(
                 rx.el.div(
@@ -439,7 +395,7 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                             key=WorldSearchState.query,
                             class_name=rx.cond(
                                 compact,
-                                "gah-search-inner gah-filter-field min-w-0 flex-1 h-9 rounded-xl border-0 bg-transparent px-3 text-sm font-medium text-[#404040] placeholder:text-[#404040] outline-hidden focus-visible:outline-none!",
+                                layout.SEARCH_INPUT_CLASS,
                                 "gah-search-inner gah-filter-field min-w-0 flex-1 h-10 rounded-xl border-0 bg-transparent px-3.5 text-sm font-medium text-[#404040] placeholder:text-[#404040] outline-hidden focus-visible:outline-none!",
                             ),
                         ),
@@ -449,7 +405,7 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                         ],
                         class_name=rx.cond(
                             compact,
-                            "gah-search-form flex h-9 w-full items-center rounded-xl border border-gray-300 bg-white focus-within:border-[#fba922]",
+                            layout.SEARCH_FORM_CLASS,
                             "gah-search-form flex h-10 w-full items-center rounded-xl border border-gray-300 bg-white focus-within:border-[#fba922]",
                         ),
                     ),
@@ -477,7 +433,7 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                             aria_label=ui("Filter by reward"),
                             class_name=rx.cond(
                                 compact,
-                                "gah-filter-field h-9 w-full appearance-none cursor-pointer rounded-xl border border-gray-300 bg-white px-3 pr-9 text-sm font-medium text-[#404040] outline-hidden transition-colors focus:border-[#fba922] focus:ring-2 focus:ring-[#fba922]/30",
+                                layout.SELECT_CLASS,
                                 "gah-filter-field h-10 w-full appearance-none cursor-pointer rounded-xl border border-gray-300 bg-white px-3.5 pr-9 text-sm font-medium text-[#404040] outline-hidden transition-colors focus:border-[#fba922] focus:ring-2 focus:ring-[#fba922]/30",
                             ),
                         )
@@ -486,14 +442,10 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                 ),
                 rx.el.div(
                     show_my_location_block(compact=compact),
-                    class_name="-mt-[6px] w-full",
+                    class_name=layout.LOCATION_SPACING_CLASS,
                 ),
                 distance_filter_block(compact=compact),
-                class_name=rx.cond(
-                    compact,
-                    "mt-1 grid grid-cols-1 gap-1.5 w-full",
-                    "mt-2 grid grid-cols-1 gap-2.5 w-full",
-                ),
+                class_name=layout.BODY_CLASS,
             ),
             advanced_filters_block(),
             rx.el.div(
@@ -508,7 +460,7 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                     disabled=SavedSearchState.is_saving,
                     aria_label=ui("Save these search filters as an alert"),
                     on_click=SavedSearchState.save_current_search,
-                    class_name="w-fit flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-semibold text-[#6b7280] transition-colors hover:bg-white hover:text-[#b86e08] disabled:opacity-60 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]/40",
+                    class_name=layout.FOOTER_BUTTON_CLASS,
                 ),
                 rx.el.button(
                     rx.icon("x", class_name="h-3 w-3"),
@@ -520,13 +472,9 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                         | DiscoveryState.distance_warning
                     ),
                     on_click=DiscoveryState.clear_filters,
-                    class_name="w-fit flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-semibold text-[#6b7280] transition-colors enabled:hover:bg-white enabled:hover:text-[#b86e08] disabled:opacity-60 disabled:cursor-not-allowed focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]/40",
+                    class_name=layout.FOOTER_BUTTON_CLASS,
                 ),
-                class_name=rx.cond(
-                    compact,
-                    "flex flex-wrap items-center justify-between gap-1",
-                    "flex flex-wrap items-center justify-center gap-2",
-                ),
+                class_name=layout.FOOTER_CLASS,
             ),
             rx.cond(
                 SavedSearchState.error,
@@ -546,11 +494,7 @@ def filter_drawer(class_name: str, compact: bool = False) -> rx.Component:
                 ),
                 rx.fragment(),
             ),
-            class_name=rx.cond(
-                compact,
-                "flex flex-col gap-1.5 font-['Inter'] [&_button]:text-sm [&_input]:text-sm [&_select]:text-sm [&_button_span]:text-sm [&_label]:text-[13px] [&_p]:text-xs [&_span[role=status]]:text-[13px]",
-                "flex flex-col gap-2.5 font-['Inter'] [&_button]:text-sm [&_input]:text-sm [&_select]:text-sm [&_button_span]:text-sm [&_label]:text-[13px] [&_p]:text-xs [&_span[role=status]]:text-[13px]",
-            ),
+            class_name=layout.CONTENT_CLASS,
         ),
         role="dialog",
         aria_label=ui("Search filters"),

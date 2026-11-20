@@ -8,6 +8,7 @@ from app.components import (
     discover_panel,
     map_utility_icon,
     member_map,
+    filter_layout,
 )
 
 
@@ -21,14 +22,14 @@ class CompactMemberMapFilterTests(unittest.TestCase):
             "w-[calc(100vw-1rem)]",
             "max-w-[23.75rem]",
             "overflow-y-auto overscroll-contain",
-            "bg-[#f4f7ff]",
+            "bg-white/80",
             "compact=True",
         ):
-            self.assertIn(token, sheet)
+            self.assertIn(token, f"{sheet} {filter_layout.DRAWER_CLASS}")
         for token in (
             'sheet_mode_button(\n                            "Go"',
             "sheet_view_toggle()",
-            'aria_label="Close Search filters"',
+            'aria_label=ui("Close Search filters")',
             'name="world_search"',
             "category_multiselect(compact)",
             "DiscoveryState.reward_filter_options",
@@ -45,7 +46,7 @@ class CompactMemberMapFilterTests(unittest.TestCase):
         )
         self.assertLess(
             drawer.index("sheet_view_toggle()"),
-            drawer.index('aria_label="Close Search filters"'),
+            drawer.index('aria_label=ui("Close Search filters")'),
         )
         self.assertTrue(member_map.member_filter_sheet().render())
 

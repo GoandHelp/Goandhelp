@@ -7,7 +7,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from test_utils import run_event
-from app.components import guest_map, guest_filters
+from app.components import guest_map, guest_filters, filter_layout
 from app.components.openfreemap import _MAP_COMPONENT
 from app.filter_categories import expand_category_tokens
 from app.models import HELP_MODE_OFFER, HELP_MODE_BOTH, TASK_CATEGORIES
@@ -246,7 +246,7 @@ class GuestMapFilterTests(unittest.IsolatedAsyncioTestCase):
             "on_change=GuestMapState.set_reward_filter",
             "on_click=GuestMapState.clear_filters",
             "on_click=GuestMapState.open_join_prompt",
-            "disabled=True",
+            "GuestMapState.gate_distance_filter.throttle(100)",
             "gah-guest-filter-close",
             "gah-guest-filter-open",
             "Escape",
@@ -255,9 +255,9 @@ class GuestMapFilterTests(unittest.IsolatedAsyncioTestCase):
             "overflow-y-auto",
             "3.875rem",
             "max-w-[23.75rem]",
-            "bg-[#f4f8ff]",
+            "bg-white/80",
         ):
-            self.assertIn(token, source)
+            self.assertIn(token, f"{source} {filter_layout.DRAWER_CLASS}")
         self.assertNotIn("DiscoveryState", source)
         self.assertNotIn("geolocation", source)
         self.assertNotIn("guest-map-language", source)

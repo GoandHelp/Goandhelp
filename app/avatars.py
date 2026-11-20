@@ -1,23 +1,23 @@
 import reflex as rx
 
-ANIMAL_AVATARS: tuple[str, ...] = (
-    "/face_apricot_1.png",
-    "/face_sage_1.png",
-    "/face_1_single.png",
-    "/face_cream_1.png",
+from urllib.parse import quote
+
+USER_AVATAR_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">'
+    '<rect width="64" height="64" fill="#fff7e8"/>'
+    '<circle cx="32" cy="21" r="11" fill="#404040"/>'
+    '<path d="M10 56 A22 22 0 0 1 54 56 Z" fill="#404040"/>'
+    "</svg>"
 )
+USER_AVATAR = f"data:image/svg+xml,{quote(USER_AVATAR_SVG, safe='')}"
+ANIMAL_AVATARS: tuple[str, ...] = (USER_AVATAR,)
 
 
 def animal_avatar(seed: str | rx.Var[str]) -> str | rx.Var[str]:
-    """Stable local fox, owl, cat or dog; never include a seed in a URL."""
+    """Compatibility fallback: one standard user silhouette, independent of seed."""
     if isinstance(seed, rx.Var):
-        return rx.Var(
-            _js_expr=f"{list(ANIMAL_AVATARS)!r}[Array.from(String({str(seed)} ?? '').includes('@') ? 'member' : String({str(seed)} ?? '')).reduce((n, c) => (n + c.codePointAt(0)) % 4, 0)]",
-            _var_type=str,
-            _var_data=seed._get_all_var_data(),
-        ).to(str)
-    safe_seed = "member" if "@" in seed else seed
-    return ANIMAL_AVATARS[sum(ord(char) for char in safe_seed) % 4]
+        return rx.Var.create(USER_AVATAR)
+    return USER_AVATAR
 
 
 def member_avatar(

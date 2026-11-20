@@ -1,6 +1,7 @@
 import reflex as rx
 
 from app.interface_i18n import ui
+from app.components import filter_layout as layout
 
 from app.components.geolocation import geolocation_request
 from app.states.profile_state import ProfileState
@@ -36,8 +37,8 @@ def location_tap(
             label,
             class_name=rx.cond(
                 value == "hidden",
-                "whitespace-nowrap text-black",
-                "whitespace-nowrap",
+                "min-w-0 text-black [overflow-wrap:anywhere]",
+                "min-w-0 [overflow-wrap:anywhere]",
             ),
         ),
         type="button",
@@ -56,12 +57,12 @@ def location_tap(
             ProfileState.location_mode == value,
             rx.cond(
                 compact,
-                "gah-segment-control flex flex-1 shrink-0 basis-auto items-center justify-center gap-1 rounded-lg bg-[#fba922] px-2 py-1.5 text-[11px] font-bold text-[#111827] transition-colors disabled:opacity-60 outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]/40",
+                layout.LOCATION_ON_CLASS,
                 LOCATION_TAP_ON,
             ),
             rx.cond(
                 compact,
-                "gah-segment-control flex flex-1 shrink-0 basis-auto items-center justify-center gap-1 rounded-lg bg-transparent px-2 py-1.5 text-[11px] font-bold text-[#404040] transition-colors hover:bg-white disabled:opacity-60 outline-hidden focus-visible:ring-2 focus-visible:ring-[#e08b12]/40",
+                layout.LOCATION_OFF_CLASS,
                 LOCATION_TAP_OFF,
             ),
         ),
@@ -81,7 +82,7 @@ def location_selection(compact: bool = False) -> rx.Component:
                     rx.cond(compact, ui("My location"), ui("Show my location")),
                     class_name=rx.cond(
                         compact,
-                        "text-xs font-semibold text-[#404040]",
+                        layout.LOCATION_LABEL_CLASS,
                         "text-[13px] font-bold text-[#111827]",
                     ),
                 ),
@@ -100,13 +101,13 @@ def location_selection(compact: bool = False) -> rx.Component:
                 aria_label=ui("Show my location"),
                 class_name=rx.cond(
                     compact,
-                    "gah-segment-group flex min-w-fit flex-1 flex-row flex-wrap items-stretch gap-1 rounded-xl bg-white/80 p-0.5",
+                    layout.LOCATION_GROUP_CLASS,
                     "gah-segment-group flex w-full flex-row items-stretch gap-1 rounded-2xl border border-[#d4d4d4] bg-white p-1",
                 ),
             ),
             class_name=rx.cond(
                 compact,
-                "flex w-full flex-wrap items-center justify-start gap-x-2 gap-y-1.5",
+                layout.LOCATION_ROW_CLASS,
                 "flex flex-col w-full items-center",
             ),
         ),

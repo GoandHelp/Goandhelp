@@ -442,13 +442,14 @@ class ForumMonthAndAvatarTests(unittest.TestCase):
         self.assertEqual(
             animal_avatar("private@example.test"), animal_avatar("member")
         )
-        for path in ANIMAL_AVATARS:
-            self.assertTrue(Path("assets", path.lstrip("/")).is_file())
+        self.assertEqual(len(ANIMAL_AVATARS), 1)
+        self.assertTrue(ANIMAL_AVATARS[0].startswith("data:image/svg+xml,"))
 
     def test_var_helper_compiles_and_photos_take_precedence(self):
         result = animal_avatar(AuthState.subscriber_id)
         self.assertIsInstance(result, rx.Var)
-        self.assertIn("codePointAt", str(result))
+        self.assertIn("data:image/svg+xml,", str(result))
+        self.assertNotIn("codePointAt", str(result))
         self.assertNotIn("dicebear", str(result))
         self.assertEqual(
             member_avatar("photo.webp", "member-9"), "/_upload/photo.webp"

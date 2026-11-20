@@ -9,6 +9,7 @@ controls.
 import reflex as rx
 
 from app.interface_i18n import ui
+from app.components import filter_layout as layout
 
 from app.components.discover_panel import (
     filter_drawer,
@@ -232,7 +233,7 @@ def member_filter_sheet() -> rx.Component:
     return rx.cond(
         DiscoveryState.filter_panel_open,
         filter_drawer(
-            "gah-search-drawer pointer-events-auto fixed right-2 bottom-[calc(3.875rem+env(safe-area-inset-bottom))] z-30 flex w-[calc(100vw-1rem)] max-w-[23.75rem] max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom))] min-h-0 flex-col overflow-y-auto overscroll-contain rounded-tl-2xl border-0 bg-[#f4f7ff] p-3 font-['Inter'] text-[#404040] backdrop-blur-sm",
+            layout.DRAWER_CLASS,
             compact=True,
         ),
         rx.fragment(),

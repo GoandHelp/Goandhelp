@@ -441,6 +441,14 @@ class GuestMapState(rx.State):
         self.wall_reason = "Browse job titles as a visitor. Join or sign in to unlock job details."
 
     @rx.event
+    def gate_distance_filter(self, value: str):
+        yield rx.call_script(
+            "const slider = document.getElementById('gah-guest-distance'); if (slider) slider.value = '0';"
+        )
+        if value != "0":
+            yield GuestMapState.open_join_prompt
+
+    @rx.event
     def open_wall(self, reason: str):
         self.wall_open = True
         self.wall_reason = reason
