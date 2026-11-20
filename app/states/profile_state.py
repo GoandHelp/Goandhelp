@@ -37,6 +37,7 @@ from app.states.messaging_state import (
     review_released_sql,
 )
 from app.verification import public_base_url
+from app.interface_i18n import translate
 
 
 # Shared map-pin picker panel key for the Profile location disclosure.
@@ -1340,7 +1341,10 @@ class ProfileState(rx.State):
             self.skills = other
             self.is_saving = False
             self.success = "Skills and knowledge saved."
-        yield rx.toast("Skills and knowledge saved.", duration=3000)
+            language = (await self.get_state(AuthState)).preferred_language
+        yield rx.toast(
+            translate(language, "Skills and knowledge saved."), duration=3000
+        )
 
     @rx.event(background=True)
     async def change_password(self, form_data: dict[str, Any]):
@@ -2445,7 +2449,10 @@ SELECT a.id, a.post_id, a.helper_id, p.title,
             self.success = "Profile details saved."
             auth = await self.get_state(AuthState)
             auth.phone = phone
-        yield rx.toast("Profile details saved.", duration=3000)
+            language = auth.preferred_language
+        yield rx.toast(
+            translate(language, "Profile details saved."), duration=3000
+        )
 
     @rx.event(background=True)
     async def save_area(self, form_data: dict[str, Any]):

@@ -200,6 +200,10 @@ from app.interface_catalog_profile_membership import (
     PROFILE_MEMBERSHIP_CATALOGS,
     PROFILE_MEMBERSHIP_KEYS,
 )
+from app.interface_catalog_profile_forms import (
+    PROFILE_FORM_CATALOGS,
+    PROFILE_FORM_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -696,6 +700,7 @@ for _catalogs in (
     HELP_HUB_FEEDBACK_CATALOGS,
     REQUEST_COUNT_CATALOGS,
     PROFILE_MEMBERSHIP_CATALOGS,
+    PROFILE_FORM_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -775,6 +780,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *HELP_HUB_FEEDBACK_KEYS,
             *REQUEST_COUNT_KEYS,
             *PROFILE_MEMBERSHIP_KEYS,
+            *PROFILE_FORM_KEYS,
             "clear",
             "optional",
         ]

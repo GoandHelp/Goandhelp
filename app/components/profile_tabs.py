@@ -2,6 +2,10 @@ import reflex as rx
 from app.avatars import animal_avatar
 from reflex.style import set_color_mode
 from app.interface_i18n import ui, ui_template
+from app.components.profile_form_feedback import (
+    localized_profile_form_message,
+    localized_profile_skills_summary,
+)
 
 from app.components.disclosure import disclosure_arrow
 
@@ -509,7 +513,7 @@ def sign_out_action() -> rx.Component:
 
 def disclosure_header(
     title: str,
-    subtitle: rx.Var[str] | str,
+    subtitle: rx.Var[str] | str | rx.Component,
     icon: str,
     open_var: rx.Var[bool],
     on_click: rx.event.EventType,
@@ -523,11 +527,11 @@ def disclosure_header(
         rx.el.span(
             rx.el.span(
                 ui(title),
-                class_name="block text-left text-lg font-bold tracking-tight text-[#111827]",
+                class_name="block text-start text-lg font-bold tracking-tight text-[#111827]",
             ),
             rx.el.span(
                 subtitle,
-                class_name="mt-0.5 block text-left text-xs font-medium leading-relaxed text-[#4b5563]",
+                class_name="mt-0.5 block text-start text-xs font-medium leading-relaxed text-[#4b5563]",
             ),
             class_name="min-w-0 flex-1",
         ),
@@ -545,7 +549,7 @@ def my_information_section() -> rx.Component:
     return rx.el.section(
         disclosure_header(
             "My information",
-            "Handle, Phone, Email, Bio, Languages, Password",
+            ui("Handle, Phone, Email, Bio, Languages, Password"),
             "notebook-pen",
             ProfileState.information_open,
             ProfileState.toggle_information,
@@ -569,7 +573,10 @@ def skills_knowledge_section() -> rx.Component:
     return rx.el.section(
         disclosure_header(
             "My Skills",
-            ProfileState.skills_summary,
+            localized_profile_skills_summary(
+                ProfileState.selected_category_labels,
+                ProfileState.skill_list.length(),
+            ),
             "wrench",
             ProfileState.skills_open,
             ProfileState.toggle_skills,
@@ -580,7 +587,7 @@ def skills_knowledge_section() -> rx.Component:
             rx.el.form(
                 rx.el.div(
                     rx.el.p(
-                        "Select what you can help with",
+                        ui("Select what you can help with"),
                         class_name="w-full text-center text-sm font-semibold text-[#111827]",
                     ),
                     rx.el.div(
@@ -597,7 +604,7 @@ def skills_knowledge_section() -> rx.Component:
                         rx.foreach(
                             ProfileState.selected_category_labels,
                             lambda label: rx.el.span(
-                                label,
+                                ui(label),
                                 class_name="w-fit rounded-full border border-[#fba922] bg-white px-3 py-1 text-xs font-semibold text-black",
                             ),
                         ),
@@ -615,7 +622,10 @@ def skills_knowledge_section() -> rx.Component:
                         default_value=ProfileState.skills,
                         key=ProfileState.skills,
                         rows="3",
-                        placeholder="Plumber, Electrician, Hairdresser, Dentist, Tailor...",
+                        placeholder=ui(
+                            "Plumber, Electrician, Hairdresser, Dentist, Tailor..."
+                        ),
+                        aria_label=ui("Other Skills"),
                         class_name=INPUT_CLASS + " resize-y leading-relaxed",
                     ),
                     class_name="w-full",
@@ -630,7 +640,7 @@ def skills_knowledge_section() -> rx.Component:
                         ),
                         rx.el.span(
                             rx.icon("check", class_name="h-4 w-4"),
-                            "Save skills and knowledge",
+                            ui("Save skills and knowledge"),
                             class_name="flex items-center justify-center gap-2",
                         ),
                     ),
@@ -640,6 +650,7 @@ def skills_knowledge_section() -> rx.Component:
                 ),
                 on_submit=ProfileState.save_skills,
                 reset_on_submit=False,
+                dir=AuthState.interface_direction,
                 id="gah-my-skills",
                 class_name="mt-4 flex flex-col gap-4 w-full",
             ),
@@ -1260,6 +1271,7 @@ def details_tab() -> rx.Component:
                         default_value=ProfileState.username,
                         key=ProfileState.username,
                         placeholder="maya.lisbon",
+                        aria_label=ui("Public handle"),
                         class_name=INPUT_CLASS,
                     ),
                     class_name="w-full",
@@ -1273,6 +1285,7 @@ def details_tab() -> rx.Component:
                     default_value=AuthState.phone,
                     key=AuthState.phone,
                     placeholder="+351 900 000 000",
+                    aria_label=ui("Phone"),
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full md:w-1/2",
@@ -1285,7 +1298,8 @@ def details_tab() -> rx.Component:
                     default_value=ProfileState.home_country,
                     key=ProfileState.home_country,
                     max_length=100,
-                    placeholder="Country",
+                    placeholder=ui("Country"),
+                    aria_label=ui("Country"),
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full md:w-1/2",
@@ -1294,7 +1308,7 @@ def details_tab() -> rx.Component:
                 AuthState.is_signed_in,
                 rx.el.div(
                     rx.el.label(
-                        "Email",
+                        ui("Email"),
                         html_for="profile-private-email",
                         class_name="block text-sm font-semibold text-[#111827]",
                     ),
@@ -1305,10 +1319,13 @@ def details_tab() -> rx.Component:
                         key=AuthState.email,
                         read_only=True,
                         aria_describedby="profile-private-email-help",
+                        aria_label=ui("Email"),
                         class_name=INPUT_CLASS,
                     ),
                     rx.el.p(
-                        "Private — only visible to you. Your email cannot be edited here.",
+                        ui(
+                            "Private — only visible to you. Your email cannot be edited here."
+                        ),
                         id="profile-private-email-help",
                         class_name="mt-1 text-sm text-[#4b5563]",
                     ),
@@ -1323,7 +1340,10 @@ def details_tab() -> rx.Component:
                     default_value=ProfileState.bio,
                     key=ProfileState.bio,
                     rows="5",
-                    placeholder="I.e. I'm a Photographer travelling Asia, happy to help others in exchange for a accommodation...",
+                    placeholder=ui(
+                        "I.e. I'm a Photographer travelling Asia, happy to help others in exchange for a accommodation..."
+                    ),
+                    aria_label=ui("Biography"),
                     class_name=INPUT_CLASS + " resize-y leading-relaxed",
                 ),
                 class_name="w-full",
@@ -1335,7 +1355,8 @@ def details_tab() -> rx.Component:
                         name="languages",
                         default_value=ProfileState.languages,
                         key=ProfileState.languages,
-                        placeholder="English, Portuguese, Spanish",
+                        placeholder=ui("English, Portuguese, Spanish"),
+                        aria_label=ui("Languages"),
                         class_name=INPUT_CLASS,
                     ),
                     class_name="w-full",
@@ -1352,6 +1373,7 @@ def details_tab() -> rx.Component:
             save_changes_button(),
             on_submit=ProfileState.save_details,
             reset_on_submit=False,
+            dir=AuthState.interface_direction,
             class_name="flex flex-col gap-[17px] w-full",
         ),
         change_password_form(),
@@ -1480,7 +1502,7 @@ def category_chip(category: str) -> rx.Component:
             rx.icon("check", class_name="h-3.5 w-3.5"),
             rx.icon("plus", class_name="h-3.5 w-3.5"),
         ),
-        CATEGORY_LABELS.get(category, category.replace("_", " ").title()),
+        ui(CATEGORY_LABELS.get(category, category.replace("_", " ").title())),
         type="button",
         on_click=lambda: ProfileState.toggle_category(category),
         class_name=rx.cond(
@@ -1656,8 +1678,10 @@ def loading_skeleton() -> rx.Component:
 def profile_screen() -> rx.Component:
     return rx.el.div(
         identity_passport(),
-        error_banner(ProfileState.error),
-        success_banner(ProfileState.success, centered=True),
+        error_banner(localized_profile_form_message(ProfileState.error)),
+        success_banner(
+            localized_profile_form_message(ProfileState.success), centered=True
+        ),
         rx.el.div(
             my_information_section(),
             skills_knowledge_section(),
