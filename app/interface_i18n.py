@@ -70,6 +70,10 @@ from app.interface_catalog_search_filters import (
     SEARCH_FILTER_KEYS,
 )
 from app.interface_catalog_admin_ui import ADMIN_UI_CATALOGS, ADMIN_UI_KEYS
+from app.interface_catalog_admin_remainder import (
+    ADMIN_REMAINDER_CATALOGS,
+    ADMIN_REMAINDER_KEYS,
+)
 from app.interface_catalog_map_status import (
     MAP_STATUS_CATALOGS,
     MAP_STATUS_KEYS,
@@ -690,6 +694,10 @@ for _language, _entries in ADMIN_UI_CATALOGS.items():
     for _key, _value in _entries.items():
         CATALOGS[_language].setdefault(_key, _value)
 
+for _language, _entries in ADMIN_REMAINDER_CATALOGS.items():
+    for _key, _value in _entries.items():
+        CATALOGS[_language].setdefault(_key, _value)
+
 for _language, _entries in MAP_STATUS_CATALOGS.items():
     for _key, _value in _entries.items():
         CATALOGS[_language].setdefault(_key, _value)
@@ -782,6 +790,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *EVENT_KEYS,
             *SEARCH_FILTER_KEYS,
             *ADMIN_UI_KEYS,
+            *ADMIN_REMAINDER_KEYS,
             *MAP_STATUS_KEYS,
             *SHARED_INTERFACE_KEYS,
             *INBOX_CONTACT_KEYS,
