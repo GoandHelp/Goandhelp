@@ -441,6 +441,8 @@ async def create_checkout_session(
             stripe.checkout.Session.create,
             api_key=key,
             mode="subscription",
+            # Use standard Stripe Checkout/Billing regardless of the account Managed Payments default.
+            managed_payments={"enabled": False},
             customer=customer_id,
             client_reference_id=str(subscriber_id),
             success_url=checkout_success_url(base_url),
