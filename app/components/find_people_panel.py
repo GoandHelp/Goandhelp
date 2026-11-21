@@ -46,7 +46,7 @@ def search_panel() -> rx.Component:
             rx.el.div(
                 rx.icon("search", class_name="h-4 w-4 text-[#e08b12]"),
                 rx.el.h3(
-                    "Find fellow travellers",
+                    ui("Find fellow travellers"),
                     class_name="text-sm font-bold text-[#111827]",
                 ),
                 class_name="flex items-center gap-2",
@@ -54,8 +54,12 @@ def search_panel() -> rx.Component:
             rx.el.span(
                 rx.cond(
                     ContactsState.has_searched,
-                    f"{ContactsState.search_results.length()} on the board",
-                    "Search by name or city",
+                    ui_template(
+                        "{count} on the board",
+                        "count",
+                        ContactsState.search_results.length().to_string(),
+                    ),
+                    ui("Search by name or city"),
                 ),
                 class_name="w-fit rounded-full bg-[#fff7e8] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#e08b12]",
             ),
@@ -100,7 +104,9 @@ def search_panel() -> rx.Component:
         ),
         rx.el.div(
             rx.el.p(
-                "Neighbours are listed with the most kindness points first.",
+                ui(
+                    "Neighbours are listed with the most kindness points first."
+                ),
                 class_name="text-xs font-medium text-[#4b5563]",
             ),
             rx.el.div(
@@ -116,7 +122,7 @@ def search_panel() -> rx.Component:
                 ),
                 rx.el.button(
                     rx.icon("refresh-cw", class_name="h-3.5 w-3.5"),
-                    "Refresh board",
+                    ui("Refresh board"),
                     type="button",
                     on_click=[
                         ContactsState.search_people,
@@ -132,10 +138,32 @@ def search_panel() -> rx.Component:
     )
 
 
+def localized_person_status(status: rx.Var[str]) -> rx.Var[str]:
+    return rx.match(
+        status,
+        (
+            "Request sent — waiting for a reply",
+            ui("Request sent — waiting for a reply"),
+        ),
+        (
+            "They'd like to connect with you",
+            ui("They'd like to connect with you"),
+        ),
+        ("Already in your contacts", ui("Already in your contacts")),
+        (
+            "Request was declined — you can ask again",
+            ui("Request was declined — you can ask again"),
+        ),
+        ("You were contacts before", ui("You were contacts before")),
+        ("Not connected yet", ui("Not connected yet")),
+        status,
+    ).to(str)
+
+
 def status_note(person: dict[str, str]) -> rx.Component:
     return rx.el.span(
         rx.icon("info", class_name="h-3 w-3"),
-        person["status_label"],
+        localized_person_status(person["status_label"]),
         class_name=rx.cond(
             person["is_contact"],
             "w-fit flex items-center gap-1.5 rounded-full bg-[#fba922] px-2.5 py-1 text-[11px] font-semibold text-[#111827]",
@@ -152,7 +180,7 @@ def detail_row(icon: str, label: str, value: rx.Var[str]) -> rx.Component:
         ),
         rx.el.div(
             rx.el.p(
-                label,
+                ui(label),
                 class_name="text-[10px] font-bold uppercase tracking-wide text-[#4b5563]",
             ),
             rx.el.p(
@@ -174,7 +202,9 @@ def request_form(person: dict[str, str]) -> rx.Component:
             rx.el.textarea(
                 name="note",
                 rows="3",
-                placeholder="Hi! I'm in town for a fortnight and would love to swap language practice for a bike repair lesson.",
+                placeholder=ui(
+                    "Hi! I'm in town for a fortnight and would love to swap language practice for a bike repair lesson."
+                ),
                 class_name=INPUT_CLASS + " resize-y leading-relaxed",
             ),
             class_name="w-full",
@@ -189,7 +219,9 @@ def request_form(person: dict[str, str]) -> rx.Component:
                 ),
                 rx.el.span(
                     rx.icon("user-round-plus", class_name="h-4 w-4"),
-                    f"Send contact request to {person['name']}",
+                    ui_template(
+                        "Send contact request to {name}", "name", person["name"]
+                    ),
                     class_name="flex items-center justify-center gap-2",
                 ),
             ),
@@ -209,17 +241,21 @@ def person_details(person: dict[str, str]) -> rx.Component:
             detail_row(
                 "map-pin",
                 "Based in",
-                rx.cond(person["city"], person["city"], "City not shared yet"),
+                rx.cond(
+                    person["city"], person["city"], ui("City not shared yet")
+                ),
             ),
             detail_row(
                 "languages",
                 "Languages",
-                rx.cond(person["languages"], person["languages"], "Not listed"),
+                rx.cond(
+                    person["languages"], person["languages"], ui("Not listed")
+                ),
             ),
             detail_row(
                 "wrench",
                 "Skills",
-                rx.cond(person["skills"], person["skills"], "Not listed"),
+                rx.cond(person["skills"], person["skills"], ui("Not listed")),
             ),
             detail_row(
                 "clock",
@@ -227,7 +263,7 @@ def person_details(person: dict[str, str]) -> rx.Component:
                 rx.cond(
                     person["availability"],
                     person["availability"],
-                    "Ask them directly",
+                    ui("Ask them directly"),
                 ),
             ),
             class_name="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full rounded-2xl border border-[#e5e5e5] bg-[#ffffff] p-4",
@@ -236,7 +272,7 @@ def person_details(person: dict[str, str]) -> rx.Component:
             person["can_request"],
             request_form(person),
             rx.el.p(
-                person["status_label"],
+                localized_person_status(person["status_label"]),
                 class_name="text-sm font-medium text-[#4b5563]",
             ),
         ),
@@ -245,7 +281,7 @@ def person_details(person: dict[str, str]) -> rx.Component:
                 REPORT_TARGET_PROFILE,
                 person["id"],
                 person["name"],
-                "Report profile",
+                ui("Report profile"),
             ),
             class_name="w-full",
         ),
@@ -260,6 +296,9 @@ def person_card(person: dict[str, str]) -> rx.Component:
                 member_avatar(person["avatar_path"], person["avatar_seed"]),
                 person["verified"],
                 "size-14 rounded-full border-2 border-white bg-[#fff7e8] shrink-0",
+                accessible_label=ui_template(
+                    "Open the profile of {name}", "name", person["name"]
+                ),
             ),
             rx.el.div(
                 rx.el.p(
@@ -273,7 +312,7 @@ def person_card(person: dict[str, str]) -> rx.Component:
                         class_name="text-sm font-medium text-[#4b5563] mt-1 leading-relaxed line-clamp-2",
                     ),
                     rx.el.p(
-                        "A Go and Help neighbour with a story to swap.",
+                        ui("A Go and Help neighbour with a story to swap."),
                         class_name="text-sm font-medium text-[#4b5563] mt-1 italic",
                     ),
                 ),
@@ -309,8 +348,8 @@ def person_card(person: dict[str, str]) -> rx.Component:
                 ui_template(
                     rx.cond(
                         person["kindness"].to(int) == 1,
-                        "{count} kindness point",
-                        "{count} kindness points",
+                        ui("{count} kindness point"),
+                        ui("{count} kindness points"),
                     ),
                     "count",
                     person["kindness"].to(int).to_string(),
@@ -324,8 +363,8 @@ def person_card(person: dict[str, str]) -> rx.Component:
                     ui_template_multi(
                         rx.cond(
                             person["reviews"].to(int) == 1,
-                            "{rating} · {count} review",
-                            "{rating} · {count} reviews",
+                            ui("{rating} · {count} review"),
+                            ui("{rating} · {count} reviews"),
                         ),
                         {
                             "rating": f"{person['rating'].to(float):.1f}",
@@ -336,7 +375,7 @@ def person_card(person: dict[str, str]) -> rx.Component:
                 ),
                 rx.el.span(
                     rx.icon("heart-handshake", class_name="h-3 w-3"),
-                    "New to Go and Help",
+                    ui("New to Go and Help"),
                     class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-2.5 py-1 text-[11px] font-semibold text-[#e08b12]",
                 ),
             ),
@@ -361,8 +400,8 @@ def person_card(person: dict[str, str]) -> rx.Component:
                 ),
                 rx.cond(
                     FindPeopleState.expanded_id == person["id"],
-                    "Hide profile",
-                    "View profile details",
+                    ui("Hide profile"),
+                    ui("View profile details"),
                 ),
                 type="button",
                 on_click=lambda: FindPeopleState.toggle_expanded(person["id"]),
@@ -386,7 +425,7 @@ def person_card(person: dict[str, str]) -> rx.Component:
                 person["can_respond"],
                 rx.el.button(
                     rx.icon("check", class_name="h-3.5 w-3.5"),
-                    "Accept their request",
+                    ui("Accept their request"),
                     type="button",
                     disabled=ContactsState.is_responding,
                     on_click=lambda: ContactsState.accept_request(
@@ -400,7 +439,7 @@ def person_card(person: dict[str, str]) -> rx.Component:
                 person["is_contact"],
                 rx.el.span(
                     rx.icon("circle-check-big", class_name="h-3.5 w-3.5"),
-                    "Already contacts",
+                    ui("Already contacts"),
                     class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fba922] px-3.5 py-2 text-xs font-semibold text-[#111827]",
                 ),
                 rx.fragment(),
@@ -409,7 +448,7 @@ def person_card(person: dict[str, str]) -> rx.Component:
                 REPORT_TARGET_PROFILE,
                 person["id"],
                 person["name"],
-                "Report",
+                ui("Report"),
             ),
             class_name="flex flex-wrap items-center gap-2 mt-4",
         ),
@@ -445,12 +484,13 @@ def start_state() -> rx.Component:
             class_name="flex items-center justify-center size-12 rounded-2xl bg-[#fff7e8] mb-3",
         ),
         rx.el.p(
-            "Pin a name or a city to the noticeboard",
+            ui("Pin a name or a city to the noticeboard"),
             class_name="text-sm font-bold text-[#111827]",
         ),
         rx.el.p(
-            "Type someone's name, or the city you're heading to, and the travellers "
-            "who can help will appear here.",
+            ui(
+                "Type someone's name, or the city you're heading to, and the travellers who can help will appear here."
+            ),
             class_name="mt-1 max-w-xl text-sm font-medium leading-relaxed text-[#4b5563]",
         ),
         class_name="flex flex-col items-center justify-center text-center w-full rounded-[2rem] border border-dashed border-[#f6c66f] bg-[#fff7e8]/40 px-6 py-12",
@@ -464,11 +504,13 @@ def empty_state() -> rx.Component:
             class_name="flex items-center justify-center size-12 rounded-2xl bg-[#fff7e8] mb-3",
         ),
         rx.el.p(
-            "Nobody on the board matches that yet",
+            ui("Nobody on the board matches that yet"),
             class_name="text-sm font-bold text-[#111827]",
         ),
         rx.el.p(
-            "Try a shorter name, or search by city only — new neighbours join every day.",
+            ui(
+                "Try a shorter name, or search by city only — new neighbours join every day."
+            ),
             class_name="mt-1 max-w-xl text-sm font-medium leading-relaxed text-[#4b5563]",
         ),
         class_name="flex flex-col items-center justify-center text-center w-full rounded-[2rem] border border-dashed border-[#d4d4d4] bg-[#ffffff] px-6 py-12",
@@ -507,12 +549,13 @@ def find_people_panel() -> rx.Component:
                     class_name="w-fit flex items-center gap-2 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#e08b12]",
                 ),
                 rx.el.h2(
-                    "The traveller noticeboard.",
+                    ui("The traveller noticeboard."),
                     class_name="mt-3 text-2xl font-bold tracking-tight text-[#111827]",
                 ),
                 rx.el.p(
-                    "Search neighbours by name or city, read what they can offer, "
-                    "and send a contact request to start swapping help.",
+                    ui(
+                        "Search neighbours by name or city, read what they can offer, and send a contact request to start swapping help."
+                    ),
                     class_name="mt-1 text-sm font-medium text-[#4b5563] leading-relaxed",
                 ),
                 class_name="min-w-0 flex-1",
@@ -520,14 +563,34 @@ def find_people_panel() -> rx.Component:
             rx.el.div(
                 rx.el.span(
                     rx.icon("users-round", class_name="h-3.5 w-3.5"),
-                    ContactsState.contact_count_label,
+                    rx.cond(
+                        ContactsState.contacts.length() == 0,
+                        ui("No contacts yet"),
+                        rx.cond(
+                            ContactsState.contacts.length() == 1,
+                            ui_template(
+                                "{count} contact",
+                                "count",
+                                ContactsState.contacts.length().to_string(),
+                            ),
+                            ui_template(
+                                "{count} contacts",
+                                "count",
+                                ContactsState.contacts.length().to_string(),
+                            ),
+                        ),
+                    ),
                     class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fba922] px-3 py-1.5 text-xs font-semibold text-[#111827]",
                 ),
                 rx.cond(
                     ContactsState.incoming_count > 0,
                     rx.el.span(
                         rx.icon("mail", class_name="h-3.5 w-3.5"),
-                        f"{ContactsState.incoming_count} waiting on you",
+                        ui_template(
+                            "{count} waiting on you",
+                            "count",
+                            ContactsState.incoming_count.to_string(),
+                        ),
                         class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1.5 text-xs font-semibold text-[#e08b12]",
                     ),
                     rx.fragment(),
@@ -536,7 +599,11 @@ def find_people_panel() -> rx.Component:
                     ContactsState.outgoing_count > 0,
                     rx.el.span(
                         rx.icon("send", class_name="h-3.5 w-3.5"),
-                        f"{ContactsState.outgoing_count} sent",
+                        ui_template(
+                            "{count} sent",
+                            "count",
+                            ContactsState.outgoing_count.to_string(),
+                        ),
                         class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1.5 text-xs font-semibold text-[#e08b12]",
                     ),
                     rx.fragment(),

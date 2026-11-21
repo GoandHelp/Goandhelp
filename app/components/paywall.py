@@ -2,7 +2,7 @@
 
 import reflex as rx
 
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template
 from app.components.header import BRAND_LOGO_SRC, BRAND_LOGO_ALT
 from app.states.membership_state import MembershipState, NoticeItem
 from app.skill_categories import CATEGORY_UPGRADE_REASON
@@ -25,7 +25,7 @@ def benefit_marker(line: str) -> rx.Component:
             class_name="h-3.5 w-3.5 shrink-0 text-[#fba922]",
         ),
         rx.el.span(
-            line,
+            ui(line),
             class_name="min-w-0 text-[12px] font-semibold leading-snug text-[#111827]",
         ),
         class_name="grid w-full grid-cols-[1rem_minmax(0,1fr)] items-start gap-4 text-left",
@@ -45,7 +45,7 @@ def transit_ticket(
             ),
             rx.icon("bus-front", class_name="size-4"),
             rx.el.span(
-                rx.cond(tone == "green", "PASS", "TICKET"),
+                rx.cond(tone == "green", ui("PASS"), ui("TICKET")),
                 class_name="text-[8px] font-bold tracking-[0.22em]",
             ),
             class_name=rx.cond(
@@ -66,7 +66,7 @@ def free_marker(line: str) -> rx.Component:
             class_name="h-3.5 w-3.5 shrink-0 text-[#4b5563]",
         ),
         rx.el.span(
-            line,
+            ui(line),
             class_name="min-w-0 text-left text-[12px] font-medium leading-snug text-[#4b5563]",
         ),
         class_name="grid w-full grid-cols-[1rem_minmax(0,1fr)] items-start gap-4 text-left",
@@ -79,7 +79,7 @@ def ticket_to_ride_choice() -> rx.Component:
             transit_ticket(MembershipState.coffee_selected, "purple"),
             rx.el.div(
                 rx.el.p(
-                    "Monthly Ticket",
+                    ui("Monthly Ticket"),
                     class_name="text-base font-bold tracking-tight text-[#e08b12]",
                 ),
                 rx.el.p(
@@ -91,13 +91,13 @@ def ticket_to_ride_choice() -> rx.Component:
             class_name="flex items-center gap-3",
         ),
         rx.el.p(
-            "Unlock all benefits, cancel anytime",
+            ui("Unlock all benefits, cancel anytime"),
             class_name="mt-2 w-full pl-[5.75rem] text-left text-[12px] font-medium leading-snug text-[#4b5563]",
         ),
         type="button",
         role="radio",
         aria_checked=rx.cond(MembershipState.coffee_selected, "true", "false"),
-        aria_label="Choose the Monthly Ticket, $5 monthly",
+        aria_label=ui("Choose the Monthly Ticket, $5 monthly"),
         on_click=lambda: MembershipState.select_plan(COFFEE_PLAN),
         class_name=rx.cond(
             MembershipState.coffee_selected,
@@ -113,7 +113,7 @@ def annual_pass_choice() -> rx.Component:
             transit_ticket(MembershipState.dinner_selected, "green"),
             rx.el.div(
                 rx.el.p(
-                    "Annual pass",
+                    ui("Annual pass"),
                     class_name="text-base font-bold tracking-tight text-[#fba922]",
                 ),
                 rx.el.p(
@@ -125,13 +125,13 @@ def annual_pass_choice() -> rx.Component:
             class_name="flex items-center gap-3",
         ),
         rx.el.p(
-            "Unlock all benefits, cancel anytime",
+            ui("Unlock all benefits, cancel anytime"),
             class_name="mt-2 w-full pl-[5.75rem] text-left text-[12px] font-medium leading-snug text-[#4b5563]",
         ),
         type="button",
         role="radio",
         aria_checked=rx.cond(MembershipState.dinner_selected, "true", "false"),
-        aria_label="Choose the Annual pass, $49 annually",
+        aria_label=ui("Choose the Annual pass, $49 annually"),
         on_click=lambda: MembershipState.select_plan(DINNER_PLAN),
         class_name=rx.cond(
             MembershipState.dinner_selected,
@@ -145,7 +145,7 @@ def comparison_rail() -> rx.Component:
     return rx.el.div(
         rx.el.div(
             rx.el.p(
-                "Premium members get",
+                ui("Premium members get"),
                 class_name="text-center text-[11px] font-bold uppercase tracking-[0.12em] text-[#fba922]",
             ),
             rx.el.div(
@@ -156,7 +156,7 @@ def comparison_rail() -> rx.Component:
         ),
         rx.el.div(
             rx.el.p(
-                "Free stays free",
+                ui("Free stays free"),
                 class_name="text-center text-[11px] font-bold uppercase tracking-[0.12em] text-[#4b5563]",
             ),
             rx.el.div(
@@ -209,22 +209,24 @@ def paywall_modal() -> rx.Component:
                         rx.el.button(
                             rx.icon("x", class_name="h-4 w-4"),
                             type="button",
-                            title="Close membership panel",
-                            aria_label="Close membership panel",
+                            title=ui("Close membership panel"),
+                            aria_label=ui("Close membership panel"),
                             on_click=MembershipState.close_paywall,
                             class_name="flex size-8 shrink-0 items-center justify-center rounded-full border border-[#d4d4d4] bg-white text-[#4b5563] transition-colors hover:border-[#e08b12] hover:text-[#e08b12]",
                         ),
                         class_name="flex items-start justify-between gap-3",
                     ),
                     rx.el.h3(
-                        "Become a Premium Member",
+                        ui("Become a Premium Member"),
                         class_name="text-center text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-[#fba922]",
                     ),
                     rx.el.p(
                         rx.cond(
                             MembershipState.upgrade_reason
                             == CATEGORY_UPGRADE_REASON,
-                            "Unlock multiple categories to your help request and increase your chances of receiving help",
+                            ui(
+                                "Unlock multiple categories to your help request and increase your chances of receiving help"
+                            ),
                             rx.cond(
                                 MembershipState.upgrade_reason != "",
                                 rx.match(
@@ -239,7 +241,9 @@ def paywall_modal() -> rx.Component:
                                     ),
                                     MembershipState.upgrade_reason,
                                 ),
-                                "Select Monthly or Yearly. Both unlock all benefits",
+                                ui(
+                                    "Select Monthly or Yearly. Both unlock all benefits"
+                                ),
                             ),
                         ),
                         class_name="text-center text-[12px] font-semibold leading-relaxed text-[#4b5563]",
@@ -266,7 +270,7 @@ def paywall_modal() -> rx.Component:
                         ticket_to_ride_choice(),
                         annual_pass_choice(),
                         role="radiogroup",
-                        aria_label="Choose your membership",
+                        aria_label=ui("Choose your membership"),
                         class_name="grid grid-cols-1 gap-3 w-full sm:grid-cols-2",
                     ),
                     comparison_rail(),
@@ -287,14 +291,13 @@ def paywall_modal() -> rx.Component:
                         ),
                         rx.cond(
                             MembershipState.checkout_busy,
-                            "Opening secure checkout…",
-                            "Start My Subscription",
+                            ui("Opening secure checkout…"),
+                            ui("Start My Subscription"),
                         ),
                         type="button",
                         disabled=MembershipState.checkout_busy,
-                        aria_label=(
-                            "Start My Subscription — continue to secure "
-                            "Stripe checkout"
+                        aria_label=ui(
+                            "Start My Subscription — continue to secure Stripe checkout"
                         ),
                         aria_busy=rx.cond(
                             MembershipState.checkout_busy, "true", "false"
@@ -303,7 +306,7 @@ def paywall_modal() -> rx.Component:
                         class_name=PAYMENT_ACTION_CLASS,
                     ),
                     rx.el.p(
-                        "Payments are handled by Stripe.",
+                        ui("Payments are handled by Stripe."),
                         class_name="text-center text-[10px] font-medium text-[#4b5563]",
                     ),
                     class_name="membership-scroll flex w-full max-h-[inherit] flex-col gap-3 overflow-y-auto overscroll-contain p-4 sm:p-5",
@@ -329,7 +332,13 @@ def membership_status_card() -> rx.Component:
                     MembershipState.is_premium,
                     rx.el.span(
                         rx.icon("badge-check", class_name="h-3.5 w-3.5"),
-                        MembershipState.tier_name,
+                        rx.match(
+                            MembershipState.tier_name,
+                            ("Free member", ui("Free member")),
+                            ("Monthly Ticket", ui("Monthly Ticket")),
+                            ("Annual pass", ui("Annual pass")),
+                            MembershipState.tier_name,
+                        ),
                         class_name="w-fit flex items-center gap-2 rounded-full bg-[#fba922] px-3 py-1 text-xs font-semibold text-[#111827]",
                     ),
                     rx.fragment(),
@@ -337,7 +346,7 @@ def membership_status_card() -> rx.Component:
                 rx.cond(
                     MembershipState.is_premium,
                     rx.el.h2(
-                        "Your premium membership is active.",
+                        ui("Your premium membership is active."),
                         class_name="mt-3 text-xl font-bold tracking-tight text-[#111827]",
                     ),
                     rx.fragment(),
@@ -345,7 +354,18 @@ def membership_status_card() -> rx.Component:
                 rx.cond(
                     MembershipState.is_premium,
                     rx.el.p(
-                        MembershipState.post_limit_label,
+                        rx.match(
+                            MembershipState.post_limit_label,
+                            (
+                                "Up to 10 open requests · visible 1 year",
+                                ui("Up to 10 open requests · visible 1 year"),
+                            ),
+                            (
+                                "Up to 2 open requests · visible 1 month",
+                                ui("Up to 2 open requests · visible 1 month"),
+                            ),
+                            MembershipState.post_limit_label,
+                        ),
                         class_name="mt-1 text-sm font-medium leading-relaxed text-[#4b5563]",
                     ),
                     rx.fragment(),
@@ -353,7 +373,27 @@ def membership_status_card() -> rx.Component:
                 rx.cond(
                     MembershipState.renewal_label,
                     rx.el.p(
-                        MembershipState.renewal_label,
+                        rx.cond(
+                            MembershipState.renewal_label.startswith("Ends "),
+                            ui_template(
+                                "Ends {date}",
+                                "date",
+                                MembershipState.renewal_label.split("Ends ")[1],
+                            ),
+                            rx.cond(
+                                MembershipState.renewal_label.startswith(
+                                    "Renews "
+                                ),
+                                ui_template(
+                                    "Renews {date}",
+                                    "date",
+                                    MembershipState.renewal_label.split(
+                                        "Renews "
+                                    )[1],
+                                ),
+                                MembershipState.renewal_label,
+                            ),
+                        ),
                         class_name="mt-1 text-xs font-semibold text-[#111827]",
                     ),
                     rx.fragment(),
@@ -366,9 +406,9 @@ def membership_status_card() -> rx.Component:
                     rx.fragment(),
                     rx.el.button(
                         rx.icon("ticket", class_name="h-4 w-4"),
-                        "See Premium Membership",
+                        ui("See Premium Membership"),
                         type="button",
-                        aria_label="Open the premium membership panel",
+                        aria_label=ui("Open the premium membership panel"),
                         on_click=lambda: MembershipState.open_paywall(""),
                         class_name="flex w-full sm:w-fit items-center justify-center gap-2 rounded-full border border-[#e08b12] bg-[#fba922] px-4 py-2.5 text-sm font-bold text-[#111827] transition-colors hover:bg-[#e08b12] hover:text-[#111827]",
                     ),
@@ -377,9 +417,11 @@ def membership_status_card() -> rx.Component:
                     MembershipState.has_billing_account,
                     rx.el.button(
                         rx.icon("receipt", class_name="h-4 w-4"),
-                        "Manage or cancel",
+                        ui("Manage or cancel"),
                         type="button",
-                        aria_label="Manage or cancel your membership in Stripe",
+                        aria_label=ui(
+                            "Manage or cancel your membership in Stripe"
+                        ),
                         on_click=MembershipState.open_billing_portal,
                         class_name="flex w-full sm:w-fit items-center justify-center gap-2 rounded-full border border-[#d4d4d4] bg-white px-4 py-2.5 text-sm font-semibold text-[#4b5563] transition-colors hover:border-[#e08b12]",
                     ),
@@ -429,18 +471,18 @@ def notice_row(notice: NoticeItem) -> rx.Component:
         rx.el.div(
             rx.el.button(
                 rx.icon("sparkles", class_name="h-3.5 w-3.5"),
-                "Upgrade",
+                ui("Upgrade"),
                 type="button",
-                aria_label="Open the premium membership panel",
+                aria_label=ui("Open the premium membership panel"),
                 on_click=lambda: MembershipState.open_paywall(
                     "Premium posts stay visible for a whole year."
                 ),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fba922] px-3 py-1.5 text-xs font-bold text-[#111827] transition-colors hover:bg-[#e08b12]",
             ),
             rx.el.button(
-                "Dismiss",
+                ui("Dismiss"),
                 type="button",
-                aria_label="Dismiss this membership notice",
+                aria_label=ui("Dismiss this membership notice"),
                 on_click=lambda: MembershipState.dismiss_notice(notice["id"]),
                 class_name="w-fit rounded-full border border-[#d4d4d4] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5563] transition-colors hover:border-[#e08b12]",
             ),
@@ -457,7 +499,7 @@ def membership_notices_panel() -> rx.Component:
         rx.el.div(
             rx.el.div(
                 rx.el.h2(
-                    "Membership notices",
+                    ui("Membership notices"),
                     class_name="text-base font-bold tracking-tight text-[#111827]",
                 ),
                 rx.el.span(
@@ -485,7 +527,9 @@ def premium_lock_button(label: str, reason: str) -> rx.Component:
         rx.icon("lock", class_name="h-3.5 w-3.5"),
         label,
         type="button",
-        aria_label=f"{label} — premium membership required",
+        aria_label=ui_template(
+            "{label} — premium membership required", "label", label
+        ),
         on_click=lambda: MembershipState.open_paywall(reason),
         class_name="w-fit flex items-center gap-1.5 rounded-full border border-dashed border-[#e08b12] bg-[#fba922] px-3 py-1.5 text-xs font-semibold text-[#111827] transition-colors hover:border-[#e08b12]",
     )

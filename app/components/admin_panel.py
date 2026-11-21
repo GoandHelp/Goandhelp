@@ -1,6 +1,6 @@
 import reflex as rx
 from app.avatars import member_avatar
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template, ui_template_multi
 
 from app.models import CATEGORY_LABELS
 from app.states.admin_state import AdminState
@@ -31,7 +31,7 @@ def th(label: str, icon: str) -> rx.Component:
     return rx.el.th(
         rx.el.div(
             rx.icon(icon, class_name="h-3.5 w-3.5 text-[#e08b12]"),
-            rx.el.span(label),
+            rx.el.span(ui(label)),
             class_name="flex items-center gap-1.5",
         ),
         class_name=TH,
@@ -49,7 +49,7 @@ def summary_card(item: tuple[str, str, str]) -> rx.Component:
             class_name="mt-3 text-2xl font-bold text-[#111827]",
         ),
         rx.el.p(
-            item[1],
+            ui(item[1]),
             class_name="text-[11px] font-semibold uppercase tracking-wide text-[#4b5563]",
         ),
         class_name="w-full rounded-2xl border border-[#f7d9a0] bg-white p-4",
@@ -59,7 +59,7 @@ def summary_card(item: tuple[str, str, str]) -> rx.Component:
 def section_button(item: dict[str, str]) -> rx.Component:
     return rx.el.button(
         rx.icon(item["icon"], class_name="h-4 w-4"),
-        item["label"],
+        ui(item["label"]),
         type="button",
         on_click=lambda: AdminState.set_section(item["value"]),
         class_name=rx.cond(
@@ -86,7 +86,17 @@ def table_shell(header: rx.Component, body: rx.Component) -> rx.Component:
 
 def pill(value: rx.Var[str]) -> rx.Component:
     return rx.el.span(
-        value,
+        rx.match(
+            value,
+            ("completed", ui("Completed")),
+            ("open", ui("Open")),
+            ("matched", ui("Matched")),
+            ("closed", ui("Closed")),
+            ("both", ui("Both")),
+            ("offer help", ui("Offer help")),
+            ("receive help", ui("Receive help")),
+            value,
+        ),
         class_name=rx.cond(
             value == "completed",
             "w-fit rounded-full bg-[#fba922] px-2.5 py-0.5 text-[11px] font-semibold text-[#111827] capitalize",
@@ -106,7 +116,7 @@ def bool_pill(flag: rx.Var[bool], label: str) -> rx.Component:
             rx.icon("check", class_name="h-3 w-3"),
             rx.icon("clock", class_name="h-3 w-3"),
         ),
-        label,
+        ui(label),
         class_name=rx.cond(
             flag,
             "w-fit flex items-center gap-1 rounded-full bg-[#fba922] px-2.5 py-0.5 text-[11px] font-semibold text-[#111827]",
@@ -302,7 +312,10 @@ def task_row(row: dict[str, str]) -> rx.Component:
         ),
         rx.el.td(row["poster"], class_name=TD),
         rx.el.td(row["helper"], class_name=TD),
-        rx.el.td(f"{row['minutes']} min", class_name=TD),
+        rx.el.td(
+            ui_template("{minutes} min", "minutes", row["minutes"].to_string()),
+            class_name=TD,
+        ),
         rx.el.td(row["reward_given"], class_name=TD),
         rx.el.td(
             rx.el.div(
@@ -339,7 +352,12 @@ def review_row(row: dict[str, str]) -> rx.Component:
         rx.el.td(row["reviewee"], class_name=TD),
         rx.el.td(
             rx.el.span(
-                row["direction_label"],
+                rx.match(
+                    row["direction_label"],
+                    ("Poster → helper", ui("Poster → helper")),
+                    ("Helper → poster", ui("Helper → poster")),
+                    row["direction_label"],
+                ),
                 class_name="w-fit rounded-full bg-[#fff7e8] px-2.5 py-0.5 text-[11px] font-semibold text-[#4b5563]",
             ),
             class_name=TD,
@@ -385,7 +403,14 @@ def reviews_table() -> rx.Component:
 
 def status_pill(row: dict[str, str]) -> rx.Component:
     return rx.el.span(
-        row["status_label"],
+        rx.match(
+            row["status"],
+            ("open", ui("Open")),
+            ("reviewing", ui("Reviewing")),
+            ("resolved", ui("Resolved")),
+            ("dismissed", ui("Dismissed")),
+            row["status_label"],
+        ),
         class_name=rx.cond(
             row["status"] == "open",
             "w-fit rounded-full bg-[#fba922] px-2.5 py-0.5 text-[11px] font-bold text-[#111827]",
@@ -405,7 +430,13 @@ def status_pill(row: dict[str, str]) -> rx.Component:
 def moderation_pill(row: dict[str, str]) -> rx.Component:
     return rx.el.div(
         rx.el.span(
-            row["moderation_label"],
+            rx.match(
+                row["moderation_status"],
+                ("banned", ui("Banned")),
+                ("warned", ui("Warned")),
+                ("clear", ui("Clear")),
+                row["moderation_label"],
+            ),
             class_name=rx.cond(
                 row["moderation_status"] == "banned",
                 "w-fit rounded-full bg-[#fff7e8] px-2.5 py-0.5 text-[11px] font-bold text-[#e08b12]",
@@ -417,7 +448,9 @@ def moderation_pill(row: dict[str, str]) -> rx.Component:
             ),
         ),
         rx.el.span(
-            f"{row['warning_count']} warning(s)",
+            ui_template(
+                "{count} warning(s)", "count", row["warning_count"].to_string()
+            ),
             class_name="text-[10px] font-semibold uppercase tracking-wide text-[#4b5563]",
         ),
         rx.cond(
@@ -425,7 +458,7 @@ def moderation_pill(row: dict[str, str]) -> rx.Component:
             rx.fragment(),
             rx.el.span(
                 rx.icon("lock", class_name="h-3 w-3"),
-                "Deactivated",
+                ui("Deactivated"),
                 class_name="w-fit flex items-center gap-1 rounded-full bg-[#fff7e8] px-2.5 py-0.5 text-[10px] font-bold text-[#e08b12]",
             ),
         ),
@@ -438,7 +471,7 @@ def safety_actions(row: dict[str, str]) -> rx.Component:
         rx.el.div(
             rx.el.button(
                 rx.icon("triangle-alert", class_name="h-3 w-3"),
-                "Warn",
+                ui("Warn"),
                 type="button",
                 disabled=AdminState.is_moderating,
                 on_click=lambda: AdminState.warn_member(row["id"]),
@@ -446,7 +479,7 @@ def safety_actions(row: dict[str, str]) -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("check", class_name="h-3 w-3"),
-                "Resolve",
+                ui("Resolve"),
                 type="button",
                 disabled=AdminState.is_moderating,
                 on_click=lambda: AdminState.resolve_report(row["id"]),
@@ -454,7 +487,7 @@ def safety_actions(row: dict[str, str]) -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("x", class_name="h-3 w-3"),
-                "Dismiss",
+                ui("Dismiss"),
                 type="button",
                 disabled=AdminState.is_moderating,
                 on_click=lambda: AdminState.dismiss_report(row["id"]),
@@ -466,20 +499,22 @@ def safety_actions(row: dict[str, str]) -> rx.Component:
             AdminState.ban_confirm_id == row["id"],
             rx.el.div(
                 rx.el.p(
-                    "Ban this member? The account is deactivated immediately.",
+                    ui(
+                        "Ban this member? The account is deactivated immediately."
+                    ),
                     class_name="text-[11px] font-semibold text-[#e08b12] whitespace-normal",
                 ),
                 rx.el.div(
                     rx.el.button(
                         rx.icon("ban", class_name="h-3 w-3"),
-                        "Confirm ban",
+                        ui("Confirm ban"),
                         type="button",
                         disabled=AdminState.is_moderating,
                         on_click=lambda: AdminState.ban_member(row["id"]),
                         class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#e08b12] px-3 py-1.5 text-[11px] font-bold text-white transition-colors hover:bg-[#b86e08] disabled:opacity-60",
                     ),
                     rx.el.button(
-                        "Cancel",
+                        ui("Cancel"),
                         type="button",
                         on_click=AdminState.cancel_ban,
                         class_name="w-fit rounded-full border border-[#f7d9a0] bg-white px-3 py-1.5 text-[11px] font-bold text-[#4b5563] transition-colors hover:border-[#404040]",
@@ -490,7 +525,7 @@ def safety_actions(row: dict[str, str]) -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("ban", class_name="h-3 w-3"),
-                "Ban…",
+                ui("Ban…"),
                 type="button",
                 on_click=lambda: AdminState.request_ban(row["id"]),
                 class_name="mt-1.5 w-fit flex items-center gap-1.5 rounded-full border border-[#f7d9a0] bg-white px-3 py-1.5 text-[11px] font-bold text-[#e08b12] transition-colors hover:bg-[#fff7e8]",
@@ -571,7 +606,7 @@ def safety_row(row: dict[str, str]) -> rx.Component:
             rx.el.span(
                 rx.icon("star", class_name="h-3 w-3"),
                 f"{row['one_star_count']}",
-                title="One-star reviews received",
+                ui("One-star reviews received"),
                 class_name=rx.cond(
                     row["one_star_count"].to(int) > 2,
                     "w-fit flex items-center gap-1 rounded-full bg-[#fff7e8] px-2.5 py-0.5 text-[11px] font-bold text-[#e08b12]",
@@ -590,7 +625,14 @@ def safety_row(row: dict[str, str]) -> rx.Component:
 def content_report_row(row: dict[str, str]) -> rx.Component:
     return rx.el.article(
         rx.el.h4(
-            f"{row['target_type']} #{row['target_id']} · {row['status']}",
+            ui_template_multi(
+                "{type} #{id} · {status}",
+                {
+                    "type": row["target_type"],
+                    "id": row["target_id"].to_string(),
+                    "status": row["status"],
+                },
+            ),
             class_name="text-sm font-bold text-black",
         ),
         rx.el.p(
@@ -598,7 +640,7 @@ def content_report_row(row: dict[str, str]) -> rx.Component:
             class_name="mt-2 whitespace-pre-wrap break-words text-sm text-[#404040]",
         ),
         rx.el.p(
-            f"Category: {row['category']}",
+            ui_template("Category: {category}", "category", row["category"]),
             class_name="mt-2 text-xs font-bold text-[#e08b12]",
         ),
         rx.el.p(
@@ -606,22 +648,38 @@ def content_report_row(row: dict[str, str]) -> rx.Component:
             class_name="mt-1 whitespace-pre-wrap break-words text-sm text-black",
         ),
         rx.el.p(
-            f"Reporter: {row['reporter']} · Reported member: {row['reported']}",
+            ui_template_multi(
+                "Reporter: {reporter} · Reported member: {member}",
+                {"reporter": row["reporter"], "member": row["reported"]},
+            ),
             class_name="mt-2 text-xs text-[#404040]",
         ),
         rx.el.p(
-            f"Created: {row['created']} · Reviewed: {row['reviewed']}",
+            ui_template_multi(
+                "Created: {created} · Reviewed: {reviewed}",
+                {"created": row["created"], "reviewed": row["reviewed"]},
+            ),
             class_name="mt-1 text-xs text-[#404040]",
         ),
         rx.el.p(
-            f"Admin note: {row['admin_note']} · Updated: {row['note_updated']}",
+            ui_template_multi(
+                "Admin note: {note} · Updated: {date}",
+                {"note": row["admin_note"], "date": row["note_updated"]},
+            ),
             class_name="mt-1 whitespace-pre-wrap break-words text-xs text-[#e08b12]",
         ),
         rx.el.div(
             rx.foreach(
                 ["reviewing", "resolved", "dismissed", "warn"],
                 lambda action: rx.el.button(
-                    action.title(),
+                    rx.match(
+                        action,
+                        ("reviewing", ui("Reviewing")),
+                        ("resolved", ui("Resolved")),
+                        ("dismissed", ui("Dismissed")),
+                        ("warn", ui("Warn")),
+                        ui("Ban"),
+                    ),
                     type="button",
                     on_click=lambda: AdminState.moderate_content(
                         row["id"].to(int), action
@@ -633,11 +691,13 @@ def content_report_row(row: dict[str, str]) -> rx.Component:
                 AdminState.content_ban_confirm_id == row["id"].to(int),
                 rx.el.div(
                     rx.el.p(
-                        "Ban this member? Their account will be deactivated.",
+                        ui(
+                            "Ban this member? Their account will be deactivated."
+                        ),
                         class_name="text-xs text-black",
                     ),
                     rx.el.button(
-                        "Confirm ban",
+                        ui("Confirm ban"),
                         type="button",
                         on_click=lambda: AdminState.moderate_content(
                             row["id"].to(int), "ban"
@@ -645,7 +705,7 @@ def content_report_row(row: dict[str, str]) -> rx.Component:
                         class_name="rounded-full bg-[#e08b12] px-3 py-2 text-xs font-bold text-white",
                     ),
                     rx.el.button(
-                        "Cancel",
+                        ui("Cancel"),
                         type="button",
                         on_click=AdminState.cancel_content_ban,
                         class_name="rounded-full border border-[#f7d9a0] bg-white px-3 py-2 text-xs text-black",
@@ -653,7 +713,7 @@ def content_report_row(row: dict[str, str]) -> rx.Component:
                     class_name="flex flex-wrap items-center gap-2",
                 ),
                 rx.el.button(
-                    "Ban…",
+                    ui("Refresh"),
                     type="button",
                     on_click=lambda: AdminState.request_content_ban(
                         row["id"].to(int)
@@ -673,17 +733,17 @@ def safety_table() -> rx.Component:
             rx.el.div(
                 rx.el.span(
                     rx.icon("shield-alert", class_name="h-3.5 w-3.5"),
-                    "Incident ledger",
+                    ui("Incident ledger"),
                     class_name="w-fit flex items-center gap-2 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-bold text-[#e08b12]",
                 ),
                 rx.el.h3(
-                    "Safety review",
+                    ui("Safety review"),
                     class_name="mt-2 text-lg font-bold tracking-tight text-[#111827]",
                 ),
                 rx.el.p(
-                    "Private reports filed by the two people on a completed job. "
-                    "Nothing here is public, and no account is ever banned "
-                    "automatically — every decision below is yours.",
+                    ui(
+                        "Private reports filed by the two people on a completed job. Nothing here is public, and no account is ever banned automatically — every decision below is yours."
+                    ),
                     class_name="mt-1 text-sm font-medium text-[#4b5563] leading-relaxed max-w-2xl",
                 ),
                 class_name="min-w-0 flex-1",
@@ -692,14 +752,16 @@ def safety_table() -> rx.Component:
         ),
         rx.el.div(
             rx.el.label(
-                "Admin note (optional) — saved with the next action you take",
+                ui(
+                    "Admin note (optional) — saved with the next action you take"
+                ),
                 html_for="admin_moderation_note",
                 class_name="text-xs font-semibold text-[#404040]",
             ),
             rx.el.textarea(
                 id="admin_moderation_note",
                 rows="2",
-                placeholder="What did you check, and why this outcome?",
+                placeholder=ui("What did you check, and why this outcome?"),
                 default_value=AdminState.admin_note,
                 on_change=AdminState.set_admin_note.debounce(400),
                 class_name="mt-1.5 w-full rounded-xl border border-[#f7d9a0] bg-[#ffffff] px-4 py-2.5 text-sm font-medium text-[#111827] placeholder:text-[#4b5563] outline-hidden transition-colors focus:border-[#e08b12] focus:ring-2 focus:ring-[#fff7e8] resize-y",
@@ -740,7 +802,7 @@ def safety_table() -> rx.Component:
                 class_name="mt-3 flex w-full flex-col gap-3",
             ),
             rx.el.p(
-                "No content reports have been filed.",
+                ui("No content reports have been filed."),
                 class_name="mt-3 text-sm text-[#404040]",
             ),
         ),
@@ -773,12 +835,13 @@ def safety_table() -> rx.Component:
                     class_name="h-6 w-6 text-[#e08b12] mb-2",
                 ),
                 rx.el.p(
-                    "No safety reports have been filed.",
+                    ui("No safety reports have been filed."),
                     class_name="text-sm font-bold text-[#111827]",
                 ),
                 rx.el.p(
-                    "Reports appear here the moment someone tells us about a "
-                    "bad experience on a completed job.",
+                    ui(
+                        "Reports appear here the moment someone tells us about a bad experience on a completed job."
+                    ),
                     class_name="mt-1 text-sm font-medium text-[#4b5563]",
                 ),
                 class_name="mt-4 flex flex-col items-center justify-center text-center w-full rounded-2xl border border-dashed border-[#f7d9a0] bg-white px-6 py-10",
@@ -801,16 +864,17 @@ def admin_panel() -> rx.Component:
             rx.el.div(
                 rx.el.span(
                     rx.icon("shield", class_name="h-3.5 w-3.5"),
-                    "Backend activity",
+                    ui("Backend activity"),
                     class_name="w-fit flex items-center gap-2 rounded-full bg-[#fba922] px-3 py-1 text-xs font-semibold text-[#111827]",
                 ),
                 rx.el.h2(
-                    "Everything happening across Go and Help.",
+                    ui("Everything happening across Go and Help."),
                     class_name="mt-3 text-2xl font-bold tracking-tight text-[#111827]",
                 ),
                 rx.el.p(
-                    "Subscribers, help posts, accepted jobs, messages, completed tasks and the "
-                    "full review history — the ledger behind the journal.",
+                    ui(
+                        "Subscribers, help posts, accepted jobs, messages, completed tasks and the full review history — the ledger behind the journal."
+                    ),
                     class_name="mt-1 text-sm font-medium text-[#4b5563] leading-relaxed",
                 ),
                 class_name="min-w-0 flex-1",
@@ -818,12 +882,16 @@ def admin_panel() -> rx.Component:
             rx.el.div(
                 rx.el.span(
                     rx.icon("star", class_name="h-3.5 w-3.5"),
-                    f"{AdminState.avg_rating:.1f} avg rating",
+                    ui_template(
+                        "{rating} avg rating",
+                        "rating",
+                        f"{AdminState.avg_rating:.1f}",
+                    ),
                     class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1.5 text-xs font-semibold text-[#e08b12]",
                 ),
                 rx.el.button(
                     rx.icon("refresh-cw", class_name="h-3.5 w-3.5"),
-                    "Refresh",
+                    ui("Refresh"),
                     type="button",
                     on_click=AdminState.load_activity,
                     class_name="w-fit flex items-center gap-2 rounded-full border border-[#f7d9a0] bg-white px-4 py-2 text-xs font-semibold text-[#404040] transition-colors hover:border-[#e08b12] hover:text-[#e08b12]",
