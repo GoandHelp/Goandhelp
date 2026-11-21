@@ -856,7 +856,7 @@ def post_form() -> rx.Component:
                 field_label("City", "required"),
                 rx.el.input(
                     name="city",
-                    placeholder=ui("Porto"),
+                    placeholder="Porto",
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full",
@@ -865,7 +865,7 @@ def post_form() -> rx.Component:
                 field_label("Country", "optional"),
                 rx.el.input(
                     name="country",
-                    placeholder=ui("Portugal"),
+                    placeholder="Portugal",
                     class_name=INPUT_CLASS,
                 ),
                 class_name="w-full",

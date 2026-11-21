@@ -231,6 +231,10 @@ from app.interface_catalog_remaining_ui_stars import (
     REMAINING_STARS_CATALOGS,
     REMAINING_STARS_KEYS,
 )
+from app.interface_catalog_remaining_ui_actions import (
+    REMAINING_ACTIONS_CATALOGS,
+    REMAINING_ACTIONS_KEYS,
+)
 
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
@@ -733,6 +737,7 @@ for _catalogs in (
     REMAINING_LEDGER_CATALOGS,
     REMAINING_COUNT_CATALOGS,
     REMAINING_STARS_CATALOGS,
+    REMAINING_ACTIONS_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -818,6 +823,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *REMAINING_LEDGER_KEYS,
             *REMAINING_COUNT_KEYS,
             *REMAINING_STARS_KEYS,
+            *REMAINING_ACTIONS_KEYS,
             "clear",
             "optional",
         ]

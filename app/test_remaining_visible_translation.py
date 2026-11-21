@@ -35,6 +35,11 @@ from app.interface_catalog_remaining_ui_stars import (
     REMAINING_STARS_KEYS,
     REMAINING_STARS_ROWS,
 )
+from app.interface_catalog_remaining_ui_actions import (
+    REMAINING_ACTIONS_CATALOGS,
+    REMAINING_ACTIONS_KEYS,
+    REMAINING_ACTIONS_ROWS,
+)
 from app.interface_i18n import (
     CATALOGS,
     COMPLETE_KEYS,
@@ -77,6 +82,12 @@ GROUPS = (
         REMAINING_STARS_KEYS,
         REMAINING_STARS_ROWS,
         REMAINING_STARS_CATALOGS,
+    ),
+    (
+        "actions",
+        REMAINING_ACTIONS_KEYS,
+        REMAINING_ACTIONS_ROWS,
+        REMAINING_ACTIONS_CATALOGS,
     ),
 )
 EXPECTED_KEYS = (
@@ -131,6 +142,9 @@ EXPECTED_KEYS = (
     "{count} review",
     "{count} reviews",
     "{score} out of 5 stars",
+    "Sending request…",
+    "Send contact request",
+    "Turn off",
 )
 
 
@@ -155,7 +169,7 @@ class RemainingVisibleTranslationTests(unittest.TestCase):
             tuple(key for _, keys, _, _ in GROUPS for key in keys),
             EXPECTED_KEYS,
         )
-        self.assertEqual(len(set(EXPECTED_KEYS)), 51)
+        self.assertEqual(len(set(EXPECTED_KEYS)), 54)
         self.assertTrue(set(EXPECTED_KEYS) <= set(COMPLETE_KEYS))
         for group, keys, rows, catalogs in GROUPS:
             self.assertEqual(set(rows), offered, group)
@@ -183,12 +197,16 @@ class RemainingVisibleTranslationTests(unittest.TestCase):
         for group, _, rows, _ in GROUPS:
             path = Path(f"app/interface_catalog_remaining_ui_{group}.py")
             tree = ast.parse(path.read_text())
+            row_symbol = {
+                "counts": "REMAINING_COUNT_ROWS",
+                "actions": "REMAINING_ACTIONS_ROWS",
+            }.get(group, f"REMAINING_{group.upper()}_ROWS")
             definition = next(
                 node
                 for node in tree.body
                 if isinstance(node, ast.AnnAssign)
                 and isinstance(node.target, ast.Name)
-                and node.target.id == f"REMAINING_{group.upper()}_ROWS"
+                and node.target.id == row_symbol
             )
             self.assertEqual(ast.literal_eval(definition.value), rows)
             self.assertIsInstance(definition.value, ast.Dict)
@@ -326,6 +344,41 @@ class RemainingVisibleTranslationTests(unittest.TestCase):
             self.assertIn(original, discovery)
         self.assertIn("DiscoveryState.set_map_mode(value)", discovery)
         self.assertIn("DiscoveryState.set_view_mode(value)", discovery)
+        help_post_tree = ast.parse(
+            Path("app/components/help_post_panel.py").read_text()
+        )
+        for field, example in (("city", "Porto"), ("country", "Portugal")):
+            inputs = [
+                node
+                for node in ast.walk(help_post_tree)
+                if isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "input"
+                and any(
+                    keyword.arg == "name"
+                    and isinstance(keyword.value, ast.Constant)
+                    and keyword.value.value == field
+                    for keyword in node.keywords
+                )
+            ]
+            self.assertEqual(len(inputs), 1, field)
+            placeholder = next(
+                keyword.value
+                for keyword in inputs[0].keywords
+                if keyword.arg == "placeholder"
+            )
+            self.assertIsInstance(placeholder, ast.Constant)
+            self.assertEqual(placeholder.value, example)
+        self.assertEqual(
+            analyze_source('rx.el.input(name="city", placeholder="Porto")'),
+            [],
+        )
+        self.assertEqual(
+            analyze_source(
+                'rx.el.input(name="country", placeholder="Portugal")'
+            ),
+            [],
+        )
 
     def test_audit_reduction_is_bounded_not_global_certification(self):
         findings = audit_paths(
