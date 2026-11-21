@@ -1,5 +1,6 @@
 import reflex as rx
 from app.avatars import member_avatar
+from app.interface_i18n import ui, ui_template, ui_template_multi
 
 from app.components.feedback import (  # noqa: I001
     avatar_with_tick,
@@ -105,7 +106,7 @@ def search_panel() -> rx.Component:
             rx.el.div(
                 rx.el.button(
                     rx.icon("x", class_name="h-3.5 w-3.5"),
-                    "Clear search",
+                    ui("Clear search"),
                     type="button",
                     on_click=[
                         ContactsState.clear_search,
@@ -183,7 +184,7 @@ def request_form(person: dict[str, str]) -> rx.Component:
                 ContactsState.is_requesting,
                 rx.el.span(
                     rx.spinner(class_name="h-4 w-4"),
-                    "Sending request…",
+                    ui("Sending request…"),
                     class_name="flex items-center justify-center gap-2",
                 ),
                 rx.el.span(
@@ -305,14 +306,32 @@ def person_card(person: dict[str, str]) -> rx.Component:
         rx.el.div(
             rx.el.span(
                 rx.icon("sparkles", class_name="h-3 w-3"),
-                f"{person['kindness']} kindness points",
+                ui_template(
+                    rx.cond(
+                        person["kindness"].to(int) == 1,
+                        "{count} kindness point",
+                        "{count} kindness points",
+                    ),
+                    "count",
+                    person["kindness"].to(int).to_string(),
+                ),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-2.5 py-1 text-[11px] font-semibold text-[#e08b12]",
             ),
             rx.cond(
                 person["reviews"] > 0,
                 rx.el.span(
                     rx.icon("star", class_name="h-3 w-3"),
-                    f"{person['rating'].to(float):.1f} · {person['reviews']} reviews",
+                    ui_template_multi(
+                        rx.cond(
+                            person["reviews"].to(int) == 1,
+                            "{rating} · {count} review",
+                            "{rating} · {count} reviews",
+                        ),
+                        {
+                            "rating": f"{person['rating'].to(float):.1f}",
+                            "count": person["reviews"].to(int).to_string(),
+                        },
+                    ),
                     class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-2.5 py-1 text-[11px] font-semibold text-[#e08b12]",
                 ),
                 rx.el.span(
@@ -325,7 +344,7 @@ def person_card(person: dict[str, str]) -> rx.Component:
                 person["joined"],
                 rx.el.span(
                     rx.icon("calendar", class_name="h-3 w-3"),
-                    f"Joined {person['joined']}",
+                    ui_template("Joined {date}", "date", person["joined"]),
                     class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-2.5 py-1 text-[11px] font-semibold text-[#4b5563]",
                 ),
                 rx.fragment(),
@@ -353,7 +372,7 @@ def person_card(person: dict[str, str]) -> rx.Component:
                 person["can_request"],
                 rx.el.button(
                     rx.icon("user-round-plus", class_name="h-3.5 w-3.5"),
-                    "Send contact request",
+                    ui("Send contact request"),
                     type="button",
                     disabled=ContactsState.is_requesting,
                     on_click=lambda: FindPeopleState.quick_request(
@@ -484,7 +503,7 @@ def find_people_panel() -> rx.Component:
             rx.el.div(
                 rx.el.span(
                     rx.icon("search", class_name="h-3.5 w-3.5"),
-                    "Find people",
+                    ui("Find people"),
                     class_name="w-fit flex items-center gap-2 rounded-full bg-[#fff7e8] px-3 py-1 text-xs font-semibold text-[#e08b12]",
                 ),
                 rx.el.h2(

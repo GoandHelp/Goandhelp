@@ -209,6 +209,29 @@ from app.interface_catalog_profile_forms import (
     PROFILE_FORM_KEYS,
 )
 
+from app.interface_catalog_remaining_ui_entry import (
+    REMAINING_ENTRY_CATALOGS,
+    REMAINING_ENTRY_KEYS,
+)
+from app.interface_catalog_remaining_ui_discovery import (
+    REMAINING_DISCOVERY_CATALOGS,
+    REMAINING_DISCOVERY_KEYS,
+)
+
+from app.interface_catalog_remaining_ui_ledger import (
+    REMAINING_LEDGER_CATALOGS,
+    REMAINING_LEDGER_KEYS,
+)
+from app.interface_catalog_remaining_ui_counts import (
+    REMAINING_COUNT_CATALOGS,
+    REMAINING_COUNT_KEYS,
+)
+
+from app.interface_catalog_remaining_ui_stars import (
+    REMAINING_STARS_CATALOGS,
+    REMAINING_STARS_KEYS,
+)
+
 # Source strings are stable keys. Never pass member-authored text to ui().
 CORE_KEYS = "Continue|Back|Next|Finish|Profile|Requests|Map|Community|Inbox|Forum|Events|Reviews|Settings|Notifications|Search filters|Send|Cancel|Close|Save changes|App Language|Choose your language|Welcome to Go and Help|Languages|Get help|Give help|Your location|Skip for now|New|Email|Password|Sign in|Register".split(
     "|"
@@ -705,6 +728,11 @@ for _catalogs in (
     REQUEST_COUNT_CATALOGS,
     PROFILE_MEMBERSHIP_CATALOGS,
     PROFILE_FORM_CATALOGS,
+    REMAINING_ENTRY_CATALOGS,
+    REMAINING_DISCOVERY_CATALOGS,
+    REMAINING_LEDGER_CATALOGS,
+    REMAINING_COUNT_CATALOGS,
+    REMAINING_STARS_CATALOGS,
 ):
     for _language, _entries in _catalogs.items():
         for _key, _value in _entries.items():
@@ -785,6 +813,11 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *REQUEST_COUNT_KEYS,
             *PROFILE_MEMBERSHIP_KEYS,
             *PROFILE_FORM_KEYS,
+            *REMAINING_ENTRY_KEYS,
+            *REMAINING_DISCOVERY_KEYS,
+            *REMAINING_LEDGER_KEYS,
+            *REMAINING_COUNT_KEYS,
+            *REMAINING_STARS_KEYS,
             "clear",
             "optional",
         ]

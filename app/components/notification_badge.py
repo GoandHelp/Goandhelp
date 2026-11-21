@@ -6,10 +6,12 @@ in the app: it sits in the corner of whichever container has new activity.
 
 import reflex as rx
 
+from app.interface_i18n import ui
+
 
 def corner_activity_dot(
     active: rx.Var[bool] | bool,
-    label: str = "New activity",
+    label: str | rx.Var[str] = "New activity",
 ) -> rx.Component:
     """A green corner dot for any `relative` container with activity.
 
@@ -20,8 +22,8 @@ def corner_activity_dot(
         active,
         rx.el.span(
             role="status",
-            title=label,
-            aria_label=label,
+            title=ui(label),
+            aria_label=ui(label),
             class_name="pointer-events-none absolute right-2.5 top-2.5 size-2.5 shrink-0 rounded-full border-2 border-white bg-[#fba922]",
         ),
         rx.fragment(),
@@ -33,9 +35,9 @@ def activity_dot(count: rx.Var[int]) -> rx.Component:
     return rx.cond(
         count > 0,
         rx.el.span(
-            aria_label="New activity",
+            aria_label=ui("New activity"),
             role="status",
-            title="New activity",
+            title=ui("New activity"),
             class_name="pointer-events-none absolute -right-0.5 -top-0.5 size-2.5 shrink-0 rounded-full border-2 border-white bg-[#fba922]",
         ),
         rx.fragment(),

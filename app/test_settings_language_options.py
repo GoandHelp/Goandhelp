@@ -3,7 +3,6 @@ import inspect
 import string
 import unittest
 from pathlib import Path
-import unittest
 
 from test_utils import run_event
 
@@ -156,12 +155,29 @@ class SettingsLanguageOptionTests(unittest.TestCase):
             "UPDATE skillkind_subscriber SET preferred_language", body
         )
         self.assertIn("UPDATE skillkind_onboarding_progress", body)
-        self.assertIn('"preferred_language": language', body)
+        self.assertTrue(
+            any(
+                isinstance(key, ast.Constant)
+                and key.value == "preferred_language"
+                and isinstance(value, ast.Name)
+                and value.id == "language"
+                for node in ast.walk(update_language)
+                if isinstance(node, ast.Dict)
+                for key, value in zip(node.keys, node.values)
+            )
+        )
         self.assertIn("onboarding.interface_language = language", body)
         self.assertIn("self.preferred_language = previous", body)
 
 
 class SettingsLanguageSaveEventTests(unittest.IsolatedAsyncioTestCase):
+    async def test_register_rejects_missing_first_name_before_storage(self):
+        root = OnboardingState(_reflex_internal_init=True)
+        auth = await root.get_state(AuthState)
+        await run_event(auth.register, {})
+        self.assertEqual(auth.error, "Please add your first name.")
+        self.assertEqual(auth.subscriber_id, "")
+
     async def test_update_language_runs_on_state_tree_without_database_writes(
         self,
     ):

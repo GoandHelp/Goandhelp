@@ -1,5 +1,7 @@
 import reflex as rx
 
+from app.interface_i18n import ui
+
 from app.components.block_dialog import block_dialog
 from app.components.discover_panel import detail_panel
 from app.components.skills_prompt import skills_prompt
@@ -97,10 +99,10 @@ def session_skeleton() -> rx.Component:
             ),
             class_name="fixed bottom-6 left-1/2 flex w-full max-w-sm -translate-x-1/2 flex-col items-center gap-3 px-4",
         ),
-        rx.el.span("Loading Go and Help…", class_name="sr-only"),
+        rx.el.span(ui("Loading Go and Help…"), class_name="sr-only"),
         role="status",
         aria_live="polite",
-        aria_label="Loading Go and Help",
+        aria_label=ui("Loading Go and Help"),
         class_name="fixed inset-0 z-[100] flex h-dvh w-full items-center justify-center bg-linear-to-bl from-[#ffe2bd] to-[#d9e9d4] text-[#111827]",
     )
 
@@ -260,7 +262,7 @@ def membership_result_card() -> rx.Component:
                 rx.el.div(
                     rx.spinner(class_name="h-5 w-5"),
                     rx.el.p(
-                        "Confirming your payment with Stripe…",
+                        ui("Confirming your payment with Stripe…"),
                         class_name="text-sm font-semibold text-[#4b5563]",
                     ),
                     role="status",
@@ -275,7 +277,7 @@ def membership_result_card() -> rx.Component:
                         class_name="flex size-10 items-center justify-center rounded-2xl bg-[#fff7e8] text-[#e08b12]",
                     ),
                     rx.el.h1(
-                        "Premium Membership",
+                        ui("Premium Membership"),
                         class_name="mt-3 text-2xl font-bold tracking-tight text-[#111827]",
                     ),
                     rx.el.p(
@@ -297,7 +299,7 @@ def membership_result_card() -> rx.Component:
                         class_name="flex size-10 items-center justify-center rounded-2xl bg-[#fff7e8] text-[#e08b12]",
                     ),
                     rx.el.h1(
-                        "We couldn't confirm that membership",
+                        ui("We couldn't confirm that membership"),
                         class_name="mt-3 text-xl font-bold tracking-tight text-[#111827]",
                     ),
                     rx.el.p(
@@ -309,14 +311,15 @@ def membership_result_card() -> rx.Component:
                 ),
             ),
             rx.el.p(
-                "Open this page from your Stripe checkout to confirm a "
-                "membership.",
+                ui(
+                    "Open this page from your Stripe checkout to confirm a membership."
+                ),
                 class_name="text-sm font-medium text-[#4b5563]",
             ),
         ),
         rx.el.a(
             rx.icon("map", class_name="h-4 w-4"),
-            "Back to the map",
+            ui("Back to the map"),
             href="/",
             class_name="mt-5 flex w-fit items-center gap-2 rounded-full bg-[#e08b12] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#b86e08]",
         ),
@@ -376,7 +379,8 @@ def map_page() -> rx.Component:
     """Lightweight alias that redirects to the arrival page."""
     return rx.el.main(
         rx.el.p(
-            "Opening the map…", class_name="text-sm font-medium text-[#4b5563]"
+            ui("Opening the map…"),
+            class_name="text-sm font-medium text-[#4b5563]",
         ),
         class_name="font-['Inter'] flex h-dvh w-full items-center justify-center bg-[#ffffff]",
     )

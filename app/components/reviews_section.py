@@ -7,7 +7,7 @@ existing profile loader.
 
 import reflex as rx
 
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template, ui_template_multi
 from app.avatars import animal_avatar
 
 from app.components.language_control import browser_translatable_text
@@ -45,7 +45,7 @@ def your_reviews_header() -> rx.Component:
     return rx.el.div(
         corner_activity_dot(
             NotificationState.reviews_unread > 0,
-            "New activity in Reviews",
+            ui_template("New activity in {section}", "section", ui("Reviews")),
         ),
         rx.el.div(
             rx.foreach(ProfileState.combined_star_states, review_rating_star),
@@ -68,7 +68,11 @@ def your_reviews_header() -> rx.Component:
             class_name="w-full px-10 text-center text-xl sm:text-2xl font-bold tracking-tight text-black leading-tight",
         ),
         rx.el.p(
-            f"{ProfileState.combined_rating_avg:.1f} out of 5",
+            ui_template(
+                "{score} out of 5",
+                "score",
+                f"{ProfileState.combined_rating_avg:.1f}",
+            ),
             class_name="text-sm font-semibold text-[#4b5563]",
         ),
         class_name="relative flex w-full flex-col items-center gap-1.5",
@@ -99,14 +103,18 @@ def received_rating_stars(
             ),
         ),
         role="img",
-        aria_label=f"{score} out of 5 stars",
+        aria_label=ui_template(
+            "{score} out of 5 stars", "score", score.to_string()
+        ),
         class_name="flex shrink-0 items-center gap-0.5",
     )
 
 
 def review_category_row(item: dict[str, str]) -> rx.Component:
     return rx.el.div(
-        rx.el.span(item["label"], class_name="text-sm font-medium text-black"),
+        rx.el.span(
+            ui(item["label"]), class_name="text-sm font-medium text-black"
+        ),
         rx.el.div(
             received_rating_stars(item["score"].to(int)),
             rx.el.span(
@@ -151,7 +159,10 @@ def received_review_card(review: ReceivedReview) -> rx.Component:
                 ProfileState.open_received_review_ids.contains(review["id"])
             ),
             type="button",
-            aria_label=f"Review from {review['reviewer_name']} for {review['job_title']}",
+            aria_label=ui_template_multi(
+                "Review from {name} for {title}",
+                {"name": review["reviewer_name"], "title": review["job_title"]},
+            ),
             aria_expanded=ProfileState.open_received_review_ids.contains(
                 review["id"]
             ),

@@ -1,6 +1,6 @@
 import reflex as rx
 
-from app.interface_i18n import ui, ui_template
+from app.interface_i18n import ui, ui_template, ui_template_multi
 from app.components import filter_layout as layout
 
 from app.components.language_control import (
@@ -523,10 +523,10 @@ def mode_toggle_button(
 ) -> rx.Component:
     return rx.el.button(
         rx.icon(icon, class_name="h-3.5 w-3.5"),
-        rx.el.span(label),
+        rx.el.span(ui(label)),
         type="button",
-        aria_label=description,
-        title=description,
+        aria_label=ui(description),
+        title=ui(description),
         aria_pressed=rx.cond(DiscoveryState.map_mode == value, "true", "false"),
         on_click=lambda: DiscoveryState.set_map_mode(value),
         class_name=rx.cond(
@@ -542,7 +542,7 @@ def view_toggle_button(
 ) -> rx.Component:
     return rx.el.button(
         rx.icon(icon, class_name="h-3.5 w-3.5"),
-        rx.el.span(label, class_name="hidden sm:inline"),
+        rx.el.span(ui(label), class_name="hidden sm:inline"),
         type="button",
         aria_label=description,
         title=description,
@@ -575,14 +575,14 @@ def discovery_controls() -> rx.Component:
                     "Get help — find a person who can offer help",
                 ),
                 role="group",
-                aria_label="Choose whether to give help or get help",
+                aria_label=ui("Choose whether to give help or get help"),
                 class_name="gah-segment-group flex h-9 w-fit items-center gap-1 rounded-full border border-[#d4d4d4] bg-white p-0.5",
             ),
             rx.el.div(
                 view_toggle_button("Map View", "map", "map", "Map view"),
                 view_toggle_button("List View", "list", "list", "List view"),
                 role="group",
-                aria_label="Switch between map view and list view",
+                aria_label=ui("Switch between map view and list view"),
                 class_name="gah-segment-group flex h-9 w-fit items-center gap-1 rounded-full border border-[#d4d4d4] bg-white p-0.5",
             ),
             class_name="flex w-full flex-wrap items-center justify-between gap-2",
@@ -590,8 +590,12 @@ def discovery_controls() -> rx.Component:
         rx.el.p(
             rx.cond(
                 DiscoveryState.is_give_mode,
-                "Give — choose a job and give your help to a neighbour who asked for it.",
-                "Get — find a person you can get help from, and open their profile.",
+                ui(
+                    "Give — choose a job and give your help to a neighbour who asked for it."
+                ),
+                ui(
+                    "Get — find a person you can get help from, and open their profile."
+                ),
             ),
             class_name="text-xs font-medium text-[#404040]",
         ),
@@ -669,14 +673,14 @@ def map_panel() -> rx.Component:
                                 DiscoveryState.show_events
                                 & ~DiscoveryState.show_jobs
                                 & ~DiscoveryState.show_helpers,
-                                "No events match your filters",
+                                ui("No events match your filters"),
                                 rx.cond(
                                     DiscoveryState.show_jobs,
-                                    "No open jobs match your filters",
+                                    ui("No open jobs match your filters"),
                                     rx.cond(
                                         DiscoveryState.show_helpers,
-                                        "No helpers match your filters",
-                                        "No results match your filters",
+                                        ui("No helpers match your filters"),
+                                        ui("No results match your filters"),
                                     ),
                                 ),
                             ),
@@ -727,7 +731,7 @@ def helper_row(helper: HelperProfile) -> rx.Component:
                     class_name="text-xs font-medium text-[#404040] mt-1 text-left line-clamp-2",
                 ),
                 rx.el.p(
-                    "A Go and Help neighbour you could get help from",
+                    ui("A Go and Help neighbour you could get help from"),
                     class_name="text-xs font-medium text-[#404040] mt-1 text-left italic",
                 ),
             ),
@@ -752,8 +756,10 @@ def helper_row(helper: HelperProfile) -> rx.Component:
             class_name="min-w-0 flex-1",
         ),
         type="button",
-        aria_label=f"Open the profile of {helper['name']}",
-        title=f"Open the profile of {helper['name']}",
+        aria_label=ui_template(
+            "Open the profile of {name}", "name", helper["name"]
+        ),
+        title=ui_template("Open the profile of {name}", "name", helper["name"]),
         on_click=lambda: DiscoveryState.open_member_profile(helper["id"]),
         class_name=rx.cond(
             DiscoveryState.selected_helper["id"] == helper["id"],
@@ -768,20 +774,14 @@ def helper_list() -> rx.Component:
         rx.el.h3(
             rx.match(
                 DiscoveryState.visible_helpers.length(),
-                (0, rx.el.span("No helpers nearby")),
-                (
-                    1,
-                    rx.el.span(
-                        rx.el.span("1", class_name="text-[#e08b12]"),
-                        " helper nearby",
-                    ),
-                ),
+                (0, rx.el.span(ui("No helpers nearby"))),
+                (1, rx.el.span(ui("1 helper nearby"))),
                 rx.el.span(
-                    rx.el.span(
-                        DiscoveryState.visible_helpers.length(),
-                        class_name="text-[#e08b12]",
+                    ui_template(
+                        "{count} helpers nearby",
+                        "count",
+                        DiscoveryState.visible_helpers.length().to_string(),
                     ),
-                    " helpers nearby",
                 ),
             ),
             class_name="mb-3 w-full text-center text-xl sm:text-2xl font-bold tracking-tight text-[#111827]",
@@ -809,14 +809,16 @@ def helper_list() -> rx.Component:
                         class_name="h-6 w-6 text-[#404040] mb-2",
                     ),
                     rx.el.p(
-                        "No helpers to show yet.",
+                        ui("No helpers to show yet."),
                         class_name="text-sm font-semibold text-[#404040]",
                     ),
                     rx.el.p(
                         rx.cond(
                             DiscoveryState.viewport_ready,
-                            "Move the map to find more neighbours in view.",
-                            "Waiting for the map to locate visible neighbours.",
+                            ui("Move the map to find more neighbours in view."),
+                            ui(
+                                "Waiting for the map to locate visible neighbours."
+                            ),
                         ),
                         class_name="text-sm font-medium text-[#404040] mt-1",
                     ),
@@ -845,10 +847,21 @@ def detail_rating(rating: rx.Var[float], count: rx.Var[int]) -> rx.Component:
                     ),
                 ),
                 role="img",
-                aria_label=f"{rating:.1f} out of 5 stars",
+                aria_label=ui_template(
+                    "{score} out of 5 stars", "score", f"{rating:.1f}"
+                ),
                 class_name="flex items-center gap-0.5",
             ),
-            rx.el.span(f"{rating:.1f} · {count} reviews"),
+            rx.el.span(
+                ui_template_multi(
+                    rx.cond(
+                        count == 1,
+                        "{rating} · {count} review",
+                        "{rating} · {count} reviews",
+                    ),
+                    {"rating": f"{rating:.1f}", "count": count.to_string()},
+                ),
+            ),
             class_name="mt-1 flex flex-wrap items-center gap-1.5 text-sm font-normal text-[#b86e08]",
         ),
         rx.fragment(),
@@ -897,7 +910,11 @@ def helper_detail() -> rx.Component:
                 rx.cond(
                     DiscoveryState.selected_helper["joined"],
                     rx.el.p(
-                        f"Joined {DiscoveryState.selected_helper['joined']}",
+                        ui_template(
+                            "Joined {date}",
+                            "date",
+                            DiscoveryState.selected_helper["joined"],
+                        ),
                         class_name="mt-1 text-xs font-semibold text-[#404040]",
                     ),
                     rx.fragment(),
@@ -915,7 +932,7 @@ def helper_detail() -> rx.Component:
             | (DiscoveryState.selected_helper["skill_chips"].length() > 0),
             rx.el.div(
                 rx.el.p(
-                    "Skills and knowledge",
+                    ui("Skills and knowledge"),
                     class_name="text-sm font-bold text-[#404040]",
                 ),
                 rx.el.div(
@@ -937,7 +954,11 @@ def helper_detail() -> rx.Component:
             DiscoveryState.selected_helper["headline"],
             rx.el.div(
                 rx.el.p(
-                    f"About {DiscoveryState.selected_helper['name']}",
+                    ui_template(
+                        "About {name}",
+                        "name",
+                        DiscoveryState.selected_helper["name"],
+                    ),
                     class_name="text-sm font-bold text-[#404040]",
                 ),
                 rx.el.p(
@@ -1390,7 +1411,7 @@ def offer_estimates() -> rx.Component:
                             class_name="relative",
                         ),
                         rx.el.label(
-                            "Hours",
+                            ui("Hours"),
                             html_for="offer-hours",
                             class_name="text-xs text-[#404040]",
                         ),
@@ -1418,7 +1439,7 @@ def offer_estimates() -> rx.Component:
                             class_name="relative",
                         ),
                         rx.el.label(
-                            "Minutes",
+                            ui("Minutes"),
                             html_for="offer-minutes",
                             class_name="text-xs text-[#404040]",
                         ),
@@ -1451,9 +1472,9 @@ def offer_estimates() -> rx.Component:
                     ),
                     rx.el.div(
                         rx.el.select(
-                            rx.el.option("Day", value="days"),
-                            rx.el.option("Week", value="weeks"),
-                            rx.el.option("Month", value="months"),
+                            rx.el.option(ui("Day"), value="days"),
+                            rx.el.option(ui("Week"), value="weeks"),
+                            rx.el.option(ui("Month"), value="months"),
                             value=DiscoveryState.offer_period_unit,
                             on_change=DiscoveryState.set_offer_period_unit,
                             aria_label="Duration period unit",
@@ -1693,7 +1714,7 @@ def detail_meta_row(
         ),
         rx.el.div(
             rx.el.span(
-                rx.cond(label == "Reward", "", f"{label} – "),
+                rx.cond(label == "Reward", "", f"{ui(label)} – "),
                 class_name="shrink-0 text-sm font-bold text-[#404040]",
             ),
             rx.cond(
@@ -1722,7 +1743,8 @@ def request_where_row() -> rx.Component:
         rx.el.div(
             rx.el.span(
                 rx.el.span(
-                    "Where – ",
+                    ui("Where"),
+                    " – ",
                     class_name="text-sm font-bold text-[#404040]",
                 ),
                 DiscoveryState.selected_post["location"],

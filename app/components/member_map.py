@@ -8,7 +8,7 @@ controls.
 
 import reflex as rx
 
-from app.interface_i18n import ui
+from app.interface_i18n import ui, ui_template
 from app.components import filter_layout as layout
 
 from app.components.discover_panel import (
@@ -150,7 +150,7 @@ def group_post_button(post: dict[str, str]) -> rx.Component:
             ),
             rx.el.span(
                 rx.el.span(
-                    post["category_label"],
+                    ui(post["category_label"]),
                     class_name="w-fit rounded-full bg-[#fff7e8] px-2 py-0.5 text-[9px] font-bold text-[#b86e08]",
                 ),
                 rx.el.span(
@@ -163,7 +163,9 @@ def group_post_button(post: dict[str, str]) -> rx.Component:
         ),
         rx.icon("chevron-right", class_name="h-4 w-4 shrink-0 text-[#e08b12]"),
         type="button",
-        aria_label=f"Open the details for {post['title']}",
+        aria_label=ui_template(
+            "Open the details for {title}", "title", post["title"]
+        ),
         on_click=lambda: DiscoveryState.select_post_from_group(post["id"]),
         class_name="flex w-full items-center gap-2.5 rounded-2xl border border-[#f7d9a0] bg-white px-3 py-2.5 pr-20 transition-colors hover:border-[#e08b12] hover:bg-[#fff7e8]",
     )

@@ -111,7 +111,7 @@ def upcoming_job_card(job: dict[str, str]) -> rx.Component:
                     class_name="text-base font-bold text-[#111827] leading-snug",
                 ),
                 rx.el.p(
-                    f"with {job['other_name']}",
+                    ui_template("with {name}", "name", job["other_name"]),
                     class_name="text-sm font-medium text-[#4b5563] mt-1",
                 ),
                 class_name="min-w-0 flex-1",
@@ -1091,7 +1091,7 @@ def pending_application_card(app: dict[str, str]) -> rx.Component:
             ),
             rx.el.span(
                 rx.icon("hourglass", class_name="h-3 w-3"),
-                "Waiting on you",
+                ui("Waiting on you"),
                 class_name="w-fit shrink-0 flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1 text-[11px] font-bold text-[#b86e08]",
             ),
             class_name="flex w-full items-start gap-3",
@@ -1177,7 +1177,7 @@ def pending_application_card(app: dict[str, str]) -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("circle-x", class_name="h-4 w-4"),
-                "Deny",
+                ui("Deny"),
                 type="button",
                 disabled=ProfileState.deciding_id == app["id"],
                 on_click=lambda: ProfileState.deny_application(app["id"]),
@@ -1524,7 +1524,7 @@ def stat_card(item: tuple[str, str, str]) -> rx.Component:
             class_name="mt-3 text-3xl font-bold text-[#111827]",
         ),
         rx.el.p(
-            item[1],
+            ui(item[1]),
             class_name="text-xs font-semibold uppercase tracking-wide text-[#4b5563]",
         ),
         class_name="w-full rounded-2xl border border-[#e5e5e5] bg-white p-5",
@@ -1537,7 +1537,9 @@ def rating_card(
     return rx.el.div(
         rx.el.div(
             rx.icon(icon, class_name="h-4 w-4 text-[#111827]"),
-            rx.el.h3(title, class_name="text-sm font-semibold text-[#111827]"),
+            rx.el.h3(
+                ui(title), class_name="text-sm font-semibold text-[#111827]"
+            ),
             class_name="flex items-center gap-2",
         ),
         rx.cond(
@@ -1549,13 +1551,21 @@ def rating_card(
                 ),
                 rx.el.span(
                     rx.icon("star", class_name="h-3.5 w-3.5"),
-                    f"{count} reviews",
+                    ui_template(
+                        rx.cond(
+                            count == 1, "{count} review", "{count} reviews"
+                        ),
+                        "count",
+                        count.to_string(),
+                    ),
                     class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fba922] px-3 py-1 text-xs font-semibold text-[#111827]",
                 ),
                 class_name="mt-3 flex items-center gap-3",
             ),
             rx.el.p(
-                "No reviews yet — your first completed task starts the story.",
+                ui(
+                    "No reviews yet — your first completed task starts the story."
+                ),
                 class_name="mt-3 text-sm font-medium text-[#4b5563]",
             ),
         ),
@@ -1593,18 +1603,28 @@ def activity_tab() -> rx.Component:
         rx.el.div(
             rx.el.div(
                 rx.el.h3(
-                    "Your kindness ledger",
+                    ui("Your kindness ledger"),
                     class_name="text-lg font-semibold text-[#111827]",
                 ),
                 rx.el.p(
-                    "Everything you've posted, offered and completed on Go and Help.",
+                    ui(
+                        "Everything you've posted, offered and completed on Go and Help."
+                    ),
                     class_name="text-sm font-medium text-[#4b5563] mt-1",
                 ),
                 class_name="min-w-0",
             ),
             rx.el.span(
                 rx.icon("sparkles", class_name="h-3.5 w-3.5"),
-                f"{ProfileState.kindness_points} kindness points",
+                ui_template(
+                    rx.cond(
+                        ProfileState.kindness_points == 1,
+                        "{count} kindness point",
+                        "{count} kindness points",
+                    ),
+                    "count",
+                    ProfileState.kindness_points.to_string(),
+                ),
                 class_name="w-fit flex items-center gap-1.5 rounded-full bg-[#fff7e8] px-3 py-1.5 text-xs font-semibold text-[#b86e08]",
             ),
             class_name="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3",
@@ -1630,7 +1650,7 @@ def activity_tab() -> rx.Component:
         ),
         rx.el.div(
             rx.el.h3(
-                "Recent journal entries",
+                ui("Recent journal entries"),
                 class_name="text-sm font-semibold text-[#111827] mb-3",
             ),
             rx.cond(
@@ -1644,11 +1664,13 @@ def activity_tab() -> rx.Component:
                         "compass", class_name="h-6 w-6 text-[#4b5563] mb-2"
                     ),
                     rx.el.p(
-                        "Your journal is still blank.",
+                        ui("Your journal is still blank."),
                         class_name="text-sm font-semibold text-[#404040]",
                     ),
                     rx.el.p(
-                        "Once help posts start flowing, they'll be listed here.",
+                        ui(
+                            "Once help posts start flowing, they'll be listed here."
+                        ),
                         class_name="text-sm font-medium text-[#4b5563] mt-1",
                     ),
                     class_name="flex flex-col items-center justify-center text-center w-full rounded-2xl border border-dashed border-[#d4d4d4] bg-white/60 px-6 py-10",
@@ -1748,7 +1770,7 @@ def profile_tabs() -> rx.Component:
             ),
         ),
         on_mount=NotificationState.load_notifications,
-        aria_label=ProfileState.active_tab_label,
+        aria_label=ui(ProfileState.active_tab_label),
         class_name=rx.cond(
             ProfileState.active_tab == "community",
             "gah-member-section flex flex-col min-h-0 w-full flex-1 overflow-hidden",

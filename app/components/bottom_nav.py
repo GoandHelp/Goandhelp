@@ -71,7 +71,7 @@ def profile_button() -> rx.Component:
                         rx.get_upload_url(ProfileState.avatar_path),
                         animal_avatar(ProfileState.avatar_seed),
                     ),
-                    alt="Your profile photo",
+                    alt=ui("Your profile photo"),
                     class_name=rx.cond(
                         ProfileState.active_tab == "profile",
                         "size-[36px] min-w-[36px] min-h-[36px] aspect-square rounded-full bg-white border-0 outline outline-1 outline-offset-2 outline-[#fba922] object-cover shrink-0",
@@ -159,6 +159,6 @@ def bottom_nav() -> rx.Component:
             style={"overflow": "visible"},
         ),
         on_mount=NotificationState.load_notifications,
-        aria_label="Go and Help main navigation",
+        aria_label=ui("Go and Help main navigation"),
         class_name="gah-bottom-dock fixed bottom-0 left-0 right-0 z-50 w-full border-0 bg-white pt-1 pb-[calc(0.375rem+env(safe-area-inset-bottom))]",
     )

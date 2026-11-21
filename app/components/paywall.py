@@ -184,7 +184,7 @@ def paywall_header() -> rx.Component:
                 class_name="text-xl sm:text-2xl font-bold tracking-tight leading-tight text-[#111827]",
             ),
             rx.el.p(
-                "Community in your hands",
+                ui("Community in your hands"),
                 class_name="text-[12px] font-semibold text-[#4b5563]",
             ),
             class_name="min-w-0 flex-1 -translate-x-[3px] text-left",

@@ -2,6 +2,8 @@
 
 import reflex as rx
 
+from app.interface_i18n import ui
+
 from app.components.disclosure import record_disclosure, record_summary
 from app.components.request_heading import request_heading
 from app.states.bookmark_state import BookmarkState, SavedRequest
@@ -116,7 +118,7 @@ def alert_card(alert: SavedAlert, **props) -> rx.Component:
                     rx.cond(alert["is_enabled"], "bell-off", "bell"),
                     class_name="h-3.5 w-3.5",
                 ),
-                rx.cond(alert["is_enabled"], "Turn off", "Turn on"),
+                rx.cond(alert["is_enabled"], ui("Turn off"), ui("Turn on")),
                 type="button",
                 disabled=SavedSearchState.busy_id == alert["id"],
                 aria_pressed=rx.cond(alert["is_enabled"], "true", "false"),
@@ -126,7 +128,7 @@ def alert_card(alert: SavedAlert, **props) -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("trash-2", class_name="h-3.5 w-3.5"),
-                "Delete",
+                ui("Delete"),
                 type="button",
                 disabled=SavedSearchState.busy_id == alert["id"],
                 aria_label="Delete this saved search",
@@ -271,7 +273,7 @@ def saved_request_body(request: SavedRequest) -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("bookmark-x", class_name="h-3.5 w-3.5"),
-                "Remove",
+                ui("Remove"),
                 type="button",
                 disabled=BookmarkState.busy_id == request["id"],
                 aria_label="Remove this request from your bookmarked help requests",

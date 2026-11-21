@@ -164,7 +164,7 @@ def nationality_field() -> rx.Component:
                 placeholder="Portugal",
                 list="gah-country-suggestions",
                 auto_complete="off",
-                aria_label="Nationality",
+                aria_label=ui("Nationality"),
                 aria_invalid=rx.cond(
                     ContactsState.country_error, "true", "false"
                 ),
@@ -953,7 +953,7 @@ def comment_composer() -> rx.Component:
                         rx.icon(
                             "loader-circle", class_name="h-4 w-4 animate-spin"
                         ),
-                        "Posting…",
+                        ui("Posting…"),
                         class_name="flex items-center justify-center gap-2",
                     ),
                     rx.el.span(
