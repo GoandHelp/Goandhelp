@@ -3,6 +3,10 @@ import reflex as rx
 import json
 from reflex.vars.base import VarData
 
+from app.interface_catalog_settings_extra_languages import (
+    ADDITIONAL_SETTINGS_CATALOGS,
+)
+
 from app.interface_catalog_forum import FORUM_LABEL_CATALOGS, FORUM_LABEL_KEYS
 from app.interface_catalog_forum_text import (
     FORUM_TEXT_CATALOGS,
@@ -789,10 +793,14 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
 
 
 def translate(language: str, source: str) -> str:
+    if language in ADDITIONAL_SETTINGS_CATALOGS:
+        return ADDITIONAL_SETTINGS_CATALOGS[language].get(source, source)
     return CATALOGS.get(language, {}).get(source, source)
 
 
 def catalog(language: str) -> dict[str, str]:
+    if language in ADDITIONAL_SETTINGS_CATALOGS:
+        return dict(ADDITIONAL_SETTINGS_CATALOGS[language])
     return dict(CATALOGS.get(language, {}))
 
 

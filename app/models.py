@@ -241,6 +241,16 @@ LANGUAGE_LABELS: dict[str, str] = {
     code: label for code, label in LANGUAGE_OPTIONS
 }
 LANGUAGE_CODES: list[str] = [code for code, _ in LANGUAGE_OPTIONS]
+SETTINGS_LANGUAGE_OPTIONS: list[tuple[str, str]] = sorted(
+    [*LANGUAGE_OPTIONS, ("ru", "Russian"), ("ur", "Urdu")],
+    key=lambda option: option[1],
+)
+SETTINGS_LANGUAGE_CODES: list[str] = [
+    code for code, _ in SETTINGS_LANGUAGE_OPTIONS
+]
+SETTINGS_LANGUAGE_LABELS: dict[str, str] = {
+    code: label for code, label in SETTINGS_LANGUAGE_OPTIONS
+}
 DEFAULT_LANGUAGE = "en"
 
 REWARD_TYPES: list[str] = [

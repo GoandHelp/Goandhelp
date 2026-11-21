@@ -30,7 +30,7 @@ from app.components.help_post_panel import help_post_panel
 from app.components.messages_panel import messages_panel
 from app.components.membership_info import membership_information_section
 from app.components.paywall import membership_notices_panel
-from app.models import CATEGORY_LABELS, LANGUAGE_OPTIONS
+from app.models import CATEGORY_LABELS, SETTINGS_LANGUAGE_OPTIONS
 from app.states.auth_state import AuthState
 from app.states.block_state import BlockedMember, BlockState
 from app.states.notification_state import NotificationState
@@ -1460,7 +1460,7 @@ def app_language_field() -> rx.Component:
                 class_name="h-4 w-4 text-[#fba922] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none",
             ),
             rx.el.select(
-                rx.foreach(LANGUAGE_OPTIONS, app_language_option),
+                rx.foreach(SETTINGS_LANGUAGE_OPTIONS, app_language_option),
                 id="settings-interface-language",
                 value=AuthState.preferred_language,
                 disabled=AuthState.language_saving,

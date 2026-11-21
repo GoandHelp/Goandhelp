@@ -31,8 +31,8 @@ from app.models import (
     FIRST_NAME_MAX_LENGTH,
     HELP_MODE_BOTH,
     HELP_MODES,
-    LANGUAGE_CODES,
-    LANGUAGE_LABELS,
+    SETTINGS_LANGUAGE_CODES,
+    SETTINGS_LANGUAGE_LABELS,
     VERIFICATION_MAX_SENDS_PER_DAY,
     VERIFICATION_PURPOSE_RESEND,
     VERIFICATION_PURPOSE_SIGNUP,
@@ -338,7 +338,11 @@ class AuthState(rx.State):
 
     @rx.var
     def interface_direction(self) -> str:
-        return "rtl" if self.preferred_language in ("ar", "he", "fa") else "ltr"
+        return (
+            "rtl"
+            if self.preferred_language in ("ar", "he", "fa", "ur")
+            else "ltr"
+        )
 
     joined_label: str = ""
     auth_tab: str = "register"
@@ -547,7 +551,7 @@ class AuthState(rx.State):
 
     @rx.var
     def language_label(self) -> str:
-        return LANGUAGE_LABELS.get(self.preferred_language, "English")
+        return SETTINGS_LANGUAGE_LABELS.get(self.preferred_language, "English")
 
     @rx.var
     def register_dial_prefix(self) -> str:
@@ -1274,7 +1278,7 @@ VALUES (:sid, 1, '', :answers, '{}', 0)
 
     @rx.event(background=True)
     async def update_language(self, language: str):
-        if language not in LANGUAGE_CODES:
+        if language not in SETTINGS_LANGUAGE_CODES:
             return
         from app.states.onboarding_state import OnboardingState
 
