@@ -11,12 +11,16 @@ from string import Formatter
 from app.policies import POLICY_DOCUMENTS
 from app.policy_catalog_agreement_french import AGREEMENT_FRENCH_ROWS
 from app.policy_catalog_agreement_german import AGREEMENT_GERMAN_ROWS
+from app.policy_catalog_agreement_russian_urdu import (
+    AGREEMENT_RUSSIAN_URDU_ROWS,
+)
 from app.policy_catalog_chrome import POLICY_CHROME_KEYS, POLICY_CHROME_ROWS
 from app.policy_catalog_credits_asian import CREDITS_ASIAN_ROWS
 from app.policy_catalog_credits_european import CREDITS_EUROPEAN_ROWS
 from app.policy_catalog_credits_global import CREDITS_GLOBAL_ROWS
 from app.policy_catalog_privacy import PRIVACY_ROWS
 from app.policy_catalog_howto_french import HOWTO_FRENCH_ROWS
+from app.policy_catalog_howto_russian_urdu import HOWTO_RUSSIAN_URDU_ROWS
 
 POLICY_DOCUMENT_KEYS: tuple[str, ...] = (
     "howto",
@@ -150,6 +154,8 @@ for _keys, _rows in (
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_GERMAN_ROWS),
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_FRENCH_ROWS),
     (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_FRENCH_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_RUSSIAN_URDU_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_RUSSIAN_URDU_ROWS),
     (POLICY_CHROME_KEYS, POLICY_CHROME_ROWS),
 ):
     for _locale, _entries in validate_rows(_keys, _rows).items():
