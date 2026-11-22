@@ -6,6 +6,7 @@ from reflex.vars.base import VarData
 from app.interface_catalog_settings_extra_languages import (
     ADDITIONAL_SETTINGS_CATALOGS,
 )
+from app.policy_catalog import POLICY_CATALOGS, POLICY_TRANSLATED_KEYS
 
 from app.interface_catalog_forum import FORUM_LABEL_CATALOGS, FORUM_LABEL_KEYS
 from app.interface_catalog_forum_text import (
@@ -760,6 +761,13 @@ for _language, _entries in HELP_HUB_FEEDBACK_CATALOGS.items():
         else:
             CATALOGS[_language].setdefault(_key, _value)
 
+for _language, _entries in POLICY_CATALOGS.items():
+    for _key, _value in _entries.items():
+        if _language in ADDITIONAL_SETTINGS_CATALOGS:
+            ADDITIONAL_SETTINGS_CATALOGS[_language].setdefault(_key, _value)
+        else:
+            CATALOGS[_language].setdefault(_key, _value)
+
 COMPLETE_KEYS: tuple[str, ...] = tuple(
     dict.fromkeys(
         [
@@ -833,6 +841,7 @@ COMPLETE_KEYS: tuple[str, ...] = tuple(
             *REMAINING_COUNT_KEYS,
             *REMAINING_STARS_KEYS,
             *REMAINING_ACTIONS_KEYS,
+            *POLICY_TRANSLATED_KEYS,
             "clear",
             "optional",
         ]

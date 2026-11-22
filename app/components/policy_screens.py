@@ -5,12 +5,13 @@ import reflex as rx
 from app.components.header import BRAND_LOGO_SRC, BRAND_LOGO_ALT
 from app.interface_i18n import ui, ui_template
 from app.policies import POLICY_LINKS, PolicySection
+from app.states.auth_state import AuthState
 from app.states.policy_state import PolicyState
 
 
 def policy_paragraph(text: rx.Var[str]) -> rx.Component:
     return rx.el.p(
-        text,
+        ui(text),
         class_name="text-[13px] sm:text-sm font-medium leading-relaxed text-[#4b5563]",
     )
 
@@ -30,7 +31,7 @@ def policy_section(section: PolicySection, index: rx.Var[int]) -> rx.Component:
                     class_name="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8c91aa]",
                 ),
                 rx.el.h2(
-                    section["heading"],
+                    ui(section["heading"]),
                     class_name="text-base sm:text-lg font-bold tracking-tight leading-snug text-[#111827]",
                 ),
                 class_name="min-w-0 flex-1",
@@ -48,7 +49,7 @@ def policy_section(section: PolicySection, index: rx.Var[int]) -> rx.Component:
 def policy_header() -> rx.Component:
     return rx.el.div(
         rx.el.button(
-            rx.icon("arrow-left", class_name="h-4 w-4"),
+            rx.icon("arrow-left", class_name="h-4 w-4 rtl:rotate-180"),
             rx.el.span(ui("Back"), class_name="text-xs font-bold"),
             type="button",
             title=ui("Back to your profile"),
@@ -84,16 +85,16 @@ def policy_screen() -> rx.Component:
                 ),
                 rx.el.div(
                     rx.el.h1(
-                        PolicyState.title,
+                        ui(PolicyState.title),
                         id="policy-title",
                         class_name="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-[#111827]",
                     ),
                     rx.el.p(
-                        PolicyState.subtitle,
+                        ui(PolicyState.subtitle),
                         class_name="mt-1 text-[13px] sm:text-sm font-medium leading-relaxed text-[#4b5563]",
                     ),
                     rx.el.p(
-                        PolicyState.updated,
+                        ui(PolicyState.updated),
                         class_name="mt-2 w-fit rounded-full bg-[#fff7e8] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#b86e08]",
                     ),
                     class_name="min-w-0 flex-1",
@@ -106,7 +107,7 @@ def policy_screen() -> rx.Component:
                     class_name="mt-0.5 h-4 w-4 shrink-0 text-[#fba922]",
                 ),
                 rx.el.p(
-                    PolicyState.notice,
+                    ui(PolicyState.notice),
                     class_name="text-[13px] font-bold leading-relaxed text-[#b86e08]",
                 ),
                 role="note",
@@ -126,7 +127,7 @@ def policy_screen() -> rx.Component:
                 class_name="mt-5 text-center text-[11px] font-medium leading-relaxed text-[#68708f]",
             ),
             rx.el.button(
-                rx.icon("arrow-left", class_name="h-4 w-4"),
+                rx.icon("arrow-left", class_name="h-4 w-4 rtl:rotate-180"),
                 ui("Back to your profile"),
                 type="button",
                 aria_label=ui("Back to your profile"),
@@ -138,7 +139,9 @@ def policy_screen() -> rx.Component:
         role="dialog",
         aria_modal="true",
         aria_labelledby="policy-title",
-        class_name="gah-screen-scroll fixed inset-0 z-[70] h-[100dvh] w-full overflow-y-auto overscroll-contain bg-white",
+        dir=AuthState.interface_direction,
+        lang=AuthState.preferred_language,
+        class_name="gah-screen-scroll fixed inset-0 z-[70] h-[100dvh] w-full overflow-y-auto overscroll-contain bg-white font-['Inter'] text-start [overflow-wrap:anywhere]",
     )
 
 
@@ -156,7 +159,10 @@ def policy_link_card(item: dict[str, str]) -> rx.Component:
             ui(item["label"]),
             class_name="min-w-0 flex-1 break-words text-start text-[13px] font-bold leading-snug text-[#111827]",
         ),
-        rx.icon("chevron-right", class_name="h-4 w-4 shrink-0 text-[#e08b12]"),
+        rx.icon(
+            "chevron-right",
+            class_name="h-4 w-4 shrink-0 text-[#e08b12] rtl:rotate-180",
+        ),
         type="button",
         aria_label=ui(item["label"]),
         on_click=lambda: PolicyState.open_policy(item["key"]),

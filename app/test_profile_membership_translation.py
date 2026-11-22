@@ -503,13 +503,19 @@ class ProfileMembershipTranslationTests(unittest.TestCase):
                             "title",
                             "MembershipState.coffee_price_label",
                             "item['label']",
+                            "PolicyState.title",
+                            "PolicyState.subtitle",
+                            "PolicyState.updated",
+                            "PolicyState.notice",
+                            "section['heading']",
+                            "text",
                         },
                         first,
                     )
         for field in ("title", "subtitle", "updated", "notice"):
             self.assertIn(f"PolicyState.{field}", parsed(policy_screen))
-            self.assertNotIn(f"ui(PolicyState.{field})", parsed(policy_screen))
-        self.assertNotIn("ui(section['heading'])", parsed(policy_section))
+            self.assertIn(f"ui(PolicyState.{field})", parsed(policy_screen))
+        self.assertIn("ui(section['heading'])", parsed(policy_section))
         policy_state_source = Path("app/states/policy_state.py").read_text()
         self.assertNotIn("interface_i18n", policy_state_source)
         for field in ("title", "subtitle", "updated", "notice"):
