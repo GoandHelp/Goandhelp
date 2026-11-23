@@ -313,7 +313,15 @@ class GermanPolicyTranslationTests(unittest.TestCase):
             ),
         )
         self.assertEqual(
-            AGREEMENT_GERMAN_ROWS["de"][42],
+            AGREEMENT_GERMAN_ROWS["de"][
+                DOCUMENT_SOURCE_KEYS["agreement"].index(
+                    next(
+                        source
+                        for source in DOCUMENT_SOURCE_KEYS["agreement"]
+                        if source.startswith("You agree to indemnify")
+                    )
+                )
+            ],
             "Du erklärst dich bereit, Go and Help von Ansprüchen, Forderungen, Verlusten und angemessenen Kosten Dritter freizustellen und schadlos zu halten, die aus deinen Inhalten, deinem Verhalten, deinen Vereinbarungen mit anderen Nutzern oder deinem Verstoß gegen diese Vereinbarung entstehen — außer soweit das Recht deines Wohnorts dies nicht erlaubt oder der Anspruch aus unserem eigenen Fehlverhalten resultiert.",
         )
 
