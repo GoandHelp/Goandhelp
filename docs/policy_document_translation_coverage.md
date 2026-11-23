@@ -17,46 +17,39 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
 
 - Credits: all eight fields, including all three attribution paragraphs, in all
   38 non-English Settings locales (304 source/locale entries).
-- Privacy: all 41 fields in French, Russian and Urdu (123 entries, with the date
-  already included in Credits).
+- Privacy: all 41 fields in French, German, Russian and Urdu (164 field entries,
+  with the date already included in Credits).
 - User agreement: all 51 fields in French, German, Russian and Urdu (204 field
   entries, with the shared date already included in Credits).
-- Handbook: all 85 fields in French, Russian and Urdu, including the entire
-  merged safety notice and every safety section (255 field entries, with the
-  shared date already included in Credits).
+- Handbook: all 85 fields in French, German, Russian and Urdu, including the
+  entire merged safety notice and every safety section (340 field entries,
+  with the shared date already included in Credits).
 - Russian and Urdu reader chrome and footer disclaimer remain registered.
-- This bounded batch supplies exactly 272 literal whole-field translations:
-  170 handbook fields and 102 agreement fields. Privacy and Credits files and
-  values are unchanged. English sources and all other locale data are unchanged.
+- This German-only batch adds exactly 126 literal whole-field translations:
+  85 handbook fields and 41 privacy fields, supplying 124 new distinct authored
+  sources after shared dates are deduplicated. German agreement and Credits,
+  French/Russian/Urdu and every other locale, and canonical English are untouched.
 
-The dedicated catalogs now contain 876 distinct canonical document source/locale
-entries out of 6,916 required (38 × 182). Whole-paragraph translations total 512.
-These counts deduplicate the effective date shared across the four documents;
-reader chrome is excluded. French, Russian and Urdu each have all 182 sources;
-German has 58; the other 34 non-English Settings locales have eight each in the
- dedicated document catalogs. Russian and Urdu each increased from 50 authored
-sources to 182, a gain of 132 distinct sources despite 136 newly authored fields
-per locale (shared dates and previously supplied titles account for duplicates).
-
-Effective interface catalogs cover 1,050 of the 6,916 canonical source/locale
-pairs: French, Russian and Urdu have 182 each, German has 62, and the other 34
-locales have 13 each. Before this batch Russian and Urdu each had 51 effective
-sources and 131 gaps, rather than 50 effective sources. They now have no policy
-source gaps. These are **policy-only** counts, not wider interface-key coverage.
-The focused test computes these totals from the actual dedicated and effective
-catalogs and asserts the inventory and remaining gap distribution.
+Coverage arithmetic from the director-verified pre-write baseline and this batch
+is 876 + 124 = **1,000 authored** and 1,050 + 120 = **1,170 effective** canonical
+source/locale pairs out of 6,916 (38 × 182). These post-write totals await the
+ director's runtime verification; they are not claimed as an executed test result.
+Reader chrome is excluded. French, German, Russian and Urdu now each supply all
+182 sources; the other 34 locales retain eight dedicated and 13 effective sources
+apiece. German moves from 58 to 182 authored sources and from 62 to 182 effective
+sources, eliminating its 120 effective gaps. These are **policy-only** counts,
+not wider interface coverage. The German focused test computes actual catalog
+counts and checks these minimum gains without freezing other locales' progress.
 The Dutch title `Credits` is a documented natural-language coincidence, not a
 paragraph fallback. Proper project names, copyright symbols and licence names are
 retained in their attribution contexts.
 
-**Remaining:** 35 non-English locales still have policy gaps: German lacks 120
-sources, and each of the other 34 locales lacks 169 effective sources, for 5,866
-missing source/locale pairs. German's agreement is already complete; its handbook
-and privacy data remain incomplete. The other 34 need full handbook, privacy and
-agreement authoring beyond their existing entries. This must not be described as
-full-document coverage in all 39 languages. Wider Russian/Urdu interface gaps are
-not addressed here. The global translation checklist remains incomplete and its
-checkmarks were not changed.
+**Remaining:** 34 non-English locales need full handbook, privacy and agreement
+translations beyond their existing entries: 169 effective gaps each, or
+5,866 − 120 = **5,746** missing pairs (34 × 169), pending post-write verification.
+Spanish is not included in this batch. This is not full-document coverage in all
+39 languages. Wider interface gaps are not addressed here. The global checklist
+remains incomplete and its checkmarks were not changed.
 
 ## Checks
 
@@ -76,10 +69,21 @@ fallback, retained privacy/Credits values and attribution, placeholders, dates,
 age, distance and emergency numbers, native-word liability limits and legal
 exceptions, long-paragraph anti-summary checks, and a small Node fixture executing
 the compiled reactive lookup across Russian, Urdu and English. It also computes
-the dedicated/effective global counts and documents the 35 remaining locale gaps;
-this partial-status check is not a replacement or waiver of the all-38 gate.
+dedicated/effective global totals using progress-safe invariants (38 locales,
+182 sources, French/Russian/Urdu complete, authored ≥876, effective ≥1,050 and
+covered + missing = 6,916), rather than requiring any other locale to remain
+incomplete. Only that method and the Russian indemnity token fixture were repaired;
+the correct Russian translation itself was not changed. This check does not
+replace or waive the unchanged strict all-38/all-182 release gate.
 
-Focused tests and programmatic coverage verification are **pending the director's
-run**; no tests were executed in this turn. An independently frozen full-English
-checksum fixture and human linguistic/legal review are not supplied. No human
-review or legal certification is claimed.
+`app/test_policy_german_translation.py` adds five focused checks: pure literal
+85/41-field German-only rows; nonempty native entries, placeholders, names and
+anti-summary checks; complete 182-source authored/effective German coverage and
+computed progress; all merged safety fields plus representative full privacy and
+safety paragraphs and numerical facts; preserved agreement/Credits values; and
+the director-frozen canonical English SHA-256 checksum
+`404ee59a08a5b8fc3f5238768659a8df32b7ff7eda9279353cb86110ff575f3d`.
+
+The seven Russian/Urdu checks and five German checks, including post-write actual
+coverage verification, are **pending the director's run**; no tests were executed
+in this turn. No human linguistic/legal review or legal certification is claimed.
