@@ -5,6 +5,7 @@ import reflex as rx
 from app.interface_i18n import ui, ui_template
 from app.components.header import BRAND_LOGO_SRC, BRAND_LOGO_ALT
 from app.states.membership_state import MembershipState, NoticeItem
+from app.states.auth_state import AuthState
 from app.skill_categories import CATEGORY_UPGRADE_REASON
 from app.states.community_state import (
     FORUM_TOPIC_REASON,
@@ -28,7 +29,7 @@ def benefit_marker(line: str) -> rx.Component:
             ui(line),
             class_name="min-w-0 text-[12px] font-semibold leading-snug text-[#111827]",
         ),
-        class_name="grid w-full grid-cols-[1rem_minmax(0,1fr)] items-start gap-4 text-left",
+        class_name="grid w-full grid-cols-[1rem_minmax(0,1fr)] items-start gap-4 text-start",
     )
 
 
@@ -46,7 +47,7 @@ def transit_ticket(
             rx.icon("bus-front", class_name="size-4"),
             rx.el.span(
                 rx.cond(tone == "green", ui("PASS"), ui("TICKET")),
-                class_name="text-[8px] font-bold tracking-[0.22em]",
+                class_name="min-w-0 break-words text-center text-[7px] font-bold leading-[0.75rem] tracking-[0.12em]",
             ),
             class_name=rx.cond(
                 tone == "green",
@@ -67,9 +68,9 @@ def free_marker(line: str) -> rx.Component:
         ),
         rx.el.span(
             ui(line),
-            class_name="min-w-0 text-left text-[12px] font-medium leading-snug text-[#4b5563]",
+            class_name="min-w-0 text-start text-[12px] font-medium leading-snug text-[#4b5563]",
         ),
-        class_name="grid w-full grid-cols-[1rem_minmax(0,1fr)] items-start gap-4 text-left",
+        class_name="grid w-full grid-cols-[1rem_minmax(0,1fr)] items-start gap-4 text-start",
     )
 
 
@@ -83,16 +84,16 @@ def ticket_to_ride_choice() -> rx.Component:
                     class_name="text-base font-bold tracking-tight text-[#e08b12]",
                 ),
                 rx.el.p(
-                    MembershipState.coffee_price_label,
+                    ui(MembershipState.coffee_price_label),
                     class_name="text-sm font-semibold text-black",
                 ),
-                class_name="min-w-0 text-left",
+                class_name="min-w-0 text-start",
             ),
             class_name="flex items-center gap-3",
         ),
         rx.el.p(
             ui("Unlock all benefits, cancel anytime"),
-            class_name="mt-2 w-full pl-[5.75rem] text-left text-[12px] font-medium leading-snug text-[#4b5563]",
+            class_name="mt-2 w-full ps-[5.75rem] text-start text-[12px] font-medium leading-snug text-[#4b5563]",
         ),
         type="button",
         role="radio",
@@ -101,8 +102,8 @@ def ticket_to_ride_choice() -> rx.Component:
         on_click=lambda: MembershipState.select_plan(COFFEE_PLAN),
         class_name=rx.cond(
             MembershipState.coffee_selected,
-            "flex w-full flex-col rounded-[1.4rem] border-2 border-[#e08b12] bg-white p-4 text-left transition-colors",
-            "flex w-full flex-col rounded-[1.4rem] border border-[#e5e5e5] bg-white p-4 text-left transition-colors hover:border-[#e08b12]",
+            "flex w-full flex-col rounded-[1.4rem] border-2 border-[#e08b12] bg-white p-4 text-start transition-colors",
+            "flex w-full flex-col rounded-[1.4rem] border border-[#e5e5e5] bg-white p-4 text-start transition-colors hover:border-[#e08b12]",
         ),
     )
 
@@ -117,16 +118,16 @@ def annual_pass_choice() -> rx.Component:
                     class_name="text-base font-bold tracking-tight text-[#fba922]",
                 ),
                 rx.el.p(
-                    MembershipState.dinner_price_label,
+                    ui(MembershipState.dinner_price_label),
                     class_name="text-sm font-semibold text-[#111827]",
                 ),
-                class_name="min-w-0 text-left",
+                class_name="min-w-0 text-start",
             ),
             class_name="flex items-center gap-3",
         ),
         rx.el.p(
             ui("Unlock all benefits, cancel anytime"),
-            class_name="mt-2 w-full pl-[5.75rem] text-left text-[12px] font-medium leading-snug text-[#4b5563]",
+            class_name="mt-2 w-full ps-[5.75rem] text-start text-[12px] font-medium leading-snug text-[#4b5563]",
         ),
         type="button",
         role="radio",
@@ -135,8 +136,8 @@ def annual_pass_choice() -> rx.Component:
         on_click=lambda: MembershipState.select_plan(DINNER_PLAN),
         class_name=rx.cond(
             MembershipState.dinner_selected,
-            "flex w-full flex-col rounded-[1.4rem] border-2 border-[#e08b12] bg-white p-4 text-left transition-colors",
-            "flex w-full flex-col rounded-[1.4rem] border border-[#e5e5e5] bg-white p-4 text-left transition-colors hover:border-[#e08b12]",
+            "flex w-full flex-col rounded-[1.4rem] border-2 border-[#e08b12] bg-white p-4 text-start transition-colors",
+            "flex w-full flex-col rounded-[1.4rem] border border-[#e5e5e5] bg-white p-4 text-start transition-colors hover:border-[#e08b12]",
         ),
     )
 
@@ -150,7 +151,7 @@ def comparison_rail() -> rx.Component:
             ),
             rx.el.div(
                 rx.foreach(MembershipState.premium_benefits, benefit_marker),
-                class_name="mt-2 flex w-full min-w-0 flex-col gap-2 pl-3 sm:pl-5",
+                class_name="mt-2 flex w-full min-w-0 flex-col gap-2 ps-3 sm:ps-5",
             ),
             class_name="w-full rounded-2xl border border-[#fba922] bg-white p-4",
         ),
@@ -161,7 +162,7 @@ def comparison_rail() -> rx.Component:
             ),
             rx.el.div(
                 rx.foreach(MembershipState.free_benefits, free_marker),
-                class_name="mt-2 flex w-full min-w-0 flex-col gap-2 pl-3 sm:pl-5",
+                class_name="mt-2 flex w-full min-w-0 flex-col gap-2 ps-3 sm:ps-5",
             ),
             class_name="w-full rounded-2xl border border-[#e5e5e5] bg-[#ffffff] p-4 text-center",
         ),
@@ -187,7 +188,7 @@ def paywall_header() -> rx.Component:
                 ui("Community in your hands"),
                 class_name="text-[12px] font-semibold text-[#4b5563]",
             ),
-            class_name="min-w-0 flex-1 -translate-x-[3px] text-left",
+            class_name="min-w-0 flex-1 -translate-x-[3px] text-start",
         ),
         class_name="flex items-center gap-3",
     )
@@ -315,7 +316,9 @@ def paywall_modal() -> rx.Component:
                 role="dialog",
                 aria_modal="true",
                 aria_labelledby="paywall-title",
-                class_name="relative z-10 w-full max-w-xl max-h-[90vh] overflow-hidden rounded-[2rem] border-2 border-[#e08b12] bg-[#ffffff]",
+                lang=AuthState.preferred_language,
+                dir=AuthState.interface_direction,
+                class_name="relative z-10 w-full max-w-xl max-h-[90vh] overflow-hidden rounded-[2rem] border-2 border-[#e08b12] bg-[#ffffff] text-start",
             ),
             class_name="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-6",
         ),
