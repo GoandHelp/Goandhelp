@@ -251,7 +251,7 @@ class FinnishPolicyTranslationTests(unittest.TestCase):
                 (
                     "eivät näy kenellekään",
                     "et näy kartoilla",
-                    "koordinaatteja ei lähetetä eteenpäin",
+                    "eikä koordinaatteja lähetetä eteenpäin",
                 ),
             ),
             (

@@ -18,11 +18,10 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
 - Credits: all eight fields, including all three attribution paragraphs, in all
   38 non-English Settings locales (304 source/locale entries).
 - Privacy: all 41 fields in French, German, Spanish, Italian, Portuguese,
-  Dutch, Swedish, Danish, Finnish, Russian and Urdu (the date is already included in Credits).
-- User agreement: all 51 fields in French, German, Spanish, Italian, Portuguese,
-  Dutch, Swedish, Danish, Finnish, Russian and Urdu (the shared date is already included in Credits).
+  Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Russian and Urdu (the date is already included in Credits).
+- User agreement: all 51 fields in French, German, Spanish, Italian, Dutch, Swedish, Danish, Finnish, Czech, Polish, Portuguese, Hungarian, Russian and Urdu (the shared date is already included in Credits).
 - Handbook: all 85 fields in French, German, Spanish, Italian, Portuguese,
-  Dutch, Swedish, Danish, Finnish and Urdu, including the entire merged safety notice
+  Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Russian and Urdu, including the entire merged safety notice
   and every safety section (the shared date is already included in Credits).
 - Spanish batch: `app/policy_catalog_howto_spanish.py` (85),
   `app/policy_catalog_privacy_spanish.py` (41) and
@@ -77,38 +76,75 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
 - Finnish batch: `app/policy_catalog_howto_finnish.py` (85),
   `app/policy_catalog_privacy_finnish.py` (41) and
   `app/policy_catalog_agreement_finnish.py` (51) add exactly 177 literal,
-  complete Finnish fields, including all merged safety content. The exact
-  existing Credits date is reused; plan labels are Kuukausilippu and Vuosipassi.
-  Deduplicating that date adds 174 authored sources and is expected to close all
-  169 Finnish gaps. Finnish checks and post-write totals are **pending**.
+  complete Finnish fields, including all merged safety content. Its four focused
+  checks **passed** with 2,218 authored, 2,353 effective and 4,563 missing pairs;
+  eleven locales are complete (Danish, Finnish, German, Spanish, French, Italian,
+  Dutch, Portuguese, Russian, Swedish and Urdu). One incorrect grammatical test
+  fixture was repaired; native Finnish data was untouched.
+- Czech batch: `app/policy_catalog_howto_czech.py` (85),
+  `app/policy_catalog_privacy_czech.py` (41) and
+  `app/policy_catalog_agreement_czech.py` (51) contain 177 full literal Czech
+  fields, including the complete merged safety content. Its four focused checks
+  passed with **2,392 authored, 2,522 effective and 4,394 missing**; all 169 Czech
+  effective gaps are closed. One incorrectly shortened refund test token was
+  repaired in a single fixture-only line; the correct Czech data was unchanged.
 - Russian and Urdu reader chrome and footer disclaimer remain registered.
 
-Verified after Danish: **2,044 authored**, **2,184 effective** and **4,732
-missing** canonical source/locale pairs out of 6,916. Ten locales (Danish,
-German, Spanish, French, Italian, Dutch, Portuguese, Russian, Swedish and Urdu)
-are complete. Danish's four focused checks and actual totals are verified passed;
-its repair changed only faulty fixtures, leaving correct translation data and
-all prior locales untouched.
+Verified after Finnish: **2,218 authored**, **2,353 effective** and **4,563
+missing** canonical source/locale pairs out of 6,916. Eleven locales (Danish,
+Finnish, German, Spanish, French, Italian, Dutch, Portuguese, Russian, Swedish
+and Urdu) are complete. Finnish's four focused checks and actual totals are
+verified passed; its one-line repair changed only an incorrect grammatical test
+fixture, leaving the native Finnish data and all prior locales untouched.
 
-Expected after Finnish integration: 2,044 + 174 = **2,218 authored**,
-2,184 + 169 = **2,353 effective** and 4,732 − 169 = **4,563 missing** pairs.
-Eleven locales (Danish, Finnish, German, Spanish, French, Italian, Dutch,
-Portuguese, Russian, Swedish and Urdu) are expected to be complete; the other 27
-locales are expected to have 169 gaps each. Finnish checks and post-batch totals
-remain pending. The batches use progress-safe global minimums and do not require
-other locales to remain incomplete. Reader chrome is excluded. The Dutch title
-`Credits` is a documented natural-language coincidence, not a paragraph
-fallback. Swedish's native effective Credits title `Tack till bidragsgivarna`
-and Danish's `Tak til bidragyderne` are preserved separately from their authored
-Credits titles; Finnish's effective `Kiitokset` is retained. Project names,
-copyright symbols and licence names are retained in attribution contexts.
+Verified after Czech: **2,392 authored, 2,522 effective and 4,394 missing**
+canonical source/locale pairs. Twelve locales (Czech, Danish, Finnish, German,
+Spanish, French, Italian, Dutch, Portuguese, Russian, Swedish and Urdu) are
+complete. Czech's four focused checks passed; one incorrect refund fixture token
+was repaired without changing native Czech data.
 
-**Remaining:** 27 non-English locales are expected to need full handbook,
+- Polish batch: `app/policy_catalog_howto_polish.py` (85),
+  `app/policy_catalog_privacy_polish.py` (41) and
+  `app/policy_catalog_agreement_polish.py` (51) add exactly 177 full literal
+  Polish fields, including all merged safety content. Its four focused checks
+  **passed** with actual totals of 2,566 authored, 2,691 effective and 4,225
+  missing pairs; thirteen locales (Czech, Danish, Finnish, German, Spanish,
+  French, Italian, Dutch, Polish, Portuguese, Russian, Swedish and Urdu) are
+  complete. A two-line fixture-only repair corrected one grammatical-case
+  assertion and the distinction between 175 unique keys and 177 total rows;
+  Polish translation text was unchanged.
+- Hungarian batch: `app/policy_catalog_howto_hungarian.py` (85),
+  `app/policy_catalog_privacy_hungarian.py` (41) and
+  `app/policy_catalog_agreement_hungarian.py` (51) add 177 complete literal
+  fields, including every merged safety field. The exact existing Credits date
+  is reused and the plan labels are Havi jegy and Éves bérlet. Deduplicating
+  that date adds 174 authored sources and is expected to close all 169
+  Hungarian effective gaps. Hungarian focused checks and actual post-batch
+  totals remain pending until executed.
+
+Verified after Polish: **2,566 authored, 2,691 effective and 4,225 missing**
+canonical source/locale pairs. Thirteen locales (Czech, Danish, Finnish,
+German, Spanish, French, Italian, Dutch, Polish, Portuguese, Russian, Swedish
+and Urdu) are complete. Hungarian is expected to add 174 authored and 169
+effective entries, for expected totals of **2,740 authored, 2,860 effective
+and 4,056 missing**. Fourteen locales including Hungarian are expected complete;
+the remaining 24 locales are expected to have 169 gaps each. Hungarian checks
+and totals are pending. The batches use progress-safe global minimums and do
+not require other locales to remain incomplete. Reader chrome is excluded.
+The Dutch title `Credits` is a documented natural-language coincidence, not a
+paragraph fallback. Swedish's native effective Credits title `Tack till
+bidragsgivarna`, Danish's `Tak til bidragyderne`, Finnish's `Kiitokset`, Czech's
+`Poděkování` and Polish's `Podziękowania` are preserved separately from their
+authored Credits titles. Project names, copyright symbols and licence names are
+retained in attribution contexts.
+
+**Remaining:** 24 non-English locales are expected to need full handbook,
 privacy and agreement translations beyond their existing entries: 169 effective
-gaps each, or **4,563** missing pairs (27 × 169), pending verification of the
-Finnish batch. Later languages follow in later batches. This is not full-document
-coverage in all 39 languages. Wider interface gaps are not addressed here. The
-global checklist remains incomplete and its checkmarks were not changed.
+gaps each, or **4,056** missing pairs (24 × 169), pending verification of the
+Hungarian batch. Later languages follow in later batches. This is not
+full-document coverage in all 39 languages. Wider interface gaps are not
+addressed here. The global checklist remains incomplete and its checkmarks were
+not changed.
 
 ## Checks
 
@@ -197,7 +233,40 @@ compound-aware thresholds; all 182 authored/effective sources and unchanged
 Credits, including its effective native title; the complete merged safety
 inventory and source-bound location, age, emergency, renewal, cancellation,
 refund, liability and consumer-rights clauses; progress-safe totals; and the
-frozen English checksum. Finnish checks and post-write totals are pending.
+frozen English checksum. All four checks passed; the sole repair was to one
+incorrect grammatical fixture, with native Finnish data untouched.
+
+`app/test_policy_czech_translation.py` adds four focused checks for exact literal
+85/41/51-field Czech-only rows, full native fields, placeholders, proper names,
+numerals and long-paragraph anti-summary safeguards; complete authored/effective
+coverage with preserved Credits; the merged safety inventory and source-bound
+privacy, age, emergency, renewal, cancellation, refund, liability and consumer
+rights clauses; progress-safe totals; and the frozen English checksum. All four
+checks passed with **2,392 authored, 2,522 effective and 4,394 missing**. One
+incorrectly shortened refund assertion was repaired in a single fixture-only
+line; Czech translation data is unchanged. This focused batch does not replace
+or waive the unchanged strict all-38/all-182 release gate.
+
+`app/test_policy_polish_translation.py` adds four focused checks for exact
+literal 85/41/51-field Polish-only rows, native complete fields, placeholders,
+proper names, numerals and long-paragraph anti-summary safeguards; complete
+182-source authored/effective coverage with preserved Credits; all merged safety
+fields and source-bound privacy, age, emergency, renewal, cancellation, refund,
+maximum-liability and consumer-rights clauses; progress-safe totals; and the
+frozen English checksum. All four checks passed with actual totals of 2,566
+authored, 2,691 effective and 4,225 missing. Two fixture-only assertions were
+repaired; the correct Polish text was unchanged. This focused batch does not
+replace or waive the unchanged strict all-38/all-182 release gate.
+
+`app/test_policy_hungarian_translation.py` adds four focused checks for exact
+literal 85/41/51-field Hungarian-only rows, full native content, placeholders,
+proper names, numerals and Hungarian compound-aware anti-summary safeguards;
+complete 182-source authored/effective coverage with preserved Credits; every
+merged safety field and source-bound location, privacy, age, emergency, payment,
+refund, liability and consumer-rights conditions; progress-safe totals; and the
+frozen English checksum. Hungarian checks and actual coverage totals are pending
+until executed. This focused batch does not replace or waive the unchanged strict
+all-38/all-182 release gate.
 
 The original strict all-38/all-182 release gate is unchanged. No human
 linguistic/legal review or legal certification is claimed.
