@@ -145,7 +145,12 @@ class ItalianPolicyTranslationTests(unittest.TestCase):
         )
         for source, value in credits.items():
             self.assertEqual(authored[source], value)
-            self.assertEqual(effective[source], value)
+            expected_effective = (
+                "Crediti"
+                if source == POLICY_DOCUMENTS["credits"]["title"]
+                else value
+            )
+            self.assertEqual(effective[source], expected_effective)
         batch_sources: set[str] = set()
         for document, _, _, rows, _ in BATCH:
             entries = mapped(document, rows)
@@ -196,7 +201,12 @@ class ItalianPolicyTranslationTests(unittest.TestCase):
             (
                 howto,
                 "Set my location offers",
-                ("500m", "1km", "nessuna coordinata", "tutti gli utenti"),
+                (
+                    "500m",
+                    "1km",
+                    "non viene inviata alcuna coordinata",
+                    "tutti gli utenti",
+                ),
             ),
             (
                 howto,
@@ -280,7 +290,8 @@ class ItalianPolicyTranslationTests(unittest.TestCase):
                     self.assertIn(token, value)
         full_liability = lookup(agreement, "To the same extent")
         self.assertGreater(len(full_liability.split()), 30)
-        self.assertIn("o cinquanta dollari statunitensi", full_liability)
+        self.assertIn("al maggiore tra", full_liability)
+        self.assertIn("e cinquanta dollari statunitensi", full_liability)
 
     def test_canonical_english_source_checksum_is_unchanged(self):
         frozen = json.dumps(
