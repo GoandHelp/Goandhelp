@@ -38,6 +38,12 @@ from app.policy_catalog_agreement_dutch import AGREEMENT_DUTCH_ROWS
 from app.policy_catalog_howto_swedish import HOWTO_SWEDISH_ROWS
 from app.policy_catalog_privacy_swedish import PRIVACY_SWEDISH_ROWS
 from app.policy_catalog_agreement_swedish import AGREEMENT_SWEDISH_ROWS
+from app.policy_catalog_howto_danish import HOWTO_DANISH_ROWS
+from app.policy_catalog_privacy_danish import PRIVACY_DANISH_ROWS
+from app.policy_catalog_agreement_danish import AGREEMENT_DANISH_ROWS
+from app.policy_catalog_howto_finnish import HOWTO_FINNISH_ROWS
+from app.policy_catalog_privacy_finnish import PRIVACY_FINNISH_ROWS
+from app.policy_catalog_agreement_finnish import AGREEMENT_FINNISH_ROWS
 
 POLICY_DOCUMENT_KEYS: tuple[str, ...] = (
     "howto",
@@ -190,6 +196,12 @@ for _keys, _rows in (
     (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_SWEDISH_ROWS),
     (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_SWEDISH_ROWS),
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_SWEDISH_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_DANISH_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_DANISH_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_DANISH_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_FINNISH_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_FINNISH_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_FINNISH_ROWS),
     (POLICY_CHROME_KEYS, POLICY_CHROME_ROWS),
 ):
     for _locale, _entries in validate_rows(_keys, _rows).items():
