@@ -97,12 +97,14 @@ def session_skeleton() -> rx.Component:
                 ),
                 rx.fragment(),
             ),
-            class_name="fixed bottom-6 left-1/2 flex w-full max-w-sm -translate-x-1/2 flex-col items-center gap-3 px-4",
+            class_name="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] left-1/2 flex w-full max-w-sm -translate-x-1/2 flex-col items-center gap-3 px-4",
         ),
+        bottom_nav(loading=True),
         rx.el.span(ui("Loading Go and Help…"), class_name="sr-only"),
         role="status",
         aria_live="polite",
         aria_label=ui("Loading Go and Help"),
+        id="gah-session-loading",
         class_name="fixed inset-0 z-[100] flex h-dvh w-full items-center justify-center bg-linear-to-bl from-[#ffe2bd] to-[#d9e9d4] text-[#111827]",
     )
 

@@ -255,7 +255,7 @@ class SessionHydrationTests(unittest.IsolatedAsyncioTestCase):
         )
         self.assertIn("absolute left-1/2 top-1/2", container_classes)
         self.assertIn("-translate-x-1/2 -translate-y-1/2", container_classes)
-        self.assertIn("fixed bottom-6 left-1/2", code)
+        self.assertIn("bottom-[calc(5.5rem+env(safe-area-inset-bottom))]", code)
         self.assertIn("AuthState.error", code)
         self.assertIn("OnboardingState.error", code)
         self.assertGreaterEqual(code.count('role="alert"'), 2)

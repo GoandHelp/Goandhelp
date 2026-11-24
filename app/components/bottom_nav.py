@@ -27,6 +27,24 @@ def is_active(value: str) -> rx.Var[bool]:
     return AuthState.is_signed_in & (ProfileState.active_tab == value)
 
 
+def _click_handler(
+    loading: bool, handler: rx.event.EventType
+) -> rx.event.EventType | None:
+    return None if loading else handler
+
+
+def _mount_handler(loading: bool) -> rx.event.EventType | None:
+    return {False: NotificationState.load_notifications, True: None}[loading]
+
+
+def _dock_class(loading: bool) -> str:
+    return (
+        "gah-bottom-dock fixed bottom-0 left-0 right-0 z-[101] w-full border-0 bg-white pt-1 pb-[calc(0.375rem+env(safe-area-inset-bottom))]"
+        if loading
+        else "gah-bottom-dock fixed bottom-0 left-0 right-0 z-50 w-full border-0 bg-white pt-1 pb-[calc(0.375rem+env(safe-area-inset-bottom))]"
+    )
+
+
 def nav_button(
     value: str,
     label: str,
@@ -34,6 +52,7 @@ def nav_button(
     reason: str,
     unread: rx.Var[int] | int = 0,
     tour_target: str = "",
+    loading: bool = False,
 ) -> rx.Component:
     return rx.el.button(
         rx.el.span(
@@ -53,13 +72,16 @@ def nav_button(
         title=ui(label),
         aria_label=ui(label),
         aria_current=rx.cond(is_active(value), "page", "false"),
-        on_click=ProfileState.navigate_from_bottom_nav(value, reason),
+        on_click=_click_handler(
+            loading, ProfileState.navigate_from_bottom_nav(value, reason)
+        ),
+        disabled=loading,
         custom_attrs={"data-tour-target": f"{tour_target}{value}"},
         class_name=rx.cond(is_active(value), ITEM_ACTIVE, ITEM_IDLE),
     )
 
 
-def profile_button() -> rx.Component:
+def profile_button(loading: bool = False) -> rx.Component:
     return rx.el.button(
         rx.el.span(
             activity_dot(NotificationState.reviews_unread),
@@ -94,13 +116,16 @@ def profile_button() -> rx.Component:
         title=ui("Profile"),
         aria_label=ui("Profile"),
         aria_current=rx.cond(is_active("profile"), "page", "false"),
-        on_click=ProfileState.navigate_from_bottom_nav("profile", ""),
+        on_click=_click_handler(
+            loading, ProfileState.navigate_from_bottom_nav("profile", "")
+        ),
+        disabled=loading,
         custom_attrs={"data-tour-target": "profile"},
         class_name=rx.cond(is_active("profile"), ITEM_ACTIVE, ITEM_IDLE),
     )
 
 
-def logo_button() -> rx.Component:
+def logo_button(loading: bool = False) -> rx.Component:
     """Raised circular centrepiece that always returns to the map.
 
     The reserved icon slot stays aligned with the other dock icons while the
@@ -117,7 +142,8 @@ def logo_button() -> rx.Component:
                 type="button",
                 title=ui("Map"),
                 aria_label=ui("Map"),
-                on_click=ProfileState.return_to_map,
+                on_click=_click_handler(loading, ProfileState.return_to_map),
+                disabled=loading,
                 class_name="gah-dock-control absolute bottom-[-3px] left-1/2 -translate-x-1/2 z-10 flex size-[59px] items-center justify-center bg-transparent transition-transform hover:scale-105 focus:outline-hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#fba922]",
             ),
             style={"overflow": "visible"},
@@ -128,25 +154,27 @@ def logo_button() -> rx.Component:
     )
 
 
-def bottom_nav() -> rx.Component:
+def bottom_nav(loading: bool = False) -> rx.Component:
     """Five equal columns, so the logo/Map control is the true visual centre."""
     return rx.el.nav(
         rx.el.div(
-            profile_button(),
+            profile_button(loading),
             nav_button(
                 "help",
                 "Requests",
                 "heart-handshake",
                 "",
                 NotificationState.help_unread,
+                loading=loading,
             ),
-            logo_button(),
+            logo_button(loading),
             nav_button(
                 "community",
                 "Community",
                 "users-round",
                 "",
                 NotificationState.community_unread,
+                loading=loading,
             ),
             nav_button(
                 "inbox",
@@ -154,11 +182,12 @@ def bottom_nav() -> rx.Component:
                 "mail",
                 "",
                 NotificationState.inbox_unread,
+                loading=loading,
             ),
             class_name="grid w-full max-w-full min-[751px]:max-w-[620px] mx-auto grid-cols-5 items-center gap-0 px-1",
             style={"overflow": "visible"},
         ),
-        on_mount=NotificationState.load_notifications,
+        on_mount=_mount_handler(loading),
         aria_label=ui("Go and Help main navigation"),
-        class_name="gah-bottom-dock fixed bottom-0 left-0 right-0 z-50 w-full border-0 bg-white pt-1 pb-[calc(0.375rem+env(safe-area-inset-bottom))]",
+        class_name=_dock_class(loading),
     )
