@@ -26,6 +26,9 @@ from app.policy_catalog_howto_russian_urdu import HOWTO_RUSSIAN_URDU_ROWS
 from app.policy_catalog_howto_spanish import HOWTO_SPANISH_ROWS
 from app.policy_catalog_privacy_spanish import PRIVACY_SPANISH_ROWS
 from app.policy_catalog_agreement_spanish import AGREEMENT_SPANISH_ROWS
+from app.policy_catalog_howto_italian import HOWTO_ITALIAN_ROWS
+from app.policy_catalog_privacy_italian import PRIVACY_ITALIAN_ROWS
+from app.policy_catalog_agreement_italian import AGREEMENT_ITALIAN_ROWS
 
 POLICY_DOCUMENT_KEYS: tuple[str, ...] = (
     "howto",
@@ -166,6 +169,9 @@ for _keys, _rows in (
     (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_SPANISH_ROWS),
     (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_SPANISH_ROWS),
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_SPANISH_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_ITALIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_ITALIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_ITALIAN_ROWS),
     (POLICY_CHROME_KEYS, POLICY_CHROME_ROWS),
 ):
     for _locale, _entries in validate_rows(_keys, _rows).items():

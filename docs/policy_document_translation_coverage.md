@@ -34,34 +34,40 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
   use the Spanish names already shown on the paywall (Billete mensual, Pase
   anual); Go and Help, Stripe, Resend and OpenFreeMap are kept as proper names.
 - Russian and Urdu reader chrome and footer disclaimer remain registered.
-- This German-only batch adds exactly 126 literal whole-field translations:
-  85 handbook fields and 41 privacy fields, supplying 124 new distinct authored
-  sources after shared dates are deduplicated. German agreement and Credits,
-  French/Russian/Urdu and every other locale, and canonical English are untouched.
+- Italian batch: `app/policy_catalog_howto_italian.py` (85),
+  `app/policy_catalog_privacy_italian.py` (41) and
+  `app/policy_catalog_agreement_italian.py` (51) add 177 literal whole-field
+  translations, including the complete merged safety notice and sections.
+  After deduplicating the date already present in Italian Credits, these add
+  174 distinct authored sources and close Italy's 169 effective gaps. The
+  date reuses the existing Italian Credits wording; generic plan labels are
+  `Biglietto mensile` and `Pass annuale`.
+- Russian and Urdu reader chrome and footer disclaimer remain registered.
 
-Director-verified current baseline (after the German batch, runtime audit):
-**1,000 authored**, **1,170 effective** and **5,746 missing** canonical
-source/locale pairs out of 6,916 (38 × 182), with French, German, Russian and
-Urdu complete and Spanish at 169 gaps. Expected after this Spanish batch:
-1,000 + 174 = **1,174 authored**, 1,170 + 169 = **1,339 effective** and
-5,746 − 169 = **5,577 missing** pairs. These post-write totals are pending the
-director's run; they are not claimed as an executed test result.
-Reader chrome is excluded. French, German, Spanish, Russian and Urdu are expected
-to supply all 182 sources each; the other 33 locales retain eight dedicated and
-13 effective sources apiece.
-not wider interface coverage. The German focused test computes actual catalog
-counts and checks these minimum gains without freezing other locales' progress.
+Verified pre-Italian baseline, following the Spanish batch and corrected German
+focused method: **1,174 authored**, **1,339 effective** and **5,577 missing**
+canonical source/locale pairs out of 6,916 (38 × 182); the four Spanish checks
+and five German focused checks have passed. The failed attempt to generate
+Italian and Portuguese together saved no files and changed no coverage.
+
+Expected after this Italian batch: 1,174 + 174 = **1,348 authored**, 1,339 +
+169 = **1,508 effective** and 5,577 − 169 = **5,408 missing** pairs. Six
+locales (German, Spanish, French, Italian, Russian and Urdu) are expected to be
+complete; the other 32 locales, including Portuguese, are expected to have 169
+gaps each. These post-write counts and the new Italian checks are **pending the
+director's run**, not verified results. The Italian focused suite checks actual
+catalog coverage and progress-safe global minimums, without freezing other
+locales' progress. Reader chrome is excluded.
 The Dutch title `Credits` is a documented natural-language coincidence, not a
 paragraph fallback. Proper project names, copyright symbols and licence names are
 retained in their attribution contexts.
 
-**Remaining:** 33 non-English locales need full handbook, privacy and agreement
+**Remaining:** 32 non-English locales need full handbook, privacy and agreement
 translations beyond their existing entries: 169 effective gaps each, or
-**5,577** missing pairs (33 × 169), pending post-write verification. Later
-languages follow in later batches. This is not full-document coverage in all
-39 languages.
-39 languages. Wider interface gaps are not addressed here. The global checklist
-remains incomplete and its checkmarks were not changed.
+**5,408** missing pairs (32 × 169), pending verification of this Italian batch.
+Later languages follow in later batches. This is not full-document coverage in
+all 39 languages. Wider interface gaps are not addressed here. The global
+checklist remains incomplete and its checkmarks were not changed.
 
 ## Checks
 
@@ -96,26 +102,26 @@ safety paragraphs and numerical facts; preserved agreement/Credits values; and
 the director-frozen canonical English SHA-256 checksum
 `404ee59a08a5b8fc3f5238768659a8df32b7ff7eda9279353cb86110ff575f3d`.
 
-The German coverage itself is verified by the current runtime audit. One German
-fixture was repaired: the frozen full indemnity paragraph is now looked up by
-its canonical source (`startswith('You agree to indemnify')`, index 43) rather
-than the magic index 42, which pointed at the heading. The expected paragraph
-and the German data are unchanged; that repaired method is pending the
-director's run.
+The German coverage itself is verified by the runtime audit. Its repaired
+focused method looks up the indemnity paragraph by canonical source rather than
+a magic row index; all five German focused checks have passed.
 
-`app/test_policy_spanish_translation.py` adds four focused checks: pure literal
-85/41/51-field Spanish-only rows that pass `validate_rows`; native whole-field
-entries with placeholder, numeral, proper-name, informal-register and
-anti-summary guards (word-length minimum and no copied six-word English runs);
-all 182 Spanish sources authored and effective without English fallback,
-preserved Spanish Credits, and progress-safe global minimums (authored ≥1,174,
-effective ≥1,339, covered + missing = 6,916, fr/de/es/ru/ur complete); the full
-merged safety inventory plus representative privacy and agreement paragraphs
-(500m/1km, 0.5–1 km, 112/999/911/000, age 16, renewal, cancellation, no refund
-unless local law requires, the greater of twelve months' fees or fifty US
-dollars, non-excludable liability and mandatory consumer rights); and the frozen
-canonical English SHA-256 checksum. Fixtures are bound by canonical source,
-never by row index. This suite is **pending the director's run**.
+`app/test_policy_spanish_translation.py` adds four focused checks for its
+literal field rows, Spanish content, complete source coverage, merged safety,
+representative legal wording and the canonical English checksum. These checks
+have passed.
+
+`app/test_policy_italian_translation.py` adds four focused checks: pure literal
+85/41/51-field Italian-only rows that pass `validate_rows`; native whole-field
+entries with placeholder, numeral, proper-name and anti-summary guards; all 182
+Italian sources authored and effective without English fallback, preserved
+Italian Credits and progress-safe global minimums (authored ≥1,348, effective
+≥1,508, covered + missing = 6,916, de/es/fr/it/ru/ur complete); and the full
+merged safety inventory with representative location, privacy, age, emergency,
+renewal, cancellation, refund, liability and mandatory-consumer-rights checks,
+plus the frozen canonical English SHA-256 checksum. Fixtures are bound by
+canonical source, never by row index. The new suite and post-write coverage
+counts are **pending the director's run**.
 
 The original strict all-38/all-182 release gate is unchanged. No human
 linguistic/legal review or legal certification is claimed.
