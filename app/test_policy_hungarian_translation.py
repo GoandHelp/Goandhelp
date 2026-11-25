@@ -308,7 +308,7 @@ class HungarianPolicyTranslationTests(unittest.TestCase):
                 "Using Go and Help to offer",
                 (
                     "Stripe",
-                    "havonta automatikusan megújul",
+                    "A havi tagság havonta, az éves tagság évente automatikusan megújul",
                     "évente automatikusan megújul, amíg le nem mondod",
                 ),
             ),
@@ -326,7 +326,7 @@ class HungarianPolicyTranslationTests(unittest.TestCase):
                 agreement,
                 "To the same extent",
                 (
-                    "a két összeg közül a nagyobb",
+                    "az alábbi két összeg közül a nagyobb",
                     "a követelést megelőző 12 hónapban",
                     "50 amerikai dollár",
                 ),
@@ -335,7 +335,7 @@ class HungarianPolicyTranslationTests(unittest.TestCase):
                 agreement,
                 "Nothing in this agreement excludes",
                 (
-                    "nem zár ki vagy korlátoz olyan felelősséget",
+                    "A megállapodás egyetlen rendelkezése sem zár ki vagy korlátoz olyan felelősséget",
                     "nem lehet kizárni vagy korlátozni",
                     "gondatlanság miatt",
                     "csalásért",
@@ -362,7 +362,7 @@ class HungarianPolicyTranslationTests(unittest.TestCase):
 
         cap = lookup(agreement, "To the same extent")
         self.assertGreater(len(cap.split()), 30)
-        self.assertIn("a két összeg közül a nagyobb", cap)
+        self.assertIn("az alábbi két összeg közül a nagyobb", cap)
         self.assertIn("12 hónapban", cap)
         self.assertIn("50 amerikai dollár", cap)
 

@@ -53,6 +53,12 @@ from app.policy_catalog_agreement_polish import AGREEMENT_POLISH_ROWS
 from app.policy_catalog_howto_hungarian import HOWTO_HUNGARIAN_ROWS
 from app.policy_catalog_privacy_hungarian import PRIVACY_HUNGARIAN_ROWS
 from app.policy_catalog_agreement_hungarian import AGREEMENT_HUNGARIAN_ROWS
+from app.policy_catalog_howto_romanian import HOWTO_ROMANIAN_ROWS
+from app.policy_catalog_privacy_romanian import PRIVACY_ROMANIAN_ROWS
+from app.policy_catalog_agreement_romanian import AGREEMENT_ROMANIAN_ROWS
+from app.policy_catalog_howto_greek import HOWTO_GREEK_ROWS
+from app.policy_catalog_privacy_greek import PRIVACY_GREEK_ROWS
+from app.policy_catalog_agreement_greek import AGREEMENT_GREEK_ROWS
 
 POLICY_DOCUMENT_KEYS: tuple[str, ...] = (
     "howto",
@@ -220,6 +226,12 @@ for _keys, _rows in (
     (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_HUNGARIAN_ROWS),
     (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_HUNGARIAN_ROWS),
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_HUNGARIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_ROMANIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_ROMANIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_ROMANIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_GREEK_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_GREEK_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_GREEK_ROWS),
     (POLICY_CHROME_KEYS, POLICY_CHROME_ROWS),
 ):
     for _locale, _entries in validate_rows(_keys, _rows).items():
