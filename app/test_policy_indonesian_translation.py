@@ -153,7 +153,7 @@ class IndonesianPolicyTranslationTests(unittest.TestCase):
         credits_date = POLICY_DOCUMENTS["credits"]["updated"]
         self.assertEqual(
             sum(
-                row.count("Diperbarui dan berlaku sejak 1 Juni 2024")
+                row["id"].count("Diperbarui dan berlaku sejak 1 Juni 2024")
                 for *_, row, _ in BATCH
             ),
             3,

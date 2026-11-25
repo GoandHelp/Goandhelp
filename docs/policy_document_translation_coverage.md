@@ -19,13 +19,13 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
   38 non-English Settings locales (304 source/locale entries).
 - Privacy: all 41 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
-  Russian, Turkish, Indonesian and Urdu (the date is already included in Credits).
+  Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai and Hindi (the date is already included in Credits).
 - User agreement: all 51 fields in French, German, Spanish, Italian, Dutch,
   Swedish, Danish, Finnish, Czech, Polish, Portuguese, Hungarian, Romanian,
-  Greek, Russian, Turkish, Indonesian and Urdu (the shared date is already included in Credits).
+  Greek, Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai and Hindi (the shared date is already included in Credits).
 - Handbook: all 85 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
-  Russian, Turkish, Indonesian and Urdu, including the entire merged safety notice
+  Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai and Hindi, including the entire merged safety notice
   and every safety section (the shared date is already included in Credits).
 - Spanish batch: `app/policy_catalog_howto_spanish.py` (85),
   `app/policy_catalog_privacy_spanish.py` (41) and
@@ -145,19 +145,40 @@ was repaired without changing native Czech data.
   paragraph, and adjusted the test to preserve the existing effective Credits
   title. Plan labels are Aylık bilet and Yıllık geçiş.
 - Indonesian batch: the three `*_indonesian.py` catalogs add 177 literal Bahasa
-  Indonesia fields, including the full merged safety notice and sections. They
-  add 174 distinct authored sources and are expected to close 169 effective
-  gaps; projected totals are **3,436 authored, 3,536 effective and 3,380
-  missing**, with 18 complete locales including Indonesian and 20 remaining
-  locales at 169 gaps each. Checks and totals are pending execution. Plan labels
-  are Tiket bulanan and Pas tahunan.
+  Indonesia fields, including the complete merged safety content. Its four focused
+  checks passed at **3,436 authored, 3,536 effective and 3,380 missing**, closing
+  all 169 Indonesian gaps; 18 locales are complete. Plan labels are Tiket bulanan
+  and Pas tahunan. A one-line date-count fixture repair changed no native data.
+- Vietnamese batch: the three `*_vietnamese.py` catalogs add 177 literal,
+  complete Vietnamese fields, including the full merged safety notice and every
+  safety section. The shared date matches the existing Credits date exactly;
+  `Vé tháng` and `Vé năm` are the generic plan names. Its four focused checks
+  passed at **3,610 authored, 3,705 effective and 3,211 missing**; Vietnamese is
+  fully covered and 19 locales are complete.
+- Thai batch: `app/policy_catalog_howto_thai.py` (85),
+  `app/policy_catalog_privacy_thai.py` (41) and
+  `app/policy_catalog_agreement_thai.py` (51) add 177 literal Thai fields,
+  including all merged safety content. Reusing the exact Credits date adds 174
+  distinct authored sources and closes all 169 Thai effective gaps. Plan labels
+  are `ตั๋วรายเดือน` and `บัตรรายปี`. Its four focused checks are **verified
+  passed** at **3,784 authored, 3,874 effective and 3,042 missing**; 20 locales
+  are complete including Thai.
+- Hindi batch: `app/policy_catalog_howto_hindi.py` (85),
+  `app/policy_catalog_privacy_hindi.py` (41) and
+  `app/policy_catalog_agreement_hindi.py` (51) add 177 literal Devanagari Hindi
+  fields in the polite `आप` register, including the full merged safety notice
+  and every safety section. The exact Credits date is reused, so the batch adds
+  174 authored sources and is expected to close 169 Hindi effective gaps. Plan
+  labels are `मासिक टिकट` and `वार्षिक पास`. Its four focused checks and actual
+  totals are **pending** until tested; expected totals are **3,958 authored,
+  4,043 effective and 2,873 missing**, with 21 complete locales including Hindi
+  and 17 remaining locales at 169 gaps each.
 
-Verified after Turkish: **3,262 authored, 3,367 effective and 3,549 missing**
-canonical source/locale pairs. Seventeen locales are complete: cs, da, de, el,
-es, fi, fr, hu, it, nl, pl, pt, ro, ru, sv, tr and ur. Indonesian's projected
-post-batch totals are **3,436 authored, 3,536 effective and 3,380 missing**;
-these totals remain pending the new focused checks. Progress guards do not require
-other locales to remain incomplete. Reader chrome is excluded.
+Verified after Thai: **3,784 authored, 3,874 effective and 3,042 missing**
+canonical source/locale pairs. Twenty locales are complete: cs, da, de, el, es,
+fi, fr, hu, id, it, nl, pl, pt, ro, ru, sv, th, tr, ur and vi. Hindi's expected
+increment remains pending its focused checks and actual totals. Progress guards do
+not require other locales to remain incomplete. Reader chrome is excluded.
 The Dutch title `Credits` is a documented natural-language coincidence, not a
 paragraph fallback. Swedish's native effective Credits title `Tack till
 bidragsgivarna`, Danish's `Tak til bidragyderne`, Finnish's `Kiitokset`, Czech's
@@ -165,10 +186,12 @@ bidragsgivarna`, Danish's `Tak til bidragyderne`, Finnish's `Kiitokset`, Czech's
 authored Credits titles. Project names, copyright symbols and licence names are
 retained in attribution contexts.
 
-**Remaining:** the Indonesian batch is implemented, but its checks and actual
-global counts are pending execution. The expected counts above are projections,
-not verified results. Coverage remains partial rather than complete for all 39
-languages; wider interface gaps are outside this document translation batch.
+**Remaining:** the Hindi batch is implemented, but its focused checks and actual
+global counts are pending execution; its totals are expectations, not verified
+results. Thai's four focused checks and counts are verified passed. Seventeen
+locales still have 169 gaps each. Coverage remains partial
+Coverage remains partial rather than complete for all 39 languages; wider
+interface gaps are outside this document translation batch.
 
 ## Checks
 
@@ -315,14 +338,40 @@ original Credits subtitle, fixed one missing Go and Help attribution in a Turkis
 safety paragraph, and aligned the test with the existing effective Credits title.
 
 `app/test_policy_indonesian_translation.py` adds four focused checks for exact
-literal 85/41/51-field Indonesian-only rows, native complete fields, placeholders,
-proper names, equivalent decimal separators, numeric facts and anti-summary
-thresholds; complete authored/effective coverage and the frozen original Credits;
-the complete merged safety fields and source-bound privacy, age, emergency,
-renewal, cancellation, refund, liability and consumer-rights clauses; progress-safe
-coverage; and the frozen English checksum. Indonesian checks and resulting totals
-are pending execution; the projected totals are **3,436 authored, 3,536 effective
-and 3,380 missing**.
+literal 85/41/51-field Indonesian-only rows, complete native fields, placeholders,
+proper names, numeric facts and anti-summary thresholds; authored/effective
+coverage and frozen Credits; merged safety and source-bound location, age,
+emergency, renewal, cancellation, refund, liability and consumer-rights clauses;
+progress-safe totals; and the frozen English checksum. All four checks passed at
+**3,436 authored, 3,536 effective and 3,380 missing**. A one-line date-count test
+fixture repair changed no translation data.
+
+`app/test_policy_vietnamese_translation.py` adds four focused checks for literal
+85/41/51-field Vietnamese-only rows, native full fields, placeholders, proper
+names, numerals and long-paragraph anti-summary safeguards; complete authored
+and effective sources with frozen eight-field Credits; all merged safety content
+and source-bound privacy, age, emergency, renewal, cancellation, refund,
+maximum-liability and consumer-rights clauses; progress-safe totals; and the
+frozen English checksum. All four checks passed with **3,610 authored, 3,705
+effective and 3,211 missing**.
+
+`app/test_policy_thai_translation.py` adds four focused checks for literal
+85/41/51-field Thai-only rows, Thai-script-aware full-field content, placeholders,
+proper names, numerals and character-length anti-summary safeguards without
+space-delimited word-count assumptions; all 182 Thai authored/effective sources
+with frozen Credits; every merged safety field and source-bound privacy, age,
+emergency, renewal, cancellation, refund, maximum-liability and consumer-rights
+clauses; progress-safe totals; and the frozen English checksum. All four checks
+passed at **3,784 authored, 3,874 effective and 3,042 missing**.
+
+`app/test_policy_hindi_translation.py` adds four focused checks for pure literal
+85/41/51-field Hindi-only rows, native Devanagari without English prose,
+placeholders, proper names, numerals and anti-summary thresholds; 182-source
+authored/effective coverage with the frozen eight-field Credits row; all merged
+safety fields and source-bound privacy, age, emergency, renewal, cancellation,
+refund, maximum-liability and consumer-rights clauses; progress-safe totals
+(authored ≥3,958, effective ≥4,043); and the frozen English checksum. Execution
+is pending.
 
 The original strict all-38/all-182 release gate is unchanged. No human
 linguistic/legal review or legal certification is claimed.

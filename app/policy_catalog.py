@@ -65,6 +65,15 @@ from app.policy_catalog_agreement_turkish import AGREEMENT_TURKISH_ROWS
 from app.policy_catalog_howto_indonesian import HOWTO_INDONESIAN_ROWS
 from app.policy_catalog_privacy_indonesian import PRIVACY_INDONESIAN_ROWS
 from app.policy_catalog_agreement_indonesian import AGREEMENT_INDONESIAN_ROWS
+from app.policy_catalog_howto_vietnamese import HOWTO_VIETNAMESE_ROWS
+from app.policy_catalog_privacy_vietnamese import PRIVACY_VIETNAMESE_ROWS
+from app.policy_catalog_agreement_vietnamese import AGREEMENT_VIETNAMESE_ROWS
+from app.policy_catalog_howto_thai import HOWTO_THAI_ROWS
+from app.policy_catalog_privacy_thai import PRIVACY_THAI_ROWS
+from app.policy_catalog_agreement_thai import AGREEMENT_THAI_ROWS
+from app.policy_catalog_howto_hindi import HOWTO_HINDI_ROWS
+from app.policy_catalog_privacy_hindi import PRIVACY_HINDI_ROWS
+from app.policy_catalog_agreement_hindi import AGREEMENT_HINDI_ROWS
 
 POLICY_DOCUMENT_KEYS: tuple[str, ...] = (
     "howto",
@@ -244,6 +253,15 @@ for _keys, _rows in (
     (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_INDONESIAN_ROWS),
     (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_INDONESIAN_ROWS),
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_INDONESIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_VIETNAMESE_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_VIETNAMESE_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_VIETNAMESE_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_THAI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_THAI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_THAI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_HINDI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_HINDI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_HINDI_ROWS),
     (POLICY_CHROME_KEYS, POLICY_CHROME_ROWS),
 ):
     for _locale, _entries in validate_rows(_keys, _rows).items():
