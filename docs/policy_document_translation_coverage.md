@@ -19,13 +19,13 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
   38 non-English Settings locales (304 source/locale entries).
 - Privacy: all 41 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
-  Russian and Urdu (the date is already included in Credits).
+  Russian, Turkish, Indonesian and Urdu (the date is already included in Credits).
 - User agreement: all 51 fields in French, German, Spanish, Italian, Dutch,
   Swedish, Danish, Finnish, Czech, Polish, Portuguese, Hungarian, Romanian,
-  Greek, Russian and Urdu (the shared date is already included in Credits).
+  Greek, Russian, Turkish, Indonesian and Urdu (the shared date is already included in Credits).
 - Handbook: all 85 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
-  Russian and Urdu, including the entire merged safety notice
+  Russian, Turkish, Indonesian and Urdu, including the entire merged safety notice
   and every safety section (the shared date is already included in Credits).
 - Spanish batch: `app/policy_catalog_howto_spanish.py` (85),
   `app/policy_catalog_privacy_spanish.py` (41) and
@@ -133,13 +133,30 @@ was repaired without changing native Czech data.
   Dutch, Polish, Portuguese, Romanian, Russian, Swedish and Urdu.
 - Greek batch: the three `*_greek.py` catalogs contain 177 literal Modern Greek
   fields, including all merged safety content. Reusing the exact Credits date
-  adds 174 distinct authored sources and is expected to close all 169 Greek
-  gaps. Greek checks and post-batch totals are pending execution; expected totals
-  are **3,088 authored, 3,198 effective and 3,718 missing**, with 16 complete
-  locales including Greek and 22 remaining locales with 169 gaps each.
+  adds 174 distinct authored sources and closes all 169 Greek gaps. Its four
+  focused checks passed at **3,088 authored, 3,198 effective and 3,718 missing**.
+  One test-only repair aligned the existing `Emergencies` heading precedence;
+  Greek translation data was unchanged.
+- Turkish batch: the three `*_turkish.py` catalogs contain 177 literal Turkish
+  fields, including all merged safety content. Its four focused checks and the
+  unconditional attribution guard passed; actual totals are **3,262 authored,
+  3,367 effective and 3,549 missing**. Repair restored the original validator
+  and Credits subtitle, added the missing Go and Help name to one Turkish safety
+  paragraph, and adjusted the test to preserve the existing effective Credits
+  title. Plan labels are Aylık bilet and Yıllık geçiş.
+- Indonesian batch: the three `*_indonesian.py` catalogs add 177 literal Bahasa
+  Indonesia fields, including the full merged safety notice and sections. They
+  add 174 distinct authored sources and are expected to close 169 effective
+  gaps; projected totals are **3,436 authored, 3,536 effective and 3,380
+  missing**, with 18 complete locales including Indonesian and 20 remaining
+  locales at 169 gaps each. Checks and totals are pending execution. Plan labels
+  are Tiket bulanan and Pas tahunan.
 
-Verified after Romanian and before Greek: **2,914 authored, 3,029 effective
-and 3,887 missing** canonical source/locale pairs. Progress guards do not require
+Verified after Turkish: **3,262 authored, 3,367 effective and 3,549 missing**
+canonical source/locale pairs. Seventeen locales are complete: cs, da, de, el,
+es, fi, fr, hu, it, nl, pl, pt, ro, ru, sv, tr and ur. Indonesian's projected
+post-batch totals are **3,436 authored, 3,536 effective and 3,380 missing**;
+these totals remain pending the new focused checks. Progress guards do not require
 other locales to remain incomplete. Reader chrome is excluded.
 The Dutch title `Credits` is a documented natural-language coincidence, not a
 paragraph fallback. Swedish's native effective Credits title `Tack till
@@ -148,12 +165,10 @@ bidragsgivarna`, Danish's `Tak til bidragyderne`, Finnish's `Kiitokset`, Czech's
 authored Credits titles. Project names, copyright symbols and licence names are
 retained in attribution contexts.
 
-**Remaining:** after the Greek batch is verified, 22 non-English locales are
-expected to need full handbook, privacy and agreement translations beyond their
-existing entries: 169 effective gaps each, or **3,718** missing pairs (22 × 169).
-Greek checks and these projected totals are pending. This is not full-document
-coverage in all 39 languages. Wider interface gaps are not addressed here. The
-global checklist remains incomplete and its checkmarks were not changed.
+**Remaining:** the Indonesian batch is implemented, but its checks and actual
+global counts are pending execution. The expected counts above are projections,
+not verified results. Coverage remains partial rather than complete for all 39
+languages; wider interface gaps are outside this document translation batch.
 
 ## Checks
 
@@ -288,7 +303,26 @@ the frozen English checksum. All four checks passed; a two-string test-fixture
 repair changed no native Romanian text. This focused batch does not replace or
 waive the unchanged strict all-38/all-182 release gate.
 
-The Greek focused checks and post-batch totals remain pending execution.
+`app/test_policy_turkish_translation.py` adds four focused checks for exact
+literal 85/41/51-field Turkish-only rows, native text and anti-summary safeguards,
+all-source authored/effective coverage, preserved Credits, the merged safety
+inventory and source-bound location, age, emergency, renewal, cancellation,
+refund, maximum-liability and consumer-rights clauses, progress-safe totals, and
+the frozen canonical English checksum. All four checks passed, as did the
+unconditional attribution guard; the verified totals are **3,262 authored,
+3,367 effective and 3,549 missing**. The repair restored the validator and
+original Credits subtitle, fixed one missing Go and Help attribution in a Turkish
+safety paragraph, and aligned the test with the existing effective Credits title.
+
+`app/test_policy_indonesian_translation.py` adds four focused checks for exact
+literal 85/41/51-field Indonesian-only rows, native complete fields, placeholders,
+proper names, equivalent decimal separators, numeric facts and anti-summary
+thresholds; complete authored/effective coverage and the frozen original Credits;
+the complete merged safety fields and source-bound privacy, age, emergency,
+renewal, cancellation, refund, liability and consumer-rights clauses; progress-safe
+coverage; and the frozen English checksum. Indonesian checks and resulting totals
+are pending execution; the projected totals are **3,436 authored, 3,536 effective
+and 3,380 missing**.
 
 The original strict all-38/all-182 release gate is unchanged. No human
 linguistic/legal review or legal certification is claimed.
