@@ -19,14 +19,21 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
   38 non-English Settings locales (304 source/locale entries).
 - Privacy: all 41 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
-  Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi and Arabic (the date is already included in Credits).
+  Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
+  Hebrew, Swahili, Amharic and Chinese (the shared date is already included in
+  Credits).
+- User agreement:
 - User agreement: all 51 fields in French, German, Spanish, Italian, Dutch,
   Swedish, Danish, Finnish, Czech, Polish, Portuguese, Hungarian, Romanian,
-  Greek, Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi and Arabic (the shared date is already included in Credits).
+  Greek, Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic,
+  Persian, Hebrew, Swahili, Amharic and Chinese (the date is already included in
+  Credits).
 - Handbook: all 85 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
-  Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi and Arabic, including the entire merged safety notice
-  and every safety section (the shared date is already included in Credits).
+  Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
+  Hebrew, Swahili, Amharic and Chinese, including the entire merged safety
+  notice and every safety section
+  safety section (the shared date is already included in Credits).
 - Spanish batch: `app/policy_catalog_howto_spanish.py` (85),
   `app/policy_catalog_privacy_spanish.py` (41) and
   `app/policy_catalog_agreement_spanish.py` (51) add exactly 177 literal
@@ -172,38 +179,49 @@ was repaired without changing native Czech data.
   `मासिक टिकट` and `वार्षिक पास`. Its four focused checks are **verified
   passed** at **3,958 authored, 4,043 effective and 2,873 missing**; 21 locales
   are complete including Hindi.
-- Arabic batch: `app/policy_catalog_howto_arabic.py` (85),
-  `app/policy_catalog_privacy_arabic.py` (41) and
-  `app/policy_catalog_agreement_arabic.py` (51) add 177 literal Modern Standard
-  Arabic fields in a neutral polite second-person register, including the full
-  merged safety notice and every safety section. The exact Credits date is
-  reused, so the batch adds 174 authored sources and is expected to close 169
-  Arabic effective gaps. Existing titles and headings are reused exactly; plan
-  labels are `تذكرة شهرية` and `اشتراك سنوي`. The authored Credits title stays
-  `الشكر والتقدير` and the effective title stays `شكر وتقدير`. Its four focused
-  checks and actual totals are **pending** until tested; expected totals are
-  **4,132 authored, 4,212 effective and 2,704 missing**, with 22 complete
-  locales including Arabic and 16 remaining locales at 169 gaps each.
+- Arabic batch: the three `*_arabic.py` catalogs provide 177 full literal
+  Modern Standard Arabic fields, including all merged safety content. Its four
+  focused checks passed with **4,132 authored, 4,212 effective and 2,704
+  missing**; 22 locales were complete at that checkpoint.
+- Persian batch: the three `*_persian.py` catalogs provide 177 full literal
+  Persian fields, including all merged safety content. Its four checks passed
+  with **4,306 authored, 4,381 effective and 2,535 missing**. Persian is among
+  the 23 complete locales; the existing eight-field Credits row is unchanged.
+- Hebrew batch: the three `*_hebrew.py` catalogs add 177 literal full-field
+  translations, including every merged safety field. Its four checks passed;
+  verified totals are **4,480 authored, 4,550 effective and 2,366 missing**,
+  with 24 complete locales.
+- Swahili batch: its three catalogs contain 177 Kiswahili fields, including the
+  full merged safety content. Four focused checks passed at **4,654 authored,
+  4,719 effective and 2,197 missing**; 25 locales are complete. Two incorrect
+  test phrases were aligned with the existing native location paragraph; its
+  translation data was unchanged.
+- Amharic batch: the three `*_amharic.py` catalogs add 177 full literal Amharic
+  fields, including the complete merged safety content. The exact Credits date
+  is reused; plan labels are ወርሃዊ ትኬት and ዓመታዊ ፓስ. Its four focused checks are
+  **verified passed** at **4,828 authored, 4,888 effective and 2,028 missing**;
+  26 locales are complete including Amharic. Two incorrect fixture expectations
+  (the effective Credits title and the complete joint monthly/annual renewal
+  clause) were corrected; Amharic translation data was unchanged.
+- Chinese batch: `app/policy_catalog_howto_chinese.py` (85),
+  `app/policy_catalog_privacy_chinese.py` (41) and
+  `app/policy_catalog_agreement_chinese.py` (51) add 177 full literal Simplified
+  Chinese fields in the polite 您 register, including the complete merged safety
+  content. The exact Credits date `更新并生效于2024年6月1日` is reused and the five
+  existing titles/headings are kept exactly; plan labels are 月票 and 年票. The
+  batch adds 174 authored sources and closes 169 effective gaps. Expected totals
+  are **5,002 authored, 5,057 effective and 1,859 missing**, with 27 complete
+  locales including Chinese and 11 remaining locales at 169 gaps each. Chinese
+  checks and totals are **pending** until its focused tests run.
 
-Verified after Hindi: **3,958 authored, 4,043 effective and 2,873 missing**
-canonical source/locale pairs. Twenty-one locales are complete: cs, da, de, el,
-es, fi, fr, hi, hu, id, it, nl, pl, pt, ro, ru, sv, th, tr, ur and vi. Arabic's
-expected increment remains pending its focused checks and actual totals. Progress
-guards do not require other locales to remain incomplete. Reader chrome is
-excluded.
-The Dutch title `Credits` is a documented natural-language coincidence, not a
-paragraph fallback. Swedish's native effective Credits title `Tack till
-bidragsgivarna`, Danish's `Tak til bidragyderne`, Finnish's `Kiitokset`, Czech's
-`Poděkování` and Polish's `Podziękowania` are preserved separately from their
-authored Credits titles. Project names, copyright symbols and licence names are
-retained in attribution contexts.
-
-**Remaining:** the Arabic batch is implemented, but its focused checks and actual
-global counts are pending execution; its totals are expectations, not verified
-results. Hindi's four focused checks and counts are verified passed. Sixteen
-locales are expected to still have 169 gaps each. Coverage remains partial
-rather than complete for all 39 languages; wider interface gaps are outside this
-document translation batch.
+The latest verified checkpoint is Amharic: **4,828 authored, 4,888 effective
+and 2,028 missing** canonical source/locale pairs; 26 locales are complete.
+Chinese's increment and totals remain pending until its focused checks run.
+Progress guards do not require other locales to remain incomplete; reader chrome
+is excluded. The Dutch title `Credits` is a documented natural-language
+coincidence, not a paragraph fallback. Native effective Credits titles are
+preserved separately from authored titles. Coverage remains partial for the
+39-language deliverable; wider interface gaps are outside this batch.
 
 ## Checks
 
@@ -385,14 +403,51 @@ refund, maximum-liability and consumer-rights clauses; progress-safe totals
 (authored ≥3,958, effective ≥4,043); and the frozen English checksum. All four
 checks passed at **3,958 authored, 4,043 effective and 2,873 missing**.
 
-`app/test_policy_arabic_translation.py` adds four focused checks for pure literal
-85/41/51-field Arabic-only rows, native Arabic script without English prose,
-placeholders, proper names, numerals and anti-summary thresholds; 182-source
-authored/effective coverage with the frozen eight-field Credits row and the
-Credits-only effective title difference; all merged safety fields and
-source-bound privacy, age, emergency, renewal, cancellation, refund,
-maximum-liability and consumer-rights clauses; progress-safe totals (authored
-≥4,132, effective ≥4,212); and the frozen English checksum. Execution is pending.
+`app/test_policy_arabic_translation.py` has four focused checks for literal
+85/41/51-field Arabic rows, complete merged safety text, legal and privacy
+safeguards, the frozen Credits and English source, and progress-safe coverage.
+All four checks passed with **4,132 authored, 4,212 effective and 2,704
+missing**.
+
+`app/test_policy_persian_translation.py` adds four focused checks for literal
+85/41/51-field Persian-only rows, native script and complete paragraphs,
+placeholders, names, numerals and anti-summary thresholds; full 182-source
+Persian coverage and unchanged Credits; merged safety and source-bound privacy,
+age, emergency, renewal, cancellation, refund, liability and consumer-rights
+clauses; progress-safe totals; and the frozen English checksum. All four checks
+passed at **4,306 authored, 4,381 effective and 2,535 missing**.
+
+`app/test_policy_hebrew_translation.py` adds four focused checks for literal
+85/41/51-field rows, merged safety, full privacy and agreement safeguards,
+complete coverage, frozen Credits and the canonical English checksum. All four
+checks passed; verified totals are **4,480 authored, 4,550 effective and 2,366
+missing**.
+
+`app/test_policy_swahili_translation.py` has four focused checks for exact
+literal Kiswahili rows, full merged safety and legal/privacy safeguards, full
+source coverage, frozen Credits, progress-safe totals and the canonical English
+checksum. All four checks passed at **4,654 authored, 4,719 effective and 2,197
+missing**. Two fixture phrases were corrected to match the native translation;
+no Swahili data changed.
+
+`app/test_policy_amharic_translation.py` adds four focused checks for pure
+literal 85/41/51-field Amharic rows, Ethiopic-script-native content, proper names,
+placeholders, numerals and character/word-aware anti-summary bounds; full merged
+safety and source-bound privacy, age, emergency, renewal, cancellation, refund,
+maximum-liability and consumer-rights safeguards; frozen Credits; progress-safe
+totals; and the canonical English checksum. All four checks passed at **4,828
+authored, 4,888 effective and 2,028 missing**; two fixture expectations were
+corrected and the Amharic data was unchanged.
+
+`app/test_policy_chinese_translation.py` adds four focused checks for pure
+literal 85/41/51-field Chinese-only rows, native CJK text without English prose,
+placeholders, proper names and numerals; a character-based CJK anti-summary
+bound (no whitespace word ratios) plus complete source-bound clause guards for
+privacy, no-coordinate Off mode, age, emergency numbers, monthly/annual renewal,
+cancellation, local-law refunds, the higher-of 12-month fees or 50 USD cap,
+non-excludable liability and local consumer rights; merged safety; the frozen
+eight-field Credits row with its Credits-only effective title; progress-safe
+totals; and the canonical English checksum. Results are pending.
 
 The original strict all-38/all-182 release gate is unchanged. No human
 linguistic/legal review or legal certification is claimed.

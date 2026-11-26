@@ -77,6 +77,21 @@ from app.policy_catalog_agreement_hindi import AGREEMENT_HINDI_ROWS
 from app.policy_catalog_howto_arabic import HOWTO_ARABIC_ROWS
 from app.policy_catalog_privacy_arabic import PRIVACY_ARABIC_ROWS
 from app.policy_catalog_agreement_arabic import AGREEMENT_ARABIC_ROWS
+from app.policy_catalog_howto_persian import HOWTO_PERSIAN_ROWS
+from app.policy_catalog_privacy_persian import PRIVACY_PERSIAN_ROWS
+from app.policy_catalog_agreement_persian import AGREEMENT_PERSIAN_ROWS
+from app.policy_catalog_howto_hebrew import HOWTO_HEBREW_ROWS
+from app.policy_catalog_privacy_hebrew import PRIVACY_HEBREW_ROWS
+from app.policy_catalog_agreement_hebrew import AGREEMENT_HEBREW_ROWS
+from app.policy_catalog_howto_swahili import HOWTO_SWAHILI_ROWS
+from app.policy_catalog_privacy_swahili import PRIVACY_SWAHILI_ROWS
+from app.policy_catalog_agreement_swahili import AGREEMENT_SWAHILI_ROWS
+from app.policy_catalog_agreement_amharic import AGREEMENT_AMHARIC_ROWS
+from app.policy_catalog_howto_amharic import HOWTO_AMHARIC_ROWS
+from app.policy_catalog_privacy_amharic import PRIVACY_AMHARIC_ROWS
+from app.policy_catalog_howto_chinese import HOWTO_CHINESE_ROWS
+from app.policy_catalog_privacy_chinese import PRIVACY_CHINESE_ROWS
+from app.policy_catalog_agreement_chinese import AGREEMENT_CHINESE_ROWS
 
 POLICY_DOCUMENT_KEYS: tuple[str, ...] = (
     "howto",
@@ -268,6 +283,21 @@ for _keys, _rows in (
     (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_ARABIC_ROWS),
     (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_ARABIC_ROWS),
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_ARABIC_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_PERSIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_PERSIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_PERSIAN_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_HEBREW_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_HEBREW_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_HEBREW_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_SWAHILI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_SWAHILI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_SWAHILI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_AMHARIC_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_AMHARIC_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_AMHARIC_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_CHINESE_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_CHINESE_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_CHINESE_ROWS),
     (POLICY_CHROME_KEYS, POLICY_CHROME_ROWS),
 ):
     for _locale, _entries in validate_rows(_keys, _rows).items():
