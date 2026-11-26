@@ -92,6 +92,12 @@ from app.policy_catalog_privacy_amharic import PRIVACY_AMHARIC_ROWS
 from app.policy_catalog_howto_chinese import HOWTO_CHINESE_ROWS
 from app.policy_catalog_privacy_chinese import PRIVACY_CHINESE_ROWS
 from app.policy_catalog_agreement_chinese import AGREEMENT_CHINESE_ROWS
+from app.policy_catalog_howto_bengali import HOWTO_BENGALI_ROWS
+from app.policy_catalog_privacy_bengali import PRIVACY_BENGALI_ROWS
+from app.policy_catalog_agreement_bengali import AGREEMENT_BENGALI_ROWS
+from app.policy_catalog_howto_gujarati import HOWTO_GUJARATI_ROWS
+from app.policy_catalog_privacy_gujarati import PRIVACY_GUJARATI_ROWS
+from app.policy_catalog_agreement_gujarati import AGREEMENT_GUJARATI_ROWS
 
 POLICY_DOCUMENT_KEYS: tuple[str, ...] = (
     "howto",
@@ -298,6 +304,12 @@ for _keys, _rows in (
     (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_CHINESE_ROWS),
     (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_CHINESE_ROWS),
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_CHINESE_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_BENGALI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_BENGALI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_BENGALI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_GUJARATI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_GUJARATI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_GUJARATI_ROWS),
     (POLICY_CHROME_KEYS, POLICY_CHROME_ROWS),
 ):
     for _locale, _entries in validate_rows(_keys, _rows).items():
