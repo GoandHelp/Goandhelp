@@ -20,20 +20,18 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
 - Privacy: all 41 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
   Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
-  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati and Japanese (the shared
+  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese and Kannada (the shared
   date is already included in Credits).
-- User
 - User agreement: all 51 fields in French, German, Spanish, Italian, Dutch,
   Swedish, Danish, Finnish, Czech, Polish, Portuguese, Hungarian, Romanian,
   Greek, Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic,
-  Persian, Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati and Japanese (the
+  Persian, Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese and Kannada (the
   date is already included in Credits).
 - Handbook: all 85 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
   Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
-  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati and Japanese, including the
-  entire merged
-  safety notice and every safety section (the shared date is already included in
+  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese and Kannada,
+  including the entire merged safety notice and every safety section (the shared date is already included in
   Credits).
 - Spanish batch: `app/policy_catalog_howto_spanish.py` (85),
   `app/policy_catalog_privacy_spanish.py` (41) and
@@ -238,20 +236,30 @@ was repaired without changing native Czech data.
   Japanese fields in polite です/ます prose, including all merged safety content.
   The exact Credits date `2024年6月1日更新・発効` is reused, the five existing
   titles/headings are kept exactly, and plan labels are 月間乗車券 and 年間パス.
-  The batch adds 174 distinct authored sources and is expected to close all 169
-  Japanese gaps; the Credits catalog and its `謝辞` title are unchanged. Expected
-  checkpoint: **5,524 authored, 5,564 effective and 1,352 missing**, with 30
-  complete locales. Its focused checks are pending.
+  The batch adds 174 distinct authored sources and closes all 169 Japanese gaps;
+  the Credits catalog and its `謝辞` title are unchanged. Its four focused checks
+  passed with **5,524 authored, 5,564 effective and 1,352 missing**, and 30
+  locales complete.
+- Kannada batch: `app/policy_catalog_howto_kannada.py` (85),
+  `app/policy_catalog_privacy_kannada.py` (41) and
+  `app/policy_catalog_agreement_kannada.py` (51) add 177 full literal polite
+  Kannada fields, including every merged safety section. The exact shared Credits
+  date is reused; plan labels are `ಮಾಸಿಕ ಟಿಕೆಟ್` and `ವಾರ್ಷಿಕ ಪಾಸ್`. The batch
+  contributes 174 new authored sources and is expected to close all 169 Kannada
+  gaps without changing the eight Credits entries. Focused tests are pending;
+  expected totals are **5,698 authored, 5,733 effective and 1,183 missing**, with
+  31 complete locales.
 
 Verified checkpoints: Chinese **5,002 / 5,057 / 1,859** (27 complete locales),
-Bengali **5,176 / 5,226 / 1,690** (28) and Gujarati **5,350 / 5,395 / 1,521**
-(29) authored / effective / missing pairs. Japanese is expected to reach
-**5,524 / 5,564 / 1,352** (30), pending its focused checks. Progress guards do
-not require other locales to remain incomplete; reader chrome is excluded. The
-Dutch title `Credits` is a documented natural-language coincidence, not a
-paragraph fallback. Native effective Credits titles are preserved separately
-from authored titles. Coverage remains partial for the 39-language deliverable;
-wider interface gaps are outside this batch.
+Bengali **5,176 / 5,226 / 1,690** (28), Gujarati **5,350 / 5,395 / 1,521**
+(29) and Japanese **5,524 / 5,564 / 1,352** (30) authored / effective / missing
+pairs. Kannada is implemented and expected to reach **5,698 / 5,733 / 1,183**
+(31); its focused checks are pending. Progress guards do not require other
+locales to remain incomplete; reader chrome is excluded. The Dutch title
+`Credits` is a documented natural-language coincidence, not a paragraph fallback.
+Native effective Credits titles are preserved separately from authored titles.
+Coverage remains partial for the 39-language deliverable; wider interface gaps
+are outside this batch.
 
 ## Checks
 
