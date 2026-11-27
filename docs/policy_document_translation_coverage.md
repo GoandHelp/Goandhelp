@@ -20,17 +20,17 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
 - Privacy: all 41 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
   Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
-  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese and Kannada (the shared
+  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese, Kannada, Korean and Malayalam (the shared
   date is already included in Credits).
 - User agreement: all 51 fields in French, German, Spanish, Italian, Dutch,
   Swedish, Danish, Finnish, Czech, Polish, Portuguese, Hungarian, Romanian,
   Greek, Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic,
-  Persian, Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese and Kannada (the
+  Persian, Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese, Kannada, Korean and Malayalam (the
   date is already included in Credits).
 - Handbook: all 85 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
   Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
-  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese and Kannada,
+  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese, Kannada, Korean and Malayalam,
   including the entire merged safety notice and every safety section (the shared date is already included in
   Credits).
 - Spanish batch: `app/policy_catalog_howto_spanish.py` (85),
@@ -245,21 +245,42 @@ was repaired without changing native Czech data.
   `app/policy_catalog_agreement_kannada.py` (51) add 177 full literal polite
   Kannada fields, including every merged safety section. The exact shared Credits
   date is reused; plan labels are `ಮಾಸಿಕ ಟಿಕೆಟ್` and `ವಾರ್ಷಿಕ ಪಾಸ್`. The batch
-  contributes 174 new authored sources and is expected to close all 169 Kannada
-  gaps without changing the eight Credits entries. Focused tests are pending;
-  expected totals are **5,698 authored, 5,733 effective and 1,183 missing**, with
-  31 complete locales.
+  contributes 174 new authored sources and closes all 169 Kannada gaps without
+  changing the eight Credits entries. Its four focused checks passed at **5,698
+  authored, 5,733 effective and 1,183 missing**, with 31 complete locales.
+- Korean batch: `app/policy_catalog_howto_korean.py` (85),
+  `app/policy_catalog_privacy_korean.py` (41) and
+  `app/policy_catalog_agreement_korean.py` (51) add 177 full literal polite Korean
+  fields, including all 51 merged safety fields. The shared date is exactly
+  `2024년 6월 1일 업데이트 및 발효`; plan labels are `월간 승차권` and `연간 패스`.
+  The authored Credits title remains `감사의 글`, while the established effective
+  title remains `기여자 안내`; the other seven Credits entries are unchanged.
+  Its four checks are verified passed at **5,872 authored, 5,902 effective and
+  1,014 missing**. Two fixture-only repairs corrected the numeric form in a
+  three-position assertion and made the missing-coverage ceiling progress-safe;
+  Korean translation data was unchanged.
+- Malayalam batch: `app/policy_catalog_howto_malayalam.py` (85),
+  `app/policy_catalog_privacy_malayalam.py` (41) and
+  `app/policy_catalog_agreement_malayalam.py` (51) add 177 full literal polite
+  Malayalam fields, including the complete merged safety notice and all 51 safety
+  fields. The shared date is `1 ജൂൺ 2024ന് പുതുക്കിയതും പ്രാബല്യത്തിൽ വന്നതും`;
+  plan labels are `മാസ ടിക്കറ്റ്` and `വാർഷിക പാസ്`. The authored Credits title
+  remains `കടപ്പാടുകൾ`; only the established effective Credits title is
+  `നന്ദി രേഖപ്പെടുത്തൽ`, with the other seven Credits entries unchanged. Expected
+  progress is **6,046 authored, 6,071 effective and 845 missing**; Malayalam is
+  complete, while its four focused checks are pending.
 
 Verified checkpoints: Chinese **5,002 / 5,057 / 1,859** (27 complete locales),
 Bengali **5,176 / 5,226 / 1,690** (28), Gujarati **5,350 / 5,395 / 1,521**
-(29) and Japanese **5,524 / 5,564 / 1,352** (30) authored / effective / missing
-pairs. Kannada is implemented and expected to reach **5,698 / 5,733 / 1,183**
-(31); its focused checks are pending. Progress guards do not require other
-locales to remain incomplete; reader chrome is excluded. The Dutch title
-`Credits` is a documented natural-language coincidence, not a paragraph fallback.
-Native effective Credits titles are preserved separately from authored titles.
-Coverage remains partial for the 39-language deliverable; wider interface gaps
-are outside this batch.
+(29), Japanese **5,524 / 5,564 / 1,352** (30), Kannada **5,698 / 5,733 /
+1,183** (31) and Korean **5,872 / 5,902 / 1,014** (32) authored / effective /
+missing pairs. Malayalam is implemented with expected totals of **6,046 / 6,071 /
+845** (33); its focused checks are pending. Progress guards do not require other
+locales to remain incomplete; reader chrome is excluded. The Dutch title `Credits`
+is a documented natural-language coincidence, not a paragraph fallback. Native
+effective Credits titles are preserved separately from authored titles. Coverage
+remains partial for the 39-language deliverable; wider interface gaps are outside
+this batch.
 
 ## Checks
 
@@ -514,8 +535,35 @@ eight-field Japanese Credits; all merged safety fields and complete source-bound
 clauses for location modes, age, emergency numbers, monthly and annual renewal,
 cancellation, local refunds, the higher-of 12-month fees or 50 USD cap,
 non-excludable liability and local consumer law; progress-safe totals; and the
-frozen English checksum. These checks are pending; expected totals are 5,524
-authored, 5,564 effective and 1,352 missing.
+frozen English checksum. All four checks passed at **5,524 authored, 5,564
+effective and 1,352 missing**.
+
+`app/test_policy_kannada_translation.py` supplies four checks for the literal
+85/41/51-field rows, complete Kannada coverage, the frozen Credits and English
+sources, all merged safety fields, source-bound privacy and legal safeguards, and
+progress-safe totals. All four checks are verified passed at **5,698 authored,
+5,733 effective and 1,183 missing**; Kannada is complete.
+
+`app/test_policy_korean_translation.py` supplies four checks for pure literal
+85/41/51-field Korean rows, native Hangul without English prose, placeholders,
+proper names, ASCII numerals and character-based anti-summary bounds; all 182
+Korean authored/effective sources, frozen Credits and the Credits-only effective
+title override; all merged safety fields and source-bound location, age, emergency,
+renewal, cancellation, refund, liability and local-consumer-law safeguards; and
+progress-safe totals plus the frozen English source checksum. All four checks
+passed at **5,872 authored, 5,902 effective and 1,014 missing**. Two fixture-only
+repairs changed no Korean translation data.
+
+`app/test_policy_malayalam_translation.py` adds four focused checks for pure
+literal 85/41/51-field Malayalam rows, native-script prose, placeholders, proper
+names, ASCII numerals and long-field anti-summary bounds; all 182 authored and
+effective sources with frozen Credits and its title-only effective override; all
+51 merged safety fields and source-bound privacy, emergency, age, renewal,
+cancellation, refund, maximum-liability and local-consumer-law clauses; progress-
+safe totals; and the frozen canonical English checksum. Expected progress is
+**6,046 authored, 6,071 effective and 845 missing**; the four focused checks are
+pending. This bounded batch does not replace or waive the unchanged strict
+all-38/all-182 release gate.
 
 The original strict all-38/all-182 release gate is unchanged. No human
 linguistic/legal review or legal certification is claimed.
