@@ -20,17 +20,19 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
 - Privacy: all 41 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
   Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
-  Hebrew, Swahili, Amharic, Chinese, Bengali and Gujarati (the shared date is already
-  included in Credits).
+  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati and Japanese (the shared
+  date is already included in Credits).
+- User
 - User agreement: all 51 fields in French, German, Spanish, Italian, Dutch,
   Swedish, Danish, Finnish, Czech, Polish, Portuguese, Hungarian, Romanian,
   Greek, Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic,
-  Persian, Hebrew, Swahili, Amharic, Chinese, Bengali and Gujarati (the date is already
-  included in Credits).
+  Persian, Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati and Japanese (the
+  date is already included in Credits).
 - Handbook: all 85 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
   Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
-  Hebrew, Swahili, Amharic, Chinese, Bengali and Gujarati, including the entire merged
+  Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati and Japanese, including the
+  entire merged
   safety notice and every safety section (the shared date is already included in
   Credits).
 - Spanish batch: `app/policy_catalog_howto_spanish.py` (85),
@@ -226,26 +228,30 @@ was repaired without changing native Czech data.
   Gujarati translations in a polite register, including all merged safety
   content. They reuse the exact Gujarati Credits date, add 174 distinct authored
   sources and close all 169 Gujarati effective gaps. The Credits catalog and its
-  existing effective title are unchanged. Focused checks are pending; expected
-  checkpoint totals are **5,350 authored, 5,395 effective and 1,521 missing**,
-  with 29 complete locales. Overall coverage remains partial for the 39-language
-  deliverable.
+  existing effective title are unchanged. Its four focused checks are
+  **verified passed** at **5,350 authored, 5,395 effective and 1,521 missing**,
+  with 29 complete locales. One fixture-only correction restored the complete
+  non-excludable-liability phrase; Gujarati translation data was unchanged.
+- Japanese batch: `app/policy_catalog_howto_japanese.py` (85),
+  `app/policy_catalog_privacy_japanese.py` (41) and
+  `app/policy_catalog_agreement_japanese.py` (51) implement 177 full literal
+  Japanese fields in polite です/ます prose, including all merged safety content.
+  The exact Credits date `2024年6月1日更新・発効` is reused, the five existing
+  titles/headings are kept exactly, and plan labels are 月間乗車券 and 年間パス.
+  The batch adds 174 distinct authored sources and is expected to close all 169
+  Japanese gaps; the Credits catalog and its `謝辞` title are unchanged. Expected
+  checkpoint: **5,524 authored, 5,564 effective and 1,352 missing**, with 30
+  complete locales. Its focused checks are pending.
 
-Chinese's four focused checks verified **5,002 authored, 5,057 effective and
-1,859 missing** pairs, with 27 complete locales. Bengali's four focused checks
-verified **5,176 authored, 5,226 effective and 1,690 missing** pairs, with 28
-complete locales. The Gujarati checkpoint is expected to reach **5,350 authored,
-5,395 effective and 1,521 missing** pairs, with 29 complete locales; its focused
-checks remain pending. Progress guards do not require other locales to remain
-incomplete; reader chrome is excluded. The Dutch title `Credits` is a documented
-natural-language coincidence, not a paragraph fallback. Native effective Credits
-titles are preserved separately from authored titles. Wider interface gaps are
-outside this batch.
-Progress guards do not require other locales to remain incomplete; reader chrome
-is excluded. The Dutch title `Credits` is a documented natural-language
-coincidence, not a paragraph fallback. Native effective Credits titles are
-preserved separately from authored titles. Coverage remains partial for the
-39-language deliverable; wider interface gaps are outside this batch.
+Verified checkpoints: Chinese **5,002 / 5,057 / 1,859** (27 complete locales),
+Bengali **5,176 / 5,226 / 1,690** (28) and Gujarati **5,350 / 5,395 / 1,521**
+(29) authored / effective / missing pairs. Japanese is expected to reach
+**5,524 / 5,564 / 1,352** (30), pending its focused checks. Progress guards do
+not require other locales to remain incomplete; reader chrome is excluded. The
+Dutch title `Credits` is a documented natural-language coincidence, not a
+paragraph fallback. Native effective Credits titles are preserved separately
+from authored titles. Coverage remains partial for the 39-language deliverable;
+wider interface gaps are outside this batch.
 
 ## Checks
 
@@ -488,8 +494,20 @@ source-reference fixture fixes changed no Bengali translation data.
 85/41/51-field Gujarati-only rows, complete natural Gujarati fields, coverage of
 all 182 sources, the frozen Credits and English catalogs, all merged safety
 fields, source-bound location and legal safeguards, and progress-safe totals.
-These checks remain pending; the expected totals are 5,350 authored, 5,395
-effective and 1,521 missing.
+All four checks passed at **5,350 authored, 5,395 effective and 1,521
+missing**; one fixture-only phrase correction changed no Gujarati data.
+
+`app/test_policy_japanese_translation.py` adds four focused checks for literal
+85/41/51-field Japanese-only rows, kana/kanji-native fields without English
+prose (proper names and Cookie/IP/PIN excepted), placeholders, numerals and a
+character-based anti-summary bound without whitespace word ratios; all 182
+authored/effective sources with the frozen Credits checksum and unchanged
+eight-field Japanese Credits; all merged safety fields and complete source-bound
+clauses for location modes, age, emergency numbers, monthly and annual renewal,
+cancellation, local refunds, the higher-of 12-month fees or 50 USD cap,
+non-excludable liability and local consumer law; progress-safe totals; and the
+frozen English checksum. These checks are pending; expected totals are 5,524
+authored, 5,564 effective and 1,352 missing.
 
 The original strict all-38/all-182 release gate is unchanged. No human
 linguistic/legal review or legal certification is claimed.
