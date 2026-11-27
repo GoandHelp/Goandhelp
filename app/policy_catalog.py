@@ -110,6 +110,9 @@ from app.policy_catalog_agreement_korean import AGREEMENT_KOREAN_ROWS
 from app.policy_catalog_howto_malayalam import HOWTO_MALAYALAM_ROWS
 from app.policy_catalog_privacy_malayalam import PRIVACY_MALAYALAM_ROWS
 from app.policy_catalog_agreement_malayalam import AGREEMENT_MALAYALAM_ROWS
+from app.policy_catalog_howto_marathi import HOWTO_MARATHI_ROWS
+from app.policy_catalog_privacy_marathi import PRIVACY_MARATHI_ROWS
+from app.policy_catalog_agreement_marathi import AGREEMENT_MARATHI_ROWS
 
 POLICY_DOCUMENT_KEYS: tuple[str, ...] = (
     "howto",
@@ -334,6 +337,9 @@ for _keys, _rows in (
     (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_MALAYALAM_ROWS),
     (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_MALAYALAM_ROWS),
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_MALAYALAM_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_MARATHI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_MARATHI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_MARATHI_ROWS),
     (POLICY_CHROME_KEYS, POLICY_CHROME_ROWS),
 ):
     for _locale, _entries in validate_rows(_keys, _rows).items():
