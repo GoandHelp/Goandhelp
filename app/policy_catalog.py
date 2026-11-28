@@ -113,6 +113,9 @@ from app.policy_catalog_agreement_malayalam import AGREEMENT_MALAYALAM_ROWS
 from app.policy_catalog_howto_marathi import HOWTO_MARATHI_ROWS
 from app.policy_catalog_privacy_marathi import PRIVACY_MARATHI_ROWS
 from app.policy_catalog_agreement_marathi import AGREEMENT_MARATHI_ROWS
+from app.policy_catalog_howto_burmese import HOWTO_BURMESE_ROWS
+from app.policy_catalog_privacy_burmese import PRIVACY_BURMESE_ROWS
+from app.policy_catalog_agreement_burmese import AGREEMENT_BURMESE_ROWS
 
 POLICY_DOCUMENT_KEYS: tuple[str, ...] = (
     "howto",
@@ -186,6 +189,9 @@ SOURCE_KEYS: tuple[str, ...] = tuple(
     )
 )
 SOURCE_COINCIDENCES: frozenset[tuple[str, str]] = frozenset({("nl", "Credits")})
+ATTRIBUTION_COINCIDENCES: frozenset[tuple[str, str]] = frozenset(
+    {("my", "Go and Help")}
+)
 CREDITS_ROWS: dict[str, tuple[str, ...]] = {}
 for _part in (CREDITS_EUROPEAN_ROWS, CREDITS_ASIAN_ROWS, CREDITS_GLOBAL_ROWS):
     if set(CREDITS_ROWS) & set(_part):
@@ -229,7 +235,11 @@ def validate_rows(
                 "ODbL",
                 "©",
             ):
-                if name in source and name not in value:
+                if (
+                    name in source
+                    and name not in value
+                    and (locale, name) not in ATTRIBUTION_COINCIDENCES
+                ):
                     raise ValueError(
                         f"Policy attribution missing {name}: {locale}"
                     )
@@ -340,6 +350,9 @@ for _keys, _rows in (
     (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_MARATHI_ROWS),
     (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_MARATHI_ROWS),
     (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_MARATHI_ROWS),
+    (DOCUMENT_SOURCE_KEYS["howto"], HOWTO_BURMESE_ROWS),
+    (DOCUMENT_SOURCE_KEYS["privacy"], PRIVACY_BURMESE_ROWS),
+    (DOCUMENT_SOURCE_KEYS["agreement"], AGREEMENT_BURMESE_ROWS),
     (POLICY_CHROME_KEYS, POLICY_CHROME_ROWS),
 ):
     for _locale, _entries in validate_rows(_keys, _rows).items():

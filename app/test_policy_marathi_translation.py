@@ -332,7 +332,7 @@ class MarathiPolicyTranslationTests(unittest.TestCase):
                 agreement,
                 "agreement",
                 "Nothing in this agreement excludes or limits liability",
-                "बंधकारक ग्राहक हक्क यांसाठीची जबाबदारी समाविष्ट आहे.",
+                "बंधनकारक ग्राहक हक्क यांसाठीची जबाबदारी समाविष्ट आहे.",
             ),
             (
                 agreement,

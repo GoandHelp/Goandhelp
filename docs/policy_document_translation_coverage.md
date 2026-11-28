@@ -21,17 +21,17 @@ rules, dependencies, database schema, external APIs or logo assets were changed.
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
   Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
   Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese, Kannada, Korean,
-  Malayalam and Marathi (the shared date is already included in Credits).
+  Malayalam, Marathi and Burmese (the shared date is already included in Credits).
 - User agreement: all 51 fields in French, German, Spanish, Italian, Dutch,
   Swedish, Danish, Finnish, Czech, Polish, Portuguese, Hungarian, Romanian,
   Greek, Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic,
   Persian, Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese, Kannada,
-  Korean, Malayalam and Marathi (the date is already included in Credits).
+  Korean, Malayalam, Marathi and Burmese (the date is already included in Credits).
 - Handbook: all 85 fields in French, German, Spanish, Italian, Portuguese,
   Dutch, Swedish, Danish, Finnish, Czech, Polish, Hungarian, Romanian, Greek,
   Russian, Turkish, Indonesian, Urdu, Vietnamese, Thai, Hindi, Arabic, Persian,
   Hebrew, Swahili, Amharic, Chinese, Bengali, Gujarati, Japanese, Kannada, Korean,
-  Malayalam and Marathi, including the entire merged safety notice and every safety
+  Malayalam, Marathi and Burmese, including the entire merged safety notice and every safety
   section (the shared date is already included in Credits).
 - Spanish batch: `app/policy_catalog_howto_spanish.py` (85),
   `app/policy_catalog_privacy_spanish.py` (41) and
@@ -276,21 +276,36 @@ was repaired without changing native Czech data.
   fields. The shared date reuses the Marathi Credits date; the existing document
   headings are retained, the monthly and annual names are `मासिक तिकीट` and
   `वार्षिक पास`, and generic location/mode controls use Marathi terms. The existing
-  eight Marathi Credits entries and effective `आभार` title are preserved. Expected
-  progress is **6,220 authored, 6,240 effective and 676 missing**. Four focused
-  Marathi checks are supplied but pending; no linguistic or legal review is claimed.
+  eight Marathi Credits entries and effective `आभार` title are preserved. Four
+  focused checks are verified passed at **6,220 authored, 6,240 effective and 676
+  missing**. One fixture-only spelling repair changed no Marathi translation data.
+- Burmese batch: `app/policy_catalog_howto_burmese.py` (85),
+  `app/policy_catalog_privacy_burmese.py` (41) and
+  `app/policy_catalog_agreement_burmese.py` (51) provide 177 literal full-field
+  Burmese translations, including the entire merged safety notice and all 51
+  safety fields. They share the existing Burmese Credits date, retain the five
+  existing document headings, and use native Burmese for generic controls and
+  location modes. Burmese plan names use `လစဉ်လက်မှတ်` and `နှစ်စဉ်အသင်းဝင်ခွင့်`.
+  The original eight Burmese Credits entries remain unchanged, with only the
+  established effective Credits-title override. Expected progress is **6,394
+  authored, 6,409 effective and 507 missing**; the Burmese focused checks are
+  pending. Coverage remains partial, and no human linguistic or legal review is
+  claimed.
 
 Verified checkpoints: Chinese **5,002 / 5,057 / 1,859** (27 complete locales),
 Bengali **5,176 / 5,226 / 1,690** (28), Gujarati **5,350 / 5,395 / 1,521**
 (29), Japanese **5,524 / 5,564 / 1,352** (30), Kannada **5,698 / 5,733 /
-1,183** (31), Korean **5,872 / 5,902 / 1,014** (32), and Malayalam **6,046 /
-6,071 / 845** (33) authored / effective / missing pairs. Marathi is implemented
-with expected totals of **6,220 / 6,240 / 676** (34); its focused checks are
-pending. Progress guards do not require other locales to remain incomplete; reader
-chrome is excluded. The Dutch title `Credits` is a documented natural-language
-coincidence, not a paragraph fallback. Native effective Credits titles are
-preserved separately from authored titles. Coverage remains partial for the
-39-language deliverable; wider interface gaps are outside this batch.
+1,183** (31), Korean **5,872 / 5,902 / 1,014** (32), Malayalam **6,046 /
+6,071 / 845** (33), and Marathi **6,220 / 6,240 / 676** (34) authored /
+effective / missing pairs. The Marathi checks passed; a fixture-only spelling
+repair changed no Marathi translation data. Burmese is implemented with expected
+totals of **6,394 / 6,409 / 507** (35); its checks are pending, so these are
+expected rather than runtime-verified figures. Progress guards do not require
+other locales to remain incomplete; reader chrome is excluded. The Dutch title
+`Credits` is a documented natural-language coincidence, not a paragraph fallback.
+Native effective Credits titles are preserved separately from authored titles.
+Coverage remains partial for the 39-language deliverable; wider interface gaps
+are outside this batch.
 
 ## Checks
 
@@ -582,10 +597,22 @@ names, ASCII numerals and long-paragraph anti-summary bounds; all 182 authored a
 effective sources with the frozen eight-field Credits row; all 51 merged safety
 fields and source-bound location, age, emergency, renewal, cancellation, refund,
 maximum-liability and local-consumer-law clauses; progress-safe totals; and the
-frozen canonical English checksum. Expected progress is **6,220 authored, 6,240
-effective and 676 missing**; these checks are pending and the figures are expected,
-not runtime-verified. This bounded batch does not replace or waive the unchanged
+frozen canonical English checksum. Its checks passed at **6,220 authored, 6,240
+effective and 676 missing**. One fixture-only spelling repair changed no Marathi
+translation data. This bounded batch does not replace or waive the unchanged
 strict all-38/all-182 release gate.
+
+`app/test_policy_burmese_translation.py` supplies four focused checks for pure
+literal 85/41/51-field Burmese-only rows, Myanmar-script text, exact placeholders,
+proper names, ASCII numerals and character-length anti-summary bounds without
+space-delimited word ratios; all 182 authored/effective sources; original and
+effective Credits preservation with the frozen Credits checksum; all merged
+safety fields and source-bound privacy, location-mode, age, emergency, renewal,
+cancellation, refund, liability and local-consumer-law clauses; progress-safe
+totals; and the frozen canonical English checksum. Expected progress is **6,394
+authored, 6,409 effective and 507 missing**. These new checks are pending; totals
+are expected, not runtime-verified. This bounded batch does not replace or waive
+the unchanged strict all-38/all-182 release gate.
 
 The original strict all-38/all-182 release gate is unchanged. No human
 linguistic/legal review or legal certification is claimed.
